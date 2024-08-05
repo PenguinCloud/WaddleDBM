@@ -42,3 +42,21 @@ General: info@penguintech.group
 Documentation: ./docs/
 Premium Support: https://support.penguintech.group 
 Community Bugs / Issues: -/issues
+
+# How to setup for testing
+
+To setup and run this module for testing puproses in web2py, do the following:
+
+1. Ensure that you have web2py downloaded somewhere on your system. Source files of web2py can be found at http://www.web2py.com/init/default/download
+
+2. Navigate to the "applications" folder of web2py, found in its root directory.
+
+3. Copy the top level folder of this project (in this case its "WaddleDBM") into the "applications" folder.
+
+4. In the root folder of web2py, run web2py.exe
+
+5. In the next prompt that appears, leave the settings as is and provide a root password to web2py.
+
+6. Click on "start server"
+
+7. Web2py should be running now. To view that the application is setup correctly, navigate to: http://127.0.0.1:8000/WaddleDBM/default/index
