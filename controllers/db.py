@@ -13,7 +13,7 @@ def insert_table_into_config(table_name, columns):
     if not table_name or not columns:
         return dict(msg="Please provide a table_name and columns.")
 
-    filePath = "applications/waddlebot_db_manager/models/external_tables.json"
+    filePath = "applications/WaddleDBM/models/external_tables.json"
     tableList = []
 
     # Check if the configuration file exists.
@@ -48,7 +48,7 @@ def insert_table_into_config(table_name, columns):
 def define_tables_from_config():
     print("Defining tables from the configuration file.")
 
-    filePath = "applications/waddlebot_db_manager/models/external_tables.json"
+    filePath = "applications/WaddleDBM/models/external_tables.json"
     tableList = []
 
     # Check if the configuration file exists.
