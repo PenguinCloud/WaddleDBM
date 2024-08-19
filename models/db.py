@@ -241,7 +241,9 @@ db.define_table('gateway_types',
 db.define_table('routing_gateways',
                 Field('gateway_server', db.gateway_servers),
                 Field('channel_id', 'string'),
-                Field('gateway_type', db.gateway_types))
+                Field('gateway_type', db.gateway_types),
+                Field('activation_key', 'string'),
+                Field('is_active', 'boolean', default=False))
 
 
 # After defining the tables, create the "Global" community, if it does not exist

@@ -20,7 +20,7 @@ def create_gateway():
     if not payload:
         return dict(msg="No payload given.", status=400)
     payload = json.loads(payload)
-    if 'gateway_type_name' not in payload or 'gateway_server_name' not in payload or 'channel_id' not in payload:
+    if 'gateway_type_name' not in payload or 'gateway_server_name' not in payload or 'channel_id' not in payload or 'activation_key' not in payload:
         return dict(msg="Payload missing required fields.", status=400)
     # Check if the gateway_server exists in the gateway_servers table
     gateway_server = db(db.gateway_servers.name == payload['gateway_server_name']).select().first()
@@ -35,12 +35,26 @@ def create_gateway():
         return dict(msg="Routing gateway already exists.", status=409)
     
 
-    db.routing_gateways.insert(gateway_type=gateway_type.id, gateway_server=gateway_server.id, channel_id=payload['channel_id'])
+    db.routing_gateways.insert(gateway_type=gateway_type.id, gateway_server=gateway_server.id, channel_id=payload['channel_id'], activation_key=payload['activation_key'], is_active=False)
 
     # Get the gateway type name
     route_type = db(db.gateway_types.id == gateway_type.id).select().first()
 
     return dict(msg="Routing gateway created.", status=201, route_type=route_type.type_name)
+
+# This function activates a routing gateway by a given activation key. If the routing gateway does not exist, return an error.
+def activate_gateway():
+    payload = request.body.read()
+    if not payload:
+        return dict(msg="No payload given.", status=400)
+    payload = json.loads(payload)
+    if 'activation_key' not in payload:
+        return dict(msg="Payload missing required fields.", status=400)
+    routing_gateway = db(db.routing_gateways.activation_key == payload['activation_key']).select().first()
+    if not routing_gateway:
+        return dict(msg="Routing gateway not found.", status=404)
+    routing_gateway.update_record(is_active=True)
+    return dict(msg="Routing gateway activated.", status=200)
 
 # Get all routing gateways in the database and displaye the actual names of the gateway type and gateway_server, instead of their IDs.
 def get_all():
@@ -53,13 +67,15 @@ def get_all():
             data.append(dict(
                 gateway_type=decode_name(gateway_type.type_name),
                 gateway_server=decode_name(gateway_server.name),
-                channel_id=routing_gateway.channel_id
+                channel_id=routing_gateway.channel_id,
+                is_active=routing_gateway.is_active
             ))
         else:
             data.append(dict(
                 gateway_type=decode_name(gateway_type.type_name),
                 gateway_server="Gateway Server not found",
-                channel_id=routing_gateway.channel_id
+                channel_id=routing_gateway.channel_id,
+                is_active=routing_gateway.is_active
             ))
     return dict(data=data)
 
