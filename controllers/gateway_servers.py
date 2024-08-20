@@ -63,6 +63,7 @@ def get_by_name():
 # Update a gateway server by its name. If the gateway server does not exist, return an error.
 def update_by_name():
     name = request.args(0)
+    
     if not name:
         return dict(msg="No gateway server name given.", status=400)
     gateway_server = db(db.gateway_servers.name == name).select().first()
@@ -72,17 +73,26 @@ def update_by_name():
     if not payload:
         return dict(msg="No payload given.", status=400)
     payload = json.loads(payload)
-    if 'server_type_name' not in payload or 'server_nick' not in payload or 'server_id' not in payload:
-        return dict(msg="Payload missing required fields.", status=400)
+    # if 'server_type_name' not in payload or 'server_nick' not in payload or 'server_id' not in payload:
+    #     return dict(msg="Payload missing required fields.", status=400)
     # Check if the server type exists in the gateway_server_types table
-    server_type = db(db.gateway_server_types.type_name == payload['server_type_name']).select().first()
-    if not server_type:
-        return dict(msg="Server type does not exist.", status=404)
-    # Check if a record exists that matches the given payload exactly
-    if db((db.gateway_servers.name == payload['name']) & (db.gateway_servers.server_type == server_type.id)).count() > 0:
-        return dict(msg="Gateway server already exists.", status=409)
+
+    if 'server_type_name' in payload:
+        server_type = db(db.gateway_server_types.type_name == payload['server_type_name']).select().first()
+        if not server_type:
+            return dict(msg="Server type does not exist.", status=404)
+        gateway_server.server_type = server_type.id
+
+    if 'server_nick' in payload:
+        gateway_server.server_nick = payload['server_nick']
     
-    gateway_server.update_record(server_type=server_type.id, server_nick=payload['server_nick'], server_id=payload['server_id'])
+    if 'server_id' in payload:
+        gateway_server.server_id = payload['server_id']
+    
+    if 'protocol' in payload:
+        gateway_server.protocol = payload['protocol']
+    
+    gateway_server.update_record()
 
     return dict(msg="Gateway server updated.", status=200)
 

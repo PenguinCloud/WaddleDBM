@@ -211,14 +211,15 @@ db.define_table('gateway_servers',
                 Field('name', 'string'),
                 Field('server_id', 'string'),
                 Field('server_nick', 'string'),
-                Field('server_type', db.gateway_server_types))
+                Field('server_type', db.gateway_server_types),
+                Field('protocol', 'string'))
 
 
 # Define a table that maps specific gateways to a community through an ID
 db.define_table('routing', 
                 Field('channel', 'string'),
                 Field('community_id', db.communities),
-                Field('gateways', 'list:string'),
+                Field('routing_gateway_ids', 'list:integer'),
                 Field('aliases', 'list:string'))
 
 
@@ -244,6 +245,16 @@ db.define_table('routing_gateways',
                 Field('gateway_type', db.gateway_types),
                 Field('activation_key', 'string'),
                 Field('is_active', 'boolean', default=False))
+
+# Define a table that stores calendar events, per community
+db.define_table('calendar',
+                Field('community_id', db.communities),
+                Field('event_name', 'string'),
+                Field('event_description', 'string'),
+                Field('event_start', 'datetime'),
+                Field('event_end', 'datetime'),
+                Field('not_start_sent', 'boolean', default=False),
+                Field('not_end_sent', 'boolean', default=False))
 
 
 # After defining the tables, create the "Global" community, if it does not exist

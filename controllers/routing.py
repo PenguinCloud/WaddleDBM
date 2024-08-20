@@ -14,6 +14,25 @@ def decode_name(name):
 
     return name
 
+# Function to return a routing_gateway by a given channel_id and account. If it doesnt exist, return null.
+def get_routing_gateway(channel_id, account):
+    # First, split the account into the protocol and the server name by splitting the account string by the first dot.
+    account_split = account.split(".", 1)
+    if len(account_split) != 2:
+        return None
+    
+    protocol = account_split[0]
+    server_name = account_split[1]
+
+    gateway_server = db((db.gateway_servers.protocol == protocol) & (db.gateway_servers.name == server_name)).select().first()
+
+    if not gateway_server:
+        return None
+    
+    routing_gateway = db((db.routing_gateways.channel_id == channel_id) & (db.routing_gateways.gateway_server == gateway_server.id)).select().first()
+
+    return routing_gateway
+
 #Function to replace the first character of a string with a hash if it is an underscore.
 def replace_first_char(name):
     if name[0] == "_":
@@ -100,10 +119,14 @@ def get_by_community_name():
     routings = db(db.routing.community_id == community.id).select()
     return dict(data=routings)
 
+
+
 # Add a routing gateway to a community's list of gateways, if it doesnt exist, by their community name. If the community or 
 # routing does not exist, return an error. The  is passed as an argument. The community_name is passed as a payload.
 def add_route_to_community():
     channel_id = replace_first_char(request.args(0))
+    account = request.args(1)
+
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
@@ -124,10 +147,6 @@ def add_route_to_community():
     community = db(db.communities.community_name == community_name).select().first()
     if not community:
         return dict(msg="Community does not exist.")
-    # Get the routing gateway bu the channel_id from the routing_gateways table.
-    routing_gateway = db(db.routing_gateways.channel_id == channel_id).select().first()
-    if not routing_gateway:
-        return dict(msg="Routing gateway does not exist. Please create it first via !gateway add [platform] [channel_name]")
 
     # Get the routing record from the routing table by the community_id. If it doesnt exist, create it.
     routing = db(db.routing.community_id == community.id).select().first()
@@ -135,14 +154,22 @@ def add_route_to_community():
         routing = db.routing.insert(community_id=community.id)
 
     # Add the routing gateway to the routing record. By adding 
-    gateways = routing.gateways
-    if not gateways:
-        gateways = []
+    routing_gateway_ids = routing.routing_gateway_ids
+    if not routing_gateway_ids:
+        routing_gateway_ids = []
 
-    if channel_id in gateways:
+    # Get the routing gateway by the channel_id and account.
+    routing_gateway = get_routing_gateway(channel_id, account)
+
+    # Check if the routing gateway is not null.
+    if not routing_gateway:
+        return dict(msg="Routing gateway does not exist. Please create it first via !gateway add [platform] [channel_name]")
+
+    if routing_gateway.id in routing_gateway_ids:
         return dict(msg="Routing gateway already exists in community.")
-    gateways.append(channel_id)
-    routing.update_record(gateways=gateways)
+    
+    routing_gateway_ids.append(routing_gateway.id)
+    routing.update_record(routing_gateway_ids=routing_gateway_ids)
 
     return dict(msg="Routing added to community.")
 
@@ -150,6 +177,8 @@ def add_route_to_community():
 # routing does not exist, return an error. The channel ID is passed as an argument. The community_name is passed as a payload.
 def remove_route_from_community():
     channel_id = replace_first_char(request.args(0))
+    account = request.args(1)
+
     print(channel_id)
     payload = request.body.read()
     if not payload:
@@ -170,28 +199,27 @@ def remove_route_from_community():
     community = db(db.communities.community_name == community_name).select().first()
     if not community:
         return dict(msg="Community does not exist.")
-    # Get the routing gateway bu the channel_id from the routing_gateways table.
-    routing_gateway = db(db.routing_gateways.channel_id == channel_id).select().first()
-    if not routing_gateway:
-        return dict(msg="Routing gateway does not exist. Please create it first via !gateway add [platform] [channel_name]")
 
     # Get the routing record from the routing table by the community_id. If it doesnt exist, throw an error.
     routing = db(db.routing.community_id == community.id).select().first()
     if not routing:
         return dict(msg="Community does not exist in the routings table.")
 
+    # Get the routing gateway by the channel_id and account.
+    routing_gateway = get_routing_gateway(channel_id, account)
+
     # Remove the routing gateway from the routing record, if it exists.
-    gateways = routing.gateways
-    if not gateways:
+    routing_gateway_ids = routing.routing_gateway_ids
+    if not routing_gateway_ids:
         return dict(msg="No routing gateways in community.")
     
-    print("Gateways for the current community: ", gateways)
-    if channel_id in gateways:
-        gateways.remove(channel_id)
+    print("Gateways for the current community: ", routing_gateway_ids)
+    if routing_gateway.id in routing_gateway_ids:
+        routing_gateway_ids.remove(routing_gateway.id)
     else:
         return dict(msg="Routing gateway does not exist in community.")
     
-    routing.update_record(gateways=gateways)
+    routing.update_record(routing_gateway_ids=routing_gateway_ids)
 
     return dict(msg="Routing removed from community.")
     
