@@ -256,19 +256,55 @@ db.define_table('calendar',
                 Field('not_start_sent', 'boolean', default=False),
                 Field('not_end_sent', 'boolean', default=False))
 
+# Define a table that keeps track of prize statuses
+db.define_table('prize_statuses',
+                Field('status_name', 'string'),
+                Field('description', 'string'))
 
-# After defining the tables, create the "Global" community, if it does not exist
-if db(db.communities.community_name == "Global").count() == 0:
-    db.communities.insert(community_name="Global", community_description="The global community.")
+# Define a table that stores prizes, per community
+db.define_table('prizes',
+                Field('community_id', db.communities),
+                Field('prize_guid', 'string'),
+                Field('prize_name', 'string'),
+                Field('prize_description', 'string'),
+                Field('winner_identity_id', db.identities, default=None),
+                Field('prize_status', db.prize_statuses),
+                Field('timeout', 'integer', default=0))
 
-# After the Global community is created, create a routing entry for the Global community, if it does not exist
-global_community = db(db.communities.community_name == "Global").select().first()
-if db(db.routing.community_id == global_community.id).count() == 0:
-    db.routing.insert(channel="Global", community_id=global_community.id, gateways=[], aliases=[])
+# Define a table that stores all the users that have entered a prize draw
+db.define_table('prize_entries',
+                Field('prize_id', db.prizes),
+                Field('identity_id', db.identities))
 
-# Also create the "member" and "owner" roles, if they do not exist
-if db(db.roles.name == "member").count() == 0:
-    db.roles.insert(name="member", description="A member of a community.", privilages=["read", "write"], requirements=["reputation >= 0"])
+# Initialive the database with some initial data to some tables, if they do not exist
+def initializeDB():
+    # After defining the tables, create the "Global" community, if it does not exist
+    if db(db.communities.community_name == "Global").count() == 0:
+        db.communities.insert(community_name="Global", community_description="The global community.")
 
-if db(db.roles.name == "owner").count() == 0:
-    db.roles.insert(name="owner", description="The owner of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
+    # After the Global community is created, create a routing entry for the Global community, if it does not exist
+    global_community = db(db.communities.community_name == "Global").select().first()
+    if db(db.routing.community_id == global_community.id).count() == 0:
+        db.routing.insert(channel="Global", community_id=global_community.id, gateways=[], aliases=[])
+
+    # Also create the "member", "owner" and "admin" roles, if they do not exist
+    if db(db.roles.name == "member").count() == 0:
+        db.roles.insert(name="member", description="A member of a community.", privilages=["read", "write"], requirements=["reputation >= 0"])
+
+    if db(db.roles.name == "owner").count() == 0:
+        db.roles.insert(name="owner", description="The owner of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
+
+    if db(db.roles.name == "admin").count() == 0:
+        db.roles.insert(name="admin", description="An admin of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
+
+    # Create the prize statuses Open, Claiming, and Closed, if they do not exist
+    if db(db.prize_statuses.status_name == "Open").count() == 0:
+        db.prize_statuses.insert(status_name="Open", description="The prize is open for entries.")
+    
+    if db(db.prize_statuses.status_name == "Claiming").count() == 0:
+        db.prize_statuses.insert(status_name="Claiming", description="The prize is in the claiming phase.")
+    
+    if db(db.prize_statuses.status_name == "Closed").count() == 0:
+        db.prize_statuses.insert(status_name="Closed", description="The prize is closed.")
+
+initializeDB()
