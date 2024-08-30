@@ -256,6 +256,13 @@ db.define_table('calendar',
                 Field('not_start_sent', 'boolean', default=False),
                 Field('not_end_sent', 'boolean', default=False))
 
+# Define a table that stores an admin context session for a community, per identity
+db.define_table('admin_contexts',
+                Field('identity_id', db.identities),
+                Field('community_id', db.communities),
+                Field('session_token', 'string'),
+                Field('session_expires', 'datetime'))
+
 
 # After defining the tables, create the "Global" community, if it does not exist
 if db(db.communities.community_name == "Global").count() == 0:
@@ -266,9 +273,12 @@ global_community = db(db.communities.community_name == "Global").select().first(
 if db(db.routing.community_id == global_community.id).count() == 0:
     db.routing.insert(channel="Global", community_id=global_community.id, gateways=[], aliases=[])
 
-# Also create the "member" and "owner" roles, if they do not exist
+# Also create the "member", "owner" and admin roles, if they do not exist
 if db(db.roles.name == "member").count() == 0:
     db.roles.insert(name="member", description="A member of a community.", privilages=["read", "write"], requirements=["reputation >= 0"])
 
 if db(db.roles.name == "owner").count() == 0:
     db.roles.insert(name="owner", description="The owner of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
+
+if db(db.roles.name == "admin").count() == 0:
+    db.roles.insert(name="admin", description="An admin of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
