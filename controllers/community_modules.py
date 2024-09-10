@@ -176,16 +176,6 @@ def install_by_community_name():
     if not identity_is_admin(payload['identity_name'], community_name):
         return dict(msg="The identity attempting to install this module is not an admin of the community.")
 
-    # # Check if the identity is a member of the community
-    # community_member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
-    # if not community_member:
-    #     return dict(msg="The identity attempting to install this module is not a member of the community.")
-    
-    # # Check if the identity is an admin of the community, using the community member's role_id
-    # role = db(db.roles.id == community_member.role_id).select().first()
-    # if role.name not in ['Admin', 'Owner', 'admin', 'owner']:
-    #     return dict(msg="The identity attempting to install this module is not an admin of the community.")
-
     # Check that the module exists
     module = db(db.marketplace_modules.name == payload['module_name']).select().first()
     if not module:
