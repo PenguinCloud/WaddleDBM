@@ -154,6 +154,23 @@ if configuration.get('scheduler.enabled'):
 # -------------------------------------------------------------------------
 # auth.enable_record_versioning(db)
 
+# -------------------------------------------------------------------------
+# Core Module Tables
+# -------------------------------------------------------------------------
+
+# Define the module types table
+db.define_table('module_types',
+                Field('name', 'string'),
+                Field('description', 'string'))
+
+# Define the marketplace table
+db.define_table('marketplace_modules', 
+                Field('name', 'string'),
+                Field('description', 'string'),
+                Field('gateway_url', 'string'),
+                Field('module_type_id', 'reference module_types'),
+                Field('metadata', 'json'))
+
 # Define the identities table
 db.define_table('identities', 
                 Field('name', 'string'),
@@ -168,7 +185,7 @@ db.define_table('communities',
 
 # Define table for community modules
 db.define_table('community_modules', 
-                Field('module_id', 'integer'),
+                Field('module_id', db.marketplace_modules),
                 Field('community_id', db.communities),
                 Field('enabled', 'boolean', default=True),
                 Field('privilages', 'list:string'))
@@ -255,6 +272,7 @@ db.define_table('calendar',
                 Field('event_end', 'datetime'),
                 Field('not_start_sent', 'boolean', default=False),
                 Field('not_end_sent', 'boolean', default=False))
+
 
 
 # After defining the tables, create the "Global" community, if it does not exist
