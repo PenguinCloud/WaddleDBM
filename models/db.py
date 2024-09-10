@@ -193,6 +193,7 @@ db.define_table('community_modules',
 # Define a table for roles
 db.define_table('roles',
                 Field('name', 'string'),
+                Field('community_id', db.communities),
                 Field('description', 'string'),
                 Field('privilages', 'list:string'),
                 Field('requirements', 'list:string'))
