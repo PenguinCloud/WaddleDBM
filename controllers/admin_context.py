@@ -27,7 +27,7 @@ def create_session():
         return dict(msg="Community not found.")
     
     # Check if the identity exists.
-    identity = db(db.identities.identity_name == payload['identity_name']).select().first()
+    identity = db(db.identities.name == payload['identity_name']).select().first()
     if not identity:
         return dict(msg="Identity not found.")
     
@@ -38,7 +38,7 @@ def create_session():
     
     # Using the role_id from the community member, check if the identity is an admin or owner in the roles table.
     role = db(db.roles.id == community_member.role_id).select().first()
-    if role.role_name not in ['admin', 'owner']:
+    if role.name not in ['Admin', 'Owner']:
         return dict(msg="Identity is not an admin or owner of the community.")
     
     # Set a session expiration time of 1 hour.
@@ -77,7 +77,7 @@ def get_by_community_and_identity():
         return dict(msg="Community not found.")
     
     # Check if the identity exists.
-    identity = db(db.identities.identity_name == payload['identity_name']).select().first()
+    identity = db(db.identities.name == payload['identity_name']).select().first()
     if not identity:
         return dict(msg="Identity not found.")
     
@@ -88,7 +88,7 @@ def get_by_community_and_identity():
     
     # Using the role_id from the community member, check if the identity is an admin or owner in the roles table.
     role = db(db.roles.id == community_member.role_id).select().first()
-    if role.role_name not in ['admin', 'owner']:
+    if role.name not in ['Admin', 'Owner']:
         return dict(msg="Identity is not an admin or owner of the community.")
     
     # Check if the admin context session exists.
@@ -130,7 +130,7 @@ def check_module_in_community():
         return dict(msg="Community not found.", error=True)
     
     # Check if the identity exists.
-    identity = db(db.identities.identity_name == payload['identity_name']).select().first()
+    identity = db(db.identities.name == payload['identity_name']).select().first()
     if not identity:
         return dict(msg="Identity not found.", error=True)
     
@@ -141,7 +141,7 @@ def check_module_in_community():
     
     # Using the role_id from the community member, check if the identity is an admin or owner in the roles table.
     role = db(db.roles.id == community_member.role_id).select().first()
-    if role.role_name not in ['admin', 'owner']:
+    if role.name not in ['Admin', 'Owner']:
         return dict(msg="Identity is not an admin or owner of the community.", error=True)
     
     # Check if the admin context session exists.

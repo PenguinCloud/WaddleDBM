@@ -4,4 +4,7 @@ id_rsa*
 *.key
 venv/
 .idea/
-
+sql.txt
+*.log
+*.log.*
+*.table
