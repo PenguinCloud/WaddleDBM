@@ -11,9 +11,7 @@ def index(): return dict(message="hello from marketplace.py")
 from urllib.parse import unquote
 
 def decode_name(name):
-    if not name:
-        return None
-    return unquote(name)
+    return None if not name else unquote(name)
 
 # Create a new marketplace module from a given payload. Throws an error if no payload is given, or the marketplace module already exists.
 def create():
