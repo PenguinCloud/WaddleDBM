@@ -2431,3 +2431,29 @@ success!
 success!
 success!
 success!
+timestamp: 2024-09-10T06:46:27.486608
+CREATE TABLE "module_types"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512),
+    "description" CHAR(512)
+);
+success!
+timestamp: 2024-09-10T06:46:27.491108
+CREATE TABLE "marketplace_modules"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "name" CHAR(512),
+    "description" CHAR(512),
+    "gateway_url" CHAR(512),
+    "module_type_id" INTEGER REFERENCES "module_types" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "metadata" TEXT
+);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
