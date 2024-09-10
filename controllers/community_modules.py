@@ -31,9 +31,7 @@ def identity_is_admin(identity_name, community_name):
     if not community_member:
         return False
     role = db(db.roles.id == community_member.role_id).select().first()
-    if role.name in ['Admin', 'Owner', 'admin', 'owner']:
-        return True
-    return False
+    return role.name in ['Admin', 'Owner', 'admin', 'owner']
 
 def is_community_module(module):
     module_type = db(db.module_types.id == module.module_type_id).select().first()
