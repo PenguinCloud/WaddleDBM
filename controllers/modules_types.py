@@ -30,13 +30,12 @@ def create_module_type():
 
 # Get a module type by name. Throws an error if no name is given, or the module type does not exist.
 def get_module_type():
-    name = decode_name(request.args(0))
-    if not name:
+    if name := decode_name(request.args(0)) is None:
         return dict(msg="No name given.")
-    module_type = db(db.module_types.name == name).select().first()
-    if not module_type:
+    elif module_type := db(db.module_types.name == name).select().first() is None:
         return dict(msg="Module Type does not exist.")
-    return dict(module_type=module_type)
+    else:
+        return dict(module_type=module_type)
 
 # Get all module types.
 def get_all_module_types():
