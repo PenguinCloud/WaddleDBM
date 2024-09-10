@@ -132,7 +132,7 @@ def add_route_to_community():
         return dict(msg="No payload given.")
     payload = json.loads(payload)
     if 'community_name' not in payload:
-        return dict(msg="Payload missing required fields.")
+        return dict(msg="Payload missing required fields. Remember to add the community name at the end of the command between [] brackets.")
     community_name = decode_name(payload['community_name'])
     
     # Checkif the channel_id is given in the arguments.

@@ -4,7 +4,10 @@ import datetime
 import uuid
 import threading
 import time
+import logging
 
+# Set logging level to INFO
+logging.basicConfig(level=logging.INFO)
 
 # try something like
 def index(): return dict(message="hello from admin_context.py")
@@ -12,17 +15,22 @@ def index(): return dict(message="hello from admin_context.py")
 # Function to create a new admin context session for a given community name and identity name found in a payload.
 # Throws an error if no payload is given, or the community or identity does not exist. The identity must also be an admin or owner of the community.
 def create_session():
+    # Get the community name from the arguments.
+    community_name = request.args(0)
+    if not community_name:
+        return dict(msg="No community name given.")
+    
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
     payload = json.loads(payload)
 
     # Check if the payload contains the required fields.
-    if 'community_name' not in payload or 'identity_name' not in payload:
-        return dict(msg="Payload missing required fields.")
+    if 'identity_name' not in payload:
+        return dict(msg="Payload missing required fields. Please provide the identity name.", error=True)
     
     # Check if the community exists.
-    community = db(db.communities.community_name == payload['community_name']).select().first()
+    community = db(db.communities.community_name == community_name).select().first()
     if not community:
         return dict(msg="Community not found.")
     
@@ -37,8 +45,13 @@ def create_session():
         return dict(msg="Identity is not part of the community.")
     
     # Using the role_id from the community member, check if the identity is an admin or owner in the roles table.
-    role = db(db.roles.id == community_member.role_id).select().first()
-    if role.name not in ['Admin', 'Owner']:
+    role = db((db.roles.id == community_member.role_id)).select().first()
+    required_privileges = ['Admin', 'Owner', 'admin', 'owner']
+
+    role_privileges = role.privilages
+
+    # Check if the role privileges are in the required privileges list.
+    if not any(privilege in role_privileges for privilege in required_privileges):
         return dict(msg="Identity is not an admin or owner of the community.")
     
     # Set a session expiration time of 1 hour.
@@ -46,6 +59,12 @@ def create_session():
 
     # Generate a unique session ID token.
     session_token = str(uuid.uuid4())
+
+    # If an admin context session already exists for the community and identity, update the session expiration time.
+    admin_context = db((db.admin_contexts.community_id == community.id) & (db.admin_contexts.identity_id == identity.id)).select().first()
+    if admin_context:
+        admin_context.update_record(session_token=session_token, session_expires=expiration_time)
+        return dict(msg="Admin context session updated.", session_token=session_token)
 
     # Insert the new session into the admin_contexts table.
     db.admin_contexts.insert(session_token=session_token, community_id=community.id, identity_id=identity.id, session_expires=expiration_time)
@@ -156,6 +175,55 @@ def check_module_in_community():
     
     return dict(data=admin_context, error=False)
 
+# Function to delete an admin context session by a given community name in the arguments and an identity name in a payload. 
+# If the session does not exist, return an error.
+def delete_by_community_and_identity():
+    community_name = request.args(0)
+    if not community_name:
+        return dict(msg="No community name given.")
+    
+    payload = request.body.read()
+    if not payload:
+        return dict(msg="No payload given.")
+    payload = json.loads(payload)
+
+    # Check if the payload contains the required fields.
+    if 'identity_name' not in payload:
+        return dict(msg="Payload missing required fields. Please provide the identity name.", error=True)
+    
+    # Check if the community exists.
+    community = db(db.communities.community_name == community_name).select().first()
+    if not community:
+        return dict(msg="Community not found.")
+    
+    # Check if the identity exists.
+    identity = db(db.identities.name == payload['identity_name']).select().first()
+    if not identity:
+        return dict(msg="Identity not found.")
+    
+    # From the community members table, check if the given identity is part of the community.
+    community_member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
+    if not community_member:
+        return dict(msg="Identity is not part of the community.")
+    
+    # Using the role_id from the community member, check if the identity is an admin or owner in the roles table.
+    role = db((db.roles.id == community_member.role_id)).select().first()
+    required_privileges = ['Admin', 'Owner', 'admin', 'owner']
+
+    role_privileges = role.privilages
+
+    # Check if the role privileges are in the required privileges list.
+    if not any(privilege in role_privileges for privilege in required_privileges):
+        return dict(msg="Identity is not an admin or owner of the community.")
+    
+    # Check if the admin context session exists.
+    admin_context = db((db.admin_contexts.community_id == community.id) & (db.admin_contexts.identity_id == identity.id)).select().first()
+    if not admin_context:
+        return dict(msg="Admin context session not found.")
+    
+    admin_context.delete_record()
+    return dict(msg="Admin context session deleted.")
+
 # Function to delete an admin context session by its session token. If the session does not exist, return an error.
 def delete_by_session_token():
     session_token = request.args(0)
@@ -169,6 +237,7 @@ def delete_by_session_token():
 def delete_expired_sessions():
     current_time = datetime.datetime.now()
     db(db.admin_contexts.session_expires < current_time).delete()
+    logging.info("Expired admin context sessions deleted.")
     return dict(msg="Expired admin context sessions deleted.")
 
 # Function to continuously delete expired admin context sessions every 5 minutes.

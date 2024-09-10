@@ -6,13 +6,9 @@ import json
 def index(): return dict(message="hello from context.py")
 
 # Function to decode names with special characters in them.
+from urllib.parse import unquote
 def decode_name(name):
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    # name = name.replace("_", " ")
-
-    return name   
+    return None if not name else unquote(name) 
 
 #Function to replace the first character of a string with a hash if it is an underscore.
 def replace_first_char(name):
@@ -179,7 +175,7 @@ def get_by_identity_name():
         return dict(msg="Context does not exist.")
     # Get the community name from the community ID.
     community = db(db.communities.id == context.community_id).select().first()
-    return dict(data={"identity_name": identity_name, "community_name": community.community_name})
+    return dict(data={"identity_name": identity_name, "identity_id": identity.id, "community_name": community.community_name, "community_id": community.id})
 
 # Update a context by its identity ID. If the context does not exist, return an error.
 def update_by_identity_id():
