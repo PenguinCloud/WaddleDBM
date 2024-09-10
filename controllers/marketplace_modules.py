@@ -14,12 +14,6 @@ def decode_name(name):
     if not name:
         return None
     return unquote(name)
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
 
 # Create a new marketplace module from a given payload. Throws an error if no payload is given, or the marketplace module already exists.
 def create():

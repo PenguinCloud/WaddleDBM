@@ -168,7 +168,7 @@ db.define_table('marketplace_modules',
                 Field('name', 'string'),
                 Field('description', 'string'),
                 Field('gateway_url', 'string'),
-                Field('module_type_id', 'reference module_types'),
+                Field('module_type_id', db.module_types),
                 Field('metadata', 'json'))
 
 # Define the identities table
