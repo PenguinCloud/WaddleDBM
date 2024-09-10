@@ -17,9 +17,7 @@ def identity_in_community(identity_name, community_name):
     if not community:
         return False
     community_member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
-    if not community_member:
-        return False
-    return True
+    return bool(community_member)
 
 # A helper function that checks if a given identity is an admin of a given community. Returns True if the identity is an admin, False otherwise.
 def identity_is_admin(identity_name, community_name):
