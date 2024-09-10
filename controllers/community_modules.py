@@ -37,6 +37,10 @@ def identity_is_admin(identity_name, community_name):
         return True
     return False
 
+def is_community_module(module):
+    module_type = db(db.module_types.id == module.module_type_id).select().first()
+    return module_type.name == "Community"
+
 # Create a new community module from a given payload. Throws an error if no payload is given, or the community module already exists.
 def create():
     payload = request.body.read()
@@ -188,9 +192,8 @@ def install_by_community_name():
         return dict(msg="Module does not exist. Please provide a valid module name.")
     
     # Check if the module type is "Community"
-    module_type = db(db.module_types.id == module.module_type_id).select().first()
-    if module_type.name != "Community":
-        return dict(msg="The given module is not a Community module. Please provide a Community module name.")
+    if not is_community_module(module):
+        return dict(msg="This operation is only allowed for Community modules.")
 
     community_module = db((db.community_modules.community_id == community.id) & (db.community_modules.module_id == module.id)).select().first()
     if community_module:
