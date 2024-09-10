@@ -55,8 +55,20 @@ def get_all():
 
 # Get all the marketplace modules, as only the name and the id. Only modules that fall under the Community module type are returned.
 def get_all_community_modules():
-    community_module_type = db(db.module_types.name == "Community").select().first()
-    marketplace_modules = db(db.marketplace_modules.module_type_id == community_module_type.id).select(db.marketplace_modules.id, db.marketplace_modules.name)
+    payload = request.body.read()
+    if not payload:
+        return dict(msg="No payload given.")
+    
+    payload = json.loads(payload)
+    module_type = payload.get("module_type", "Community")
+    
+    module_type_record = db(db.module_types.name == module_type).select().first()
+    if not module_type_record:
+        return dict(msg=f"Module type '{module_type}' not found.")
+    
+    marketplace_modules = db(db.marketplace_modules.module_type_id == module_type_record.id).select(
+        db.marketplace_modules.id, db.marketplace_modules.name
+    )
     return dict(data=marketplace_modules)
 
 # Get a marketplace module by URL. Throws an error if no URL is given, or the marketplace module does not exist. Also returns the module type name.
