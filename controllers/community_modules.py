@@ -5,9 +5,12 @@ import json
 # try something like
 def index(): return dict(message="hello from communities_modules.py")
 
+def get_identity(identity_name):
+    return db(db.identities.name == identity_name).select().first()
+
 # A helper function that checks if a given identity exists in a given community. Returns True if the identity exists in the community, False otherwise.
 def identity_in_community(identity_name, community_name):
-    identity = db(db.identities.name == identity_name).select().first()
+    identity = get_identity(identity_name)
     if not identity:
         return False
     community = db(db.communities.community_name == community_name).select().first()
@@ -20,7 +23,7 @@ def identity_in_community(identity_name, community_name):
 
 # A helper function that checks if a given identity is an admin of a given community. Returns True if the identity is an admin, False otherwise.
 def identity_is_admin(identity_name, community_name):
-    identity = db(db.identities.name == identity_name).select().first()
+    identity = get_identity(identity_name)
     if not identity:
         return False
     community = db(db.communities.community_name == community_name).select().first()
