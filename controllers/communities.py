@@ -42,8 +42,14 @@ def create_roles(community_id):
 
 # Get the owner role for a given community_id.
 def get_owner_role(community_id):
-    role = db((db.roles.community_id == community_id) & (db.roles.name == "Owner")).select().first()
-    return role
+    return (
+        db(
+            (db.roles.community_id == community_id)
+            & (db.roles.name == "Owner")
+        )
+        .select()
+        .first()
+    )
 
 # Create a new community from a given payload. Throws an error if no payload is given, or the community already exists.
 def create():
