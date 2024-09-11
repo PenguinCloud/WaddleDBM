@@ -41,9 +41,7 @@ def get_community_member(identity_name, community_id):
     identity = get_identity_record(identity_name)
     community = get_community_record_by_id(community_id)
 
-    if identity is None:
-        return None
-    elif community is None:
+    if identity is None or community is None:
         return None
     else:
         return db((db.community_members.identity_id == identity.id) & (db.community_members.community_id == community.id)).select().first()
