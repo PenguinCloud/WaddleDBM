@@ -48,8 +48,8 @@ def get_community_member(identity_name, community_id):
     else:
         return db((db.community_members.identity_id == identity.id) & (db.community_members.community_id == community.id)).select().first()
     
-# A helper function to use a given identity_name and retrieve a list of privilages that the identity has in a given community, according to the community context.
-def get_privilages(identity_name) -> list:
+# A helper function to use a given identity_name and retrieve a list of priv_list that the identity has in a given community, according to the community context.
+def get_priv_list(identity_name) -> list:
     community_context = get_community_context(identity_name)
     if community_context is None:
         return None
@@ -60,16 +60,16 @@ def get_privilages(identity_name) -> list:
         if community_member is None:
             return None
         else:
-            privilages = []
+            priv_list = []
 
             role = db((db.roles.community_id == community_context.community_id) & (db.roles.id == community_member.role_id)).select().first()
 
             if not role:
                 return None
             else:
-                privilages = role.privilages
+                priv_list = role.priv_list
 
-            return privilages
+            return priv_list
         
 # A helper function to get an admin context session by a given identity name. The identity name is used to derive the current community context of the identity.
 # Returns an admin context session if one exists for the identity and the identity is an admin of the community context. Else, returns None.
@@ -89,7 +89,7 @@ def get_admin_context_session(identity_name):
             if not role:
                 return None
             else:
-                if 'admin' in role.privilages:
+                if 'admin' in role.priv_list:
                     return db((db.admin_contexts.community_id == community_id) & (db.admin_contexts.identity_id == community_member.identity_id)).select().first()
                 else:
                     return None
@@ -134,9 +134,9 @@ def get():
         marketplace_module = marketplace_module.as_dict()
         marketplace_module['module_type_name'] = module_type.name
 
-        # Get the available privilages for the identity in the community context
-        privilages = get_privilages(identity_name)
-        marketplace_module['privilages'] = privilages
+        # Get the available priv_list for the identity in the community context
+        priv_list = get_priv_list(identity_name)
+        marketplace_module['priv_list'] = priv_list
 
         # Get the admin context session for the identity
         admin_context_session = get_admin_context_session(identity_name)

@@ -38,7 +38,7 @@ def create_role():
         return dict(msg="No payload given.")
     payload = json.loads(payload)
 
-    needed_fields = ['name', 'description', 'privilages', 'requirements', 'community_name']
+    needed_fields = ['name', 'description', 'priv_list', 'requirements', 'community_name']
 
     if not all(field in payload for field in needed_fields):
         return dict(msg=f"Payload missing required fields. Required fields are: {needed_fields}")
@@ -105,10 +105,10 @@ def update_by_name_and_community_name():
         return dict(msg="No payload given.")
     payload = json.loads(payload)
 
-    required_fields = ['name', 'description', 'privilages', 'requirements', 'community_name']
+    required_fields = ['name', 'description', 'priv_list', 'requirements', 'community_name']
 
     if not all(field in payload for field in required_fields):
-        return dict(msg="Payload missing required fields. Required fields are: name, description, privilages, requirements, community_name")
+        return dict(msg="Payload missing required fields. Required fields are: name, description, priv_list, requirements, community_name")
     
     # Get the community by name
     community = get_community_record_by_name(payload['community_name'])
@@ -135,7 +135,7 @@ def update_by_name():
     if not payload:
         return dict(msg="No payload given.")
     payload = json.loads(payload)
-    if 'name' not in payload or 'description' not in payload or 'privilages' not in payload or 'requirements' not in payload:
+    if 'name' not in payload or 'description' not in payload or 'priv_list' not in payload or 'requirements' not in payload:
         return dict(msg="Payload missing required fields.")
     role = db(db.roles.name == name).select().first()
     if not role:

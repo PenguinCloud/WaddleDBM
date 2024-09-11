@@ -65,9 +65,9 @@ def create():
     if 'enabled' not in payload:
         payload['enabled'] = True
 
-    # Check if privilages is in the payload, if not, add it with an empty list
-    if 'privilages' not in payload:
-        payload['privilages'] = []
+    # Check if priv_list is in the payload, if not, add it with an empty list
+    if 'priv_list' not in payload:
+        payload['priv_list'] = []
 
     db.community_modules.insert(**payload)
     return dict(msg="Community Module created.")
@@ -120,7 +120,7 @@ def update_by_community_id_and_module_id():
     if not payload:
         return dict(msg="No payload given.")
     payload = json.loads(payload)
-    if 'module_id' not in payload or 'community_id' not in payload or 'enabled' not in payload or 'privilages' not in payload:
+    if 'module_id' not in payload or 'community_id' not in payload or 'enabled' not in payload or 'priv_list' not in payload:
         return dict(msg="Payload missing required fields.")
     community_module = db((db.community_modules.community_id == community_id) & (db.community_modules.module_id == module_id)).select().first()
     if not community_module:
@@ -195,11 +195,11 @@ def install_by_community_name():
     if 'enabled' not in payload:
         payload['enabled'] = True
 
-    # Check if privilages is in the payload, if not, add it with an empty list
-    if 'privilages' not in payload:
-        payload['privilages'] = []
+    # Check if priv_list is in the payload, if not, add it with an empty list
+    if 'priv_list' not in payload:
+        payload['priv_list'] = []
 
-    db.community_modules.insert(module_id=module.id, community_id=community.id, enabled=payload['enabled'], privilages=payload['privilages'])
+    db.community_modules.insert(module_id=module.id, community_id=community.id, enabled=payload['enabled'], priv_list=payload['priv_list'])
     return dict(msg="Community module installed.")
 
 # Uninstall a community module, using its module_id in a payload, from a given community_name as an argument. If the community module does not exist in the given community, return an error.

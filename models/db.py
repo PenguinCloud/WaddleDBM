@@ -188,14 +188,14 @@ db.define_table('community_modules',
                 Field('module_id', db.marketplace_modules),
                 Field('community_id', db.communities),
                 Field('enabled', 'boolean', default=True),
-                Field('privilages', 'list:string'))
+                Field('priv_list', 'list:string'))
 
 # Define a table for roles
 db.define_table('roles',
                 Field('name', 'string'),
                 Field('community_id', db.communities),
                 Field('description', 'string'),
-                Field('privilages', 'list:string'),
+                Field('priv_list', 'list:string'),
                 Field('requirements', 'list:string'))
 
 # Define a table for community members table
@@ -294,10 +294,10 @@ if db(db.routing.community_id == global_community.id).count() == 0:
 
 # Also create the "member", "owner" and admin roles, if they do not exist
 if db(db.roles.name == "member").count() == 0:
-    db.roles.insert(name="member", description="A member of a community.", privilages=["read", "write"], requirements=["reputation >= 0"])
+    db.roles.insert(name="member", description="A member of a community.", priv_list=["read", "write"], requirements=["reputation >= 0"])
 
 if db(db.roles.name == "owner").count() == 0:
-    db.roles.insert(name="owner", description="The owner of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
+    db.roles.insert(name="owner", description="The owner of a community.", priv_list=["read", "write", "admin"], requirements=["reputation >= 0"])
 
 if db(db.roles.name == "admin").count() == 0:
-    db.roles.insert(name="admin", description="An admin of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
+    db.roles.insert(name="admin", description="An admin of a community.", priv_list=["read", "write", "admin"], requirements=["reputation >= 0"])

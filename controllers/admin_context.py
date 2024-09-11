@@ -48,7 +48,7 @@ def create_session():
     role = db((db.roles.id == community_member.role_id)).select().first()
     required_privileges = ['Admin', 'Owner', 'admin', 'owner']
 
-    role_privileges = role.privilages
+    role_privileges = role.priv_list
 
     # Check if the role privileges are in the required privileges list.
     if not any(privilege in role_privileges for privilege in required_privileges):
@@ -210,7 +210,7 @@ def delete_by_community_and_identity():
     role = db((db.roles.id == community_member.role_id)).select().first()
     required_privileges = ['Admin', 'Owner', 'admin', 'owner']
 
-    role_privileges = role.privilages
+    role_privileges = role.priv_list
 
     # Check if the role privileges are in the required privileges list.
     if not any(privilege in role_privileges for privilege in required_privileges):

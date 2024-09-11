@@ -3241,3 +3241,37 @@ success!
 success!
 success!
 success!
+timestamp: 2024-09-11T08:16:01.755362
+ALTER TABLE "community_modules" ADD "priv_list" TEXT;
+success!
+timestamp: 2024-09-11T08:16:01.760863
+ALTER TABLE "roles" ADD "priv_list" TEXT;
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!

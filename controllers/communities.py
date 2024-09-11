@@ -22,23 +22,23 @@ def create_roles(community_id):
     requirements = ["None"]
 
     for role in roles:
-        privilages = []
+        priv_list = []
         description = ""
 
-        # If the role is member, set the privilages to read only.
+        # If the role is member, set the priv_list to read only.
         if role == "Member":
-            privilages = ["read"]
+            priv_list = ["read"]
             description = "This role is the default role for all members of the community. Members can only read data from the community."
-        # Else, if the role is admin, set the privilages to read, write and admin.
+        # Else, if the role is admin, set the priv_list to read, write and admin.
         elif role == "Admin":
-            privilages = ["read", "write", "admin"]
+            priv_list = ["read", "write", "admin"]
             description = "This role is for community admins. Admins can read, write and admin the community."
-        # Else, if the role is owner, set the privilages to read, write, update, delete, admin and owner.
+        # Else, if the role is owner, set the priv_list to read, write, update, delete, admin and owner.
         elif role == "Owner":
-            privilages = ["read", "write", "update", "delete", "admin", "owner"]
+            priv_list = ["read", "write", "update", "delete", "admin", "owner"]
             description = "This role is for the owner of the community. Owners can read, write, update, delete, admin and owner the community."
 
-        db.roles.insert(name=role, description=description, community_id=community_id, privilages=privilages, requirements=requirements)
+        db.roles.insert(name=role, description=description, community_id=community_id, priv_list=priv_list, requirements=requirements)
 
 # Get the owner role for a given community_id.
 def get_owner_role(community_id):
