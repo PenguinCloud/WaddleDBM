@@ -140,7 +140,7 @@ def get():
 
         # Get the admin context session for the identity
         admin_context_session = get_admin_context_session(identity_name)
-        marketplace_module['session_data'] = admin_context_session if admin_context_session else None
+        marketplace_module['session_data'] = admin_context_session or None
         
         return marketplace_module
     else:
