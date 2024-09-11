@@ -8,7 +8,7 @@ def index(): return dict(message="hello from context.py")
 # Function to decode names with special characters in them.
 from urllib.parse import unquote
 def decode_name(name):
-    return None if not name else unquote(name) 
+    return unquote(name) if name else None 
 
 #Function to replace the first character of a string with a hash if it is an underscore.
 def replace_first_char(name):
