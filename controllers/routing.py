@@ -45,7 +45,7 @@ def create_routing():
     if not payload:
         return dict(msg="No payload given.")
     payload = json.loads(payload)
-    if 'name' not in payload or 'description' not in payload or 'privilages' not in payload or 'requirements' not in payload:
+    if 'name' not in payload or 'description' not in payload or 'priv_list' not in payload or 'requirements' not in payload:
         return dict(msg="Payload missing required fields.")
     if db(db.routing.name == payload['name']).count() > 0:
         return dict(msg="Routing already exists.")
@@ -86,7 +86,7 @@ def update_by_name():
     if not payload:
         return dict(msg="No payload given.")
     payload = json.loads(payload)
-    if 'name' not in payload or 'description' not in payload or 'privilages' not in payload or 'requirements' not in payload:
+    if 'name' not in payload or 'description' not in payload or 'priv_list' not in payload or 'requirements' not in payload:
         return dict(msg="Payload missing required fields.")
     routing = db(db.routing.name == name).select().first()
     if not routing:
@@ -132,7 +132,7 @@ def add_route_to_community():
         return dict(msg="No payload given.")
     payload = json.loads(payload)
     if 'community_name' not in payload:
-        return dict(msg="Payload missing required fields.")
+        return dict(msg="Payload missing required fields. Remember to add the community name at the end of the command between [] brackets.")
     community_name = decode_name(payload['community_name'])
     
     # Checkif the channel_id is given in the arguments.
