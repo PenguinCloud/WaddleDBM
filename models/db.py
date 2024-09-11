@@ -281,7 +281,11 @@ db.define_table('admin_contexts',
                 Field('session_token', 'string'),
                 Field('session_expires', 'datetime'))
 
-
+# Define a table that maps a text value to a response value, per community
+db.define_table('text_responses',
+                Field('community_id', db.communities),
+                Field('text_val', 'string'),
+                Field('response_val', 'string'))
 
 # After defining the tables, create the "Global" community, if it does not exist
 if db(db.communities.community_name == "Global").count() == 0:
