@@ -10,27 +10,30 @@ def get_identity(identity_name):
 
 # A helper function that checks if a given identity exists in a given community. Returns True if the identity exists in the community, False otherwise.
 def identity_in_community(identity_name, community_name):
-    identity = get_identity(identity_name)
-    if not identity:
+    identity = db(db.identities.name == identity_name).select(db.identities.id).first()
+    community = db(db.communities.community_name == community_name).select(db.communities.id).first()
+    
+    if not identity or not community:
         return False
-    community = db(db.communities.community_name == community_name).select().first()
-    if not community:
-        return False
-    community_member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
-    return bool(community_member)
+    
+    membership = db((db.community_members.identity_id == identity.id) &
+                    (db.community_members.community_id == community.id)).select().first()
+    
+    return bool(membership)
 
 # A helper function that checks if a given identity is an admin of a given community. Returns True if the identity is an admin, False otherwise.
 def identity_is_admin(identity_name, community_name):
-    identity = get_identity(identity_name)
-    if not identity:
+    identity = db(db.identities.name == identity_name).select(db.identities.id).first()
+    community = db(db.communities.community_name == community_name).select(db.communities.id).first()
+    
+    if not identity or not community:
         return False
-    community = db(db.communities.community_name == community_name).select().first()
-    if not community:
+    
+    membership = db((db.community_members.identity_id == identity.id) &
+                    (db.community_members.community_id == community.id)).select().first()
+    if not membership:
         return False
-    community_member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
-    if not community_member:
-        return False
-    role = db(db.roles.id == community_member.role_id).select().first()
+    role = db(db.roles.id == membership.role_id).select().first()
     return role.name in ['Admin', 'Owner', 'admin', 'owner']
 
 def is_community_module(module):
