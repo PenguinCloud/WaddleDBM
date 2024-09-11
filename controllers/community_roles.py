@@ -22,6 +22,10 @@ def get_identity_record_by_name(name):
 # Helper function to set the role of all identities in a community to the default "Member" role when a role is deleted.
 # Only identities with the deleted role are affected.
 def set_default_role_for_identities_in_community(community_id, role_id):
+    db(
+        (db.community_members.community_id == community_id) &
+        (db.community_members.role_id == role_id)
+    ).update(role_id=DEFAULT_ROLE_ID)
     identities = db(db.community_members.community_id == community_id).select()
 
     if not identities:
