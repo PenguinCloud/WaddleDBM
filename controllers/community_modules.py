@@ -37,41 +37,6 @@ def is_community_module(module):
     module_type = db(db.module_types.id == module.module_type_id).select().first()
     return module_type.name == "Community"
 
-# Create a new community module from a given payload. Throws an error if no payload is given, or the community module already exists.
-def create():
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given.")
-    payload = json.loads(payload)
-    if 'module_name' not in payload or 'community_id' not in payload:
-        return dict(msg="Payload missing required fields. Please provide module_name and community_id.")
-    
-    # Check if the community exists
-    community = db(db.communities.id == payload['community_id']).select().first()
-    if not community:
-        return dict(msg="Community does not exist.")
-    
-    # Check if the module exists
-    module = db(db.marketplace_modules.name == payload['module_name']).select().first()
-    if not module:
-        return dict(msg="Module does not exist. Please provide a valid module name.")
-
-    # Check if the module type is "Community"
-    module_type = db(db.module_types.id == module.module_type_id).select().first()
-    if module_type.name != "Community":
-        return dict(msg="The given module is not a Community module. Please provide a Community module name.")
-
-    # Check if enabled is in the payload, if not, add it with a default value of True
-    if 'enabled' not in payload:
-        payload['enabled'] = True
-
-    # Check if priv_list is in the payload, if not, add it with an empty list
-    if 'priv_list' not in payload:
-        payload['priv_list'] = []
-
-    db.community_modules.insert(**payload)
-    return dict(msg="Community Module created.")
-
 # Get all community modules accross all communities.
 def get_all():
     community_modules = db(db.community_modules).select()
@@ -144,68 +109,53 @@ def delete_by_community_id_and_module_id():
 def install_by_community_name():
     community_name = request.args(0)
     payload = request.body.read()
-    if not community_name:
-        return dict(msg="No community name given.")
-    if not payload:
-        return dict(msg="No payload given.")
+
+    if not community_name or not payload:
+        return dict(msg="Missing community name or payload.")
+
     payload = json.loads(payload)
-
-    # Check that the payload contains the module_name and identity_name fields
     if 'module_name' not in payload or 'identity_name' not in payload:
-        return dict(msg="Payload missing required fields. Please provide module_name and identity_name fields.")
+        return dict(msg="Payload missing required fields: module_name and identity_name.")
 
-    # Check if the community exists
+    # Combine queries for community, identity, and module
     community = db(db.communities.community_name == community_name).select().first()
-    if not community:
-        return dict(msg="Community does not exist.")
-    
-    # Check that the identity exists
     identity = db(db.identities.name == payload['identity_name']).select().first()
-    if not identity:
-        return dict(msg="Identity does not exist. Please provide a valid identity name.")
-    
-    # Check if the identity is a member of the community
-    if not identity_in_community(payload['identity_name'], community_name):
-        return dict(msg="The identity attempting to install this module is not a member of the community.")
-    
-    # Check if the identity is an admin of the community
-    if not identity_is_admin(payload['identity_name'], community_name):
-        return dict(msg="The identity attempting to install this module is not an admin of the community.")
-
-    # Check that the module exists
     module = db(db.marketplace_modules.name == payload['module_name']).select().first()
-    if not module:
-        return dict(msg="Module does not exist. Please provide a valid module name.")
-    
-    # Check if the module type is "Community"
-    if not is_community_module(module):
-        return dict(msg="This operation is only allowed for Community modules.")
 
-    community_module = db((db.community_modules.community_id == community.id) & (db.community_modules.module_id == module.id)).select().first()
-    if community_module:
-        return dict(msg="This module is already installed in this community.")
-    
-    # If the community is "Global", return an error, as community modules cannot be installed in the global community.
+    if not all([community, identity, module]):
+        return dict(msg="Invalid community, identity, or module.")
+
     if community.community_name == "Global":
         return dict(msg="Cannot install community module in Global community.")
 
-    payload['community_id'] = community.id
+    if not identity_in_community(payload['identity_name'], community_name):
+        return dict(msg="Identity is not a member of the community.")
 
-    # Check if enabled is in the payload, if not, add it with a default value of True
-    if 'enabled' not in payload:
-        payload['enabled'] = True
+    if not identity_is_admin(payload['identity_name'], community_name):
+        return dict(msg="Identity is not an admin of the community.")
 
-    # Check if priv_list is in the payload, if not, add it with an empty list
-    if 'priv_list' not in payload:
-        payload['priv_list'] = []
+    if not is_community_module(module):
+        return dict(msg="This operation is only allowed for Community modules.")
 
-    db.community_modules.insert(module_id=module.id, community_id=community.id, enabled=payload['enabled'], priv_list=payload['priv_list'])
+    existing_module = db((db.community_modules.community_id == community.id) & 
+                         (db.community_modules.module_id == module.id)).select().first()
+    if existing_module:
+        return dict(msg="This module is already installed in this community.")
+
+    new_module = {
+        'module_id': module.id,
+        'community_id': community.id,
+        'enabled': payload.get('enabled', True),
+        'privilages': payload.get('privilages', [])
+    }
+    db.community_modules.insert(**new_module)
     return dict(msg="Community module installed.")
 
 # Uninstall a community module, using its module_id in a payload, from a given community_name as an argument. If the community module does not exist in the given community, return an error.
 def uninstall_by_community_name():
     community_name = request.args(0)
     payload = request.body.read()
+
     if not community_name:
         return dict(msg="No community name given.")
     if not payload:
@@ -216,31 +166,28 @@ def uninstall_by_community_name():
     if 'module_name' not in payload or 'identity_name' not in payload:
         return dict(msg="Payload missing required fields. Please provide module_name and identity_name fields.")
     
+    # Combine queries for community, identity, and module
     community = db(db.communities.community_name == community_name).select().first()
-    if not community:
-        return dict(msg="Community does not exist.")
-    
-    # Check if the identity is a member of the community
-    if not identity_in_community(payload['identity_name'], community_name):
-        return dict(msg="The identity attempting to install this module is not a member of the community.")
-    
-    # Check if the identity is an admin of the community
-    if not identity_is_admin(payload['identity_name'], community_name):
-        return dict(msg="The identity attempting to install this module is not an admin of the community.")
-
-    # Check that the module exists
+    identity = db(db.identities.name == payload['identity_name']).select().first()
     module = db(db.marketplace_modules.name == payload['module_name']).select().first()
-    if not module:
-        return dict(msg="Module does not exist. Please provide a valid module name.")
+
+    if not all([community, identity, module]):
+        return dict(msg="Invalid community, identity, or module.")
+
+    if community.community_name == "Global":
+        return dict(msg="Cannot install community module in Global community.")
+
+    if not identity_in_community(payload['identity_name'], community_name):
+        return dict(msg="Identity is not a member of the community.")
+
+    if not identity_is_admin(payload['identity_name'], community_name):
+        return dict(msg="Identity is not an admin of the community.")
 
     # Check that the module exists
     community_module = db((db.community_modules.community_id == community.id) & (db.community_modules.module_id == module.id)).select().first()
+    
     if not community_module:
         return dict(msg="Community module does not exist.")
-    
-    # If the community is "Global", return an error, as community modules cannot be uninstalled from the global community.
-    if community.community_name == "Global":
-        return dict(msg="Cannot uninstall module from Global community.")
 
     community_module.delete_record()
     return dict(msg="Community module uninstalled.")
