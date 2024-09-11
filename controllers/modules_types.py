@@ -25,7 +25,8 @@ def create_module_type():
         return dict(msg="Payload missing required fields.")
     if db(db.module_types.name == payload['name']).count() > 0:
         return dict(msg="Module Type already exists.")
-    db.module_types.insert(**payload)
+    
+    db.module_types.insert(name=payload['name'], description=payload['description'])
     return dict(msg="Module Type created.")
 
 # Get a module type by name. Throws an error if no name is given, or the module type does not exist.
