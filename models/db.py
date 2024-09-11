@@ -287,6 +287,12 @@ db.define_table('text_responses',
                 Field('text_val', 'string'),
                 Field('response_val', 'string'))
 
+# Define a table that maps an alias to specific command for a community
+db.define_table('alias_commands',
+                Field('community_id', db.communities),
+                Field('alias_val', 'string'),
+                Field('command_val', 'string'))
+
 # After defining the tables, create the "Global" community, if it does not exist
 if db(db.communities.community_name == "Global").count() == 0:
     db.communities.insert(community_name="Global", community_description="The global community.")

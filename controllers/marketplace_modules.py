@@ -19,6 +19,10 @@ def decode_name(name):
 
     return outName
 
+# Helper function to raplace all spaces in given command string with _ and return the new string
+def replace_spaces(command):
+    return command.replace(" ", "_")
+
 # A helper function to return an identity record from a given identity_name
 def get_identity_record(identity_name):
     return db(db.identities.name == identity_name).select().first()
@@ -91,6 +95,29 @@ def get_admin_context_session(identity_name):
                     return db((db.admin_contexts.community_id == community_id) & (db.admin_contexts.identity_id == community_member.identity_id)).select().first()
                 else:
                     return None
+                
+# A helper function to get an alias value by a given alias value and identity name. The identity name is used to derive the current community context of the identity.
+# Returns an alias value if one exists for the community. Else, returns None.
+def get_alias_command(alias, identity_name):
+    community_context = get_community_context(identity_name)
+    if community_context is None:
+        return None
+    else:
+        community_id = community_context.community_id
+        alias_command = db((db.alias_commands.community_id == community_id) & (db.alias_commands.alias_val == alias)).select().first()
+        return alias_command
+    
+# A helper function to get a marketplace module by a given command, as a result of a given alias. 
+# The identity name is used to derive the current community context of the identity.
+# Returns a marketplace module if one exists for the community. Else, returns None.
+def get_marketplace_module_by_alias(alias, identity_name):
+    alias_command = get_alias_command(alias, identity_name)
+    print(f"Alias command: {alias_command}")
+    if alias_command is None:
+        return None
+    else:
+        marketplace_module = db((db.marketplace_modules.metadata.like(f'%"{replace_spaces(alias_command.command_val)}"%'))).select().first()
+        return marketplace_module
 
 # Create a new marketplace module from a given payload. Throws an error if no payload is given, or the marketplace module already exists.
 def create():
@@ -108,10 +135,6 @@ def create():
 # Get a marketplace module by name. Throws an error if no name is given, or the marketplace module does not exist.
 # An identity name must be present in the payload to also return the available roles for the identity in the community context.
 def get():
-    name = decode_name(request.args(0))
-    if not name:
-        return dict(msg="No name given.")
-    
     # Check if a payload is given, and if so, get the identity name from the payload
     payload = request.body.read()
 
@@ -119,13 +142,27 @@ def get():
         return dict(msg="No payload given.")
     
     payload = json.loads(payload)
+
+    # Ensure that the identity name and module name is present in the payload
+    if 'name' not in payload or 'identity_name' not in payload:
+        return dict(msg="Payload missing required fields.")
+
     identity_name = payload.get("identity_name", None)
+    name = payload.get("name", None)
 
     if identity_name:
-        # Get the marketplace module and the module type
+        # Get the marketplace module. If it does not exists, check if the name can be used as an alias to get the marketplace module.
+        # If the marketplace module still does not exist, return an error.
         marketplace_module = db(db.marketplace_modules.name == name).select().first()
+
+        aliased_command = None
+
         if not marketplace_module:
-            return dict(msg="Marketplace Module does not exist.")
+            marketplace_module = get_marketplace_module_by_alias(name, identity_name)
+            if marketplace_module:
+                aliased_command = get_alias_command(name, identity_name)
+            else:
+                return dict(msg="Marketplace Module does not exist.", status=404)
         
         # Also return the marketplace module type name part of the response
         module_type = db(db.module_types.id == marketplace_module.module_type_id).select().first()
@@ -139,6 +176,10 @@ def get():
         # Get the admin context session for the identity
         admin_context_session = get_admin_context_session(identity_name)
         marketplace_module['session_data'] = admin_context_session or None
+
+        # If the alias command exists, return the aliased command value
+        if aliased_command:
+            marketplace_module['aliased_command'] = aliased_command.command_val
         
         return marketplace_module
     else:
