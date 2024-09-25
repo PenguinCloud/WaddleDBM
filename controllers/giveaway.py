@@ -38,11 +38,14 @@ def get_account(routing_gateway_id: int) -> str:
 
 # Function to create a matterbridge payload for a given community_id by checking all the gateways connected to the community. Returns None if no gateways are connected to the community.
 def create_matterbridge_payloads(community_id: int, message: str) -> list[matterbridgePayload]:
-    # Using the event's community id, get the community name
+    if not community_id:
+        raise ValueError("community_id must be provided")
+    if not message:
+        raise ValueError("message must be provided")
+
     community = db(db.communities.id == community_id).select().first()
     if not community:
-        logging.error("Community not found. The given community must have been deleted.")
-        return None
+        raise ValueError(f"No community found with id {community_id}")
     
     # In the routing table, get the routing_gateway_ids for the given community id. If the routing_gateway_ids list is empty, return an error.
     routings = db(db.routing.community_id == community.id).select().first()
@@ -112,7 +115,7 @@ def create_giveaway_timeout(timeout: int, guid: str, community_id: int) -> None:
     payloads = create_matterbridge_payloads(community_id, f"Giveaway with guid {guid} is closed. A winner will be announced shortly.")
 
     # If there are no payloads, return an error
-    if not payloads:
+    if not payloads or len(payloads) == 0:
         logging.error(f"No payloads found for the community with id {community_id}. Unable to announce the winner.")
         return None
 
@@ -411,6 +414,10 @@ def close_with_winner() -> dict:
     # Get the gateway payloads for the community
     payloads = create_matterbridge_payloads(giveaway.community_id, f"Giveway with guid {payload['guid']} is closed. Winner is {winner_identity.identity_name}.")
 
+    # If there are no payloads, return an error
+    if not payloads or len(payloads) == 0:
+        return dict(msg="No payloads found for the community. Unable to announce the winner.")
+    
     # Send a message to Matterbridge
     for payload in payloads:
         send_matterbridge_message(payload)
