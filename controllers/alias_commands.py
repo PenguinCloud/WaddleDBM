@@ -83,12 +83,7 @@ def get_all():
     
     # Get all alias commands for the given community
     alias_commands = db(db.alias_commands.community_id == community.id).select()
-    data = []
-    for alias_command in alias_commands:
-        data.append(dict(
-            alias_val=alias_command.alias_val,
-            command_val=alias_command.command_val
-        ))
+    data = [dict(alias_val=alias_command.alias_val, command_val=alias_command.command_val) for alias_command in alias_commands]
     
     return dict(status=200, data=data)
 
