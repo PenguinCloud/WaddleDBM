@@ -95,10 +95,15 @@ def get_alias_command(alias, identity_name):
     community_context = get_community_context(identity_name)
     if community_context is None:
         return None
-    else:
-        community_id = community_context.community_id
-        alias_command = db((db.alias_commands.community_id == community_id) & (db.alias_commands.alias_val == alias)).select().first()
-        return alias_command
+    community_id = community_context.community_id
+    return (
+        db(
+            (db.alias_commands.community_id == community_id)
+            & (db.alias_commands.alias_val == alias)
+        )
+        .select()
+        .first()
+    )
     
 # A helper function to get a marketplace module by a given command, as a result of a given alias. 
 # The identity name is used to derive the current community context of the identity.
