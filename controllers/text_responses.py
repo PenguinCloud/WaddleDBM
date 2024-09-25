@@ -89,12 +89,7 @@ def get_all():
     
     # Get all text responses for the given community
     text_responses = db(db.text_responses.community_id == community.id).select()
-    data = []
-    for text_response in text_responses:
-        data.append(dict(
-            text=text_response.text_val,
-            response=text_response.response_val
-        ))
+    data = [dict(text=text_response.text_val, response=text_response.response_val) for text_response in text_responses]
     
     return dict(status=200, data=data)
 
