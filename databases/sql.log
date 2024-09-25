@@ -2431,3 +2431,37 @@ success!
 success!
 success!
 success!
+success!
+success!
+success!
+success!
+timestamp: 2024-08-26T12:02:09.020644
+CREATE TABLE "prize_statuses"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "status_name" CHAR(512),
+    "description" CHAR(512)
+);
+success!
+timestamp: 2024-08-26T12:02:09.024693
+CREATE TABLE "prizes"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "community_id" INTEGER REFERENCES "communities" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "prize_guid" CHAR(512),
+    "prize_name" CHAR(512),
+    "prize_description" CHAR(512),
+    "winner_identity_id" INTEGER REFERENCES "identities" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "prize_status" INTEGER REFERENCES "prize_statuses" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "timeout" INTEGER
+);
+success!
+timestamp: 2024-08-26T12:02:09.027113
+CREATE TABLE "prize_entries"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "prize_id" INTEGER REFERENCES "prizes" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "identity_id" INTEGER REFERENCES "identities" ("id") ON DELETE CASCADE ON UPDATE CASCADE  
+);
+success!
+success!
+success!
+success!
+success!
