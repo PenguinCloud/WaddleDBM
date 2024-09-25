@@ -74,9 +74,7 @@ def get_by_name():
     if not name:
         return dict(msg="No name given.")
     role = db(db.roles.name == name).select().first()
-    if not role:
-        return dict(msg="Role does not exist.")
-    return dict(data=role)
+    return dict(msg="Role does not exist.") if not role else dict(data=role)
 
 # Get a role by community name. If the role does not exist, return an error.
 def get_by_community_name():
