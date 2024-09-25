@@ -114,8 +114,17 @@ def get_marketplace_module_by_alias(alias, identity_name):
     if alias_command is None:
         return None
     else:
-        marketplace_module = db((db.marketplace_modules.metadata.like(f'%"{replace_spaces(alias_command.command_val)}"%'))).select().first()
-        return marketplace_module
+        return (
+            db(
+                (
+                    db.marketplace_modules.metadata.like(
+                        f'%"{replace_spaces(alias_command.command_val)}"%'
+                    )
+                )
+            )
+            .select()
+            .first()
+        )
 
 # Decorator to require a payload in the request body. If no payload is given, return an error message.
 def require_payload(f):
