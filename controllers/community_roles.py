@@ -93,7 +93,8 @@ def get_by_community_name():
     role = db(db.roles.community_id == community.id).select()
     if not role:
         return dict(msg="Role does not exist.")
-    return dict(data=role)
+    else:
+        return dict(data=role)
 
 # Update a role by a given payload name and community name. If the role does not exist, return an error.
 def update_by_name_and_community_name():
