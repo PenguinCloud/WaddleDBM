@@ -28,9 +28,7 @@ def set_default_role_for_identities_in_community(community_id, role_id):
     ).update(role_id=DEFAULT_ROLE_ID)
     identities = db(db.community_members.community_id == community_id).select()
 
-    if not identities:
-        return
-    else:
+    if identities:
         for identity in identities:
             if identity.role_id == role_id:
                 identity.update_record(role_id=1)
