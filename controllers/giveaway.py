@@ -19,6 +19,21 @@ matterbridgePostURL = 'http://localhost:4200/api/message'
 # try something like
 def index(): return dict(message="hello from giveaway.py")
 
+# A helper function to close a giveaway with a given guid.
+def close_giveaway(guid: str) -> None:
+    logging.info(f"Closing giveaway with guid {guid}")
+    # Get the status id for the "Closed" status from the prize_statuses table
+    status = db(db.prize_statuses.status_name == "Closed").select().first()
+
+    # Check if the giveaway exists\
+    giveaway = db(db.prizes.guid == guid).select().first()
+    if not giveaway:
+        logging.error(f"Giveaway with guid {guid} does not exist.")
+        return None
+    
+    # Update the giveaway with the "Closed" status
+    db(db.prizes.guid == guid).update(prize_status=status.id)
+
 # Function to get a routing_gateway channel_id from a given routing_gateway_id. If it doesnt exist, return null.
 def get_channel_id(routing_gateway_id: int) -> str:
     routing_gateway = db(db.routing_gateways.id == routing_gateway_id).select().first()
@@ -122,8 +137,7 @@ def create_giveaway_timeout(timeout: int, guid: str, community_id: int) -> None:
     # If there are no entries, close the giveaway and send a message to Matterbridge
     if len(entries) == 0:
         # Close the giveaway
-        status = db(db.prize_statuses.status_name == "Closed").select().first()
-        db(db.prizes.guid == guid).update(prize_status=status.id)
+        close_giveaway(guid)
 
         # Send a message to Matterbridge
         for payload in payloads:
@@ -142,9 +156,7 @@ def create_giveaway_timeout(timeout: int, guid: str, community_id: int) -> None:
     db(db.prizes.guid == guid).update(winner_identity_id=winner_identity.id)
 
     # Close the giveaway
-    status = db(db.prize_statuses.status_name == "Closed").select().first()
-
-    db(db.prizes.guid == guid).update(prize_status=status.id)
+    close_giveaway(guid)
 
     # Send a message to Matterbridge
     for payload in payloads:
@@ -381,7 +393,7 @@ def get_winner(giveaway, winner_identity_name=None):
     return winner
 
 # A function to close a giveaway with a given guid and set a winner. If no winner_identity_name is provided, a random winner is selected from the entries.
-def close_giveaway(giveaway, winner):
+def close_giveaway_with_winner(giveaway, winner):
     db(db.prizes.guid == giveaway.guid).update(winner_identity_id=winner.id)
     status = db(db.prize_statuses.status_name == "Closed").select().first()
     db(db.prizes.guid == giveaway.guid).update(prize_status=status.id)
@@ -402,7 +414,7 @@ def close_with_winner():
     try:
         giveaway = validate_giveaway(guid)
         winner = get_winner(giveaway, payload.get('winner_identity_name'))
-        close_giveaway(giveaway, winner)
+        close_giveaway_with_winner(giveaway, winner)
         announce_winner(giveaway, winner)
         return dict(msg=f"Giveaway with guid {guid} is successfully closed.")
     except ValueError as e:
