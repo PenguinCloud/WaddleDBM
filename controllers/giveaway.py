@@ -22,9 +22,7 @@ def index(): return dict(message="hello from giveaway.py")
 # Function to get a routing_gateway channel_id from a given routing_gateway_id. If it doesnt exist, return null.
 def get_channel_id(routing_gateway_id: int) -> str:
     routing_gateway = db(db.routing_gateways.id == routing_gateway_id).select().first()
-    if not routing_gateway:
-        return None
-    return routing_gateway.channel_id
+    return None if not routing_gateway else routing_gateway.channel_id
 
 # Function to get the account as a combination of the protocol and the server name from a given routing_gateway_id. If it doesnt exist, return null.
 def get_account(routing_gateway_id: int) -> str:
