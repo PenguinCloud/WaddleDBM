@@ -391,10 +391,6 @@ def close_with_winner() -> dict:
     
     # Get all the entries for the giveaway
     entries = db(db.prize_entries.prize_id == giveaway.id).select()
-
-    # If there are no payloads, return an error
-    if not payloads:
-        return dict(msg="No payloads found for the community. Unable to announce the winner.")
     
     # If no winner_identity_name is provided, select a random winner from the entries
     if 'winner_identity_name' not in payload:
@@ -419,8 +415,8 @@ def close_with_winner() -> dict:
         return dict(msg="No payloads found for the community. Unable to announce the winner.")
     
     # Send a message to Matterbridge
-    for payload in payloads:
-        send_matterbridge_message(payload)
+    for pld in payloads:
+        send_matterbridge_message(pld)
 
     # Return a success message
     return dict(msg=f"Giveaway with guid {payload['guid']} is successfully closed.")
