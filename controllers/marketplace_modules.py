@@ -49,10 +49,11 @@ def get_community_member(identity_name, community_id):
     identity = get_identity_record(identity_name)
     community = get_community_record_by_id(community_id)
 
-    if identity is None or community is None:
-        return None
-    else:
+    if identity and community:
         return db((db.community_members.identity_id == identity.id) & (db.community_members.community_id == community.id)).select().first()
+    
+    return None
+        
     
 # A helper function to use a given identity_name and retrieve a list of priv_list that the identity has in a given community, according to the community context.
 def get_priv_list(identity_name) -> list:
