@@ -81,7 +81,7 @@ def send_matterbridge_message(payload: matterbridgePayload) -> None:
     # Send the message to Matterbridge
     try:
         requests.post(matterbridgePostURL, json=asdict(payload))
-        logging.info(f"Message sent to Matterbridge successfully.")
+        logging.info("Message sent to Matterbridge successfully.")
     except Exception as e:
         logging.error(f"Error sending message to Matterbridge: {e}")
 
