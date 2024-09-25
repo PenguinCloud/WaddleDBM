@@ -51,7 +51,7 @@ def create_session():
     role_privileges = role.priv_list
 
     # Check if the role privileges are in the required privileges list.
-    if any(privilege in role_privileges for privilege in required_privileges):
+    if not any(privilege in role_privileges for privilege in required_privileges):
         return dict(msg="Identity is not an admin or owner of the community.")
     
     # Set a session expiration time of 1 hour.
