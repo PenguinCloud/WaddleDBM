@@ -37,9 +37,7 @@ def close_giveaway(guid: str) -> None:
 # Function to get a routing_gateway channel_id from a given routing_gateway_id. If it doesnt exist, return null.
 def get_channel_id(routing_gateway_id: int) -> str:
     routing_gateway = db(db.routing_gateways.id == routing_gateway_id).select().first()
-    if not routing_gateway:
-        return None
-    return routing_gateway.channel_id
+    return None if not routing_gateway else routing_gateway.channel_id
 
 # Function to get the account as a combination of the protocol and the server name from a given routing_gateway_id. If it doesnt exist, return null.
 def get_account(routing_gateway_id: int) -> str:
@@ -98,7 +96,7 @@ def send_matterbridge_message(payload: matterbridgePayload) -> None:
     # Send the message to Matterbridge
     try:
         requests.post(matterbridgePostURL, json=asdict(payload))
-        logging.info(f"Message sent to Matterbridge successfully.")
+        logging.info("Message sent to Matterbridge successfully.")
     except Exception as e:
         logging.error(f"Error sending message to Matterbridge: {e}")
 
