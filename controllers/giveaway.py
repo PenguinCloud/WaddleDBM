@@ -359,66 +359,53 @@ def remove() -> dict:
 # A function to close a giveway with a given guid and then setting a winner, according to a winner_identity_name provided in the payload. 
 # If no winner_identity_name is provided, a random winner is selected from the entries.
 # Throws an error if no guid is provided, or the guid does not exist. Also throws an error if the giveaway is already closed, or the identity_name is not valid.
-def close_with_winner() -> dict:
-    # Check that the payload is provided
-    payload = request.body.read()
-
-    if not payload:
-        return dict(msg="No payload given.")
-    
-    payload = json.loads(payload)
-
-    # Check that the guid is provided in the payload
-    if 'guid' not in payload:
-        return dict(msg="Payload missing required fields. Please provide a guid in the payload.")
-    
-    # Check if the giveaway exists
-    giveaway = db(db.prizes.guid == payload['guid']).select().first()
+def validate_giveaway(guid):
+    giveaway = db(db.prizes.guid == guid).select().first()
     if not giveaway:
-        return dict(msg="Giveaway does not exist. Please provide a valid guid.")
-    
-    # Check if the giveaway is already closed
+        raise ValueError("Giveaway does not exist.")
     status = db(db.prize_statuses.id == giveaway.prize_status).select().first()
-
     if status.status_name == "Closed":
-        return dict(msg="Giveaway is already closed.")
-    
-    # If a winner_identity_name is provided, check if the identity exists
-    if 'winner_identity_name' in payload:
-        identity = db(db.identities.identity_name == payload['winner_identity_name']).select().first()
-        if not identity:
-            return dict(msg="Identity does not exist. Please provide a valid identity name.")
-    
-    # Get all the entries for the giveaway
-    entries = db(db.prize_entries.prize_id == giveaway.id).select()
-    
-    # If no winner_identity_name is provided, select a random winner from the entries
-    if 'winner_identity_name' not in payload:
-        winner = random.choice(entries)
-        winner_identity = db(db.identities.id == winner.identity_id).select().first()
+        raise ValueError("Giveaway is already closed.")
+    return giveaway
+
+# A function to get a winner for a given giveaway. If a winner_identity_name is provided, the winner is set to that identity.
+def get_winner(giveaway, winner_identity_name=None):
+    if winner_identity_name:
+        winner = db(db.identities.identity_name == winner_identity_name).select().first()
+        if not winner:
+            raise ValueError("Identity does not exist.")
     else:
-        winner_identity = identity
+        entries = db(db.prize_entries.prize_id == giveaway.id).select()
+        winner = random.choice(entries)
+        winner = db(db.identities.id == winner.identity_id).select().first()
+    return winner
 
-    # Update the giveaway with the winner's identity
-    db(db.prizes.guid == payload['guid']).update(winner_identity_id=winner_identity.id)
-
-    # Close the giveaway
+# A function to close a giveaway with a given guid and set a winner. If no winner_identity_name is provided, a random winner is selected from the entries.
+def close_giveaway(giveaway, winner):
+    db(db.prizes.guid == giveaway.guid).update(winner_identity_id=winner.id)
     status = db(db.prize_statuses.status_name == "Closed").select().first()
+    db(db.prizes.guid == giveaway.guid).update(prize_status=status.id)
 
-    db(db.prizes.guid == payload['guid']).update(prize_status=status.id)
+# A function to announce the winner of a giveaway in the chat of every gateway that the community is connected to, via Matterbridge.
+def announce_winner(giveaway, winner):
+    payloads = create_matterbridge_payloads(giveaway.community_id, f"Giveaway with guid {giveaway.guid} is closed. Winner is {winner.identity_name}.")
+    for payload in payloads:
+        send_matterbridge_message(payload)
 
-    # Get the gateway payloads for the community
-    payloads = create_matterbridge_payloads(giveaway.community_id, f"Giveway with guid {payload['guid']} is closed. Winner is {winner_identity.identity_name}.")
+# Function to close a giveaway with a given guid and set a winner. If no winner_identity_name is provided, a random winner is selected from the entries.
+def close_with_winner():
+    payload = json.loads(request.body.read())
+    guid = payload.get('guid')
+    if not guid:
+        return dict(msg="Please provide a guid in the payload.")
 
-    # If there are no payloads, return an error
-    if not payloads or len(payloads) == 0:
-        return dict(msg="No payloads found for the community. Unable to announce the winner.")
-    
-    # Send a message to Matterbridge
-    for pld in payloads:
-        send_matterbridge_message(pld)
-
-    # Return a success message
-    return dict(msg=f"Giveaway with guid {payload['guid']} is successfully closed.")
+    try:
+        giveaway = validate_giveaway(guid)
+        winner = get_winner(giveaway, payload.get('winner_identity_name'))
+        close_giveaway(giveaway, winner)
+        announce_winner(giveaway, winner)
+        return dict(msg=f"Giveaway with guid {guid} is successfully closed.")
+    except ValueError as e:
+        return dict(msg=str(e))
 
 # TODO: Create a function that sends a DM to the winner of the giveaway. The function should take the guid of the giveaway and the message to send as input.
