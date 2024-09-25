@@ -9,7 +9,7 @@ def index(): return dict(message="hello from roles.py")
 from urllib.parse import unquote
 
 def decode_name(name):
-    return None if not name else unquote(name)
+    return unquote(name) if name else None
 
 # Helper function to get a community record by its name.
 def get_community_record_by_name(name):
