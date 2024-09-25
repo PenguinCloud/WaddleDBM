@@ -83,13 +83,11 @@ def get_admin_context_session(identity_name):
         else:
             role = db((db.roles.community_id == community_context.community_id) & (db.roles.id == community_member.role_id)).select().first()
 
-            if not role:
-                return None
-            else:
+            if role:
                 if 'admin' in role.priv_list:
                     return db((db.admin_contexts.community_id == community_id) & (db.admin_contexts.identity_id == community_member.identity_id)).select().first()
-                else:
-                    return None
+
+    return None
                 
 # A helper function to get an alias value by a given alias value and identity name. The identity name is used to derive the current community context of the identity.
 # Returns an alias value if one exists for the community. Else, returns None.
