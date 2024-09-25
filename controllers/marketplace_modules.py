@@ -19,6 +19,10 @@ def decode_name(name):
 
     return outName
 
+# Helper function to get a record from a given table, field and value
+def get_db_record(table, field, value):
+    return db(table[field] == value).select().first()
+
 # Helper function to raplace all spaces in given command string with _ and return the new string
 def replace_spaces(command):
     return command.replace(" ", "_")
@@ -53,25 +57,15 @@ def get_community_member(identity_name, community_id):
 # A helper function to use a given identity_name and retrieve a list of priv_list that the identity has in a given community, according to the community context.
 def get_priv_list(identity_name) -> list:
     community_context = get_community_context(identity_name)
-    if community_context is None:
+    if not community_context:
         return None
-    else:
-        community_id = community_context.community_id
-        community_member = get_community_member(identity_name, community_id)
 
-        if community_member is None:
-            return None
-        else:
-            priv_list = []
+    community_member = get_community_member(identity_name, community_context.community_id)
+    if not community_member:
+        return None
 
-            role = db((db.roles.community_id == community_context.community_id) & (db.roles.id == community_member.role_id)).select().first()
-
-            if not role:
-                return None
-            else:
-                priv_list = role.priv_list
-
-            return priv_list
+    role = get_db_record(db.roles, 'id', community_member.role_id)
+    return role.priv_list if role else None
         
 # A helper function to get an admin context session by a given identity name. The identity name is used to derive the current community context of the identity.
 # Returns an admin context session if one exists for the identity and the identity is an admin of the community context. Else, returns None.
@@ -119,7 +113,17 @@ def get_marketplace_module_by_alias(alias, identity_name):
         marketplace_module = db((db.marketplace_modules.metadata.like(f'%"{replace_spaces(alias_command.command_val)}"%'))).select().first()
         return marketplace_module
 
+# Decorator to require a payload in the request body. If no payload is given, return an error message.
+def require_payload(f):
+    def wrapper(*args, **kwargs):
+        payload = request.body.read()
+        if not payload:
+            return dict(msg="No payload given.")
+        return f(json.loads(payload), *args, **kwargs)
+    return wrapper
+
 # Create a new marketplace module from a given payload. Throws an error if no payload is given, or the marketplace module already exists.
+@require_payload
 def create():
     payload = request.body.read()
     if not payload:
@@ -134,6 +138,9 @@ def create():
 
 # Get a marketplace module by name. Throws an error if no name is given, or the marketplace module does not exist.
 # An identity name must be present in the payload to also return the available roles for the identity in the community context.
+# If the marketplace module does not exist, check if the name can be used as an alias to get the marketplace module.
+# If the alias command exists, return the aliased command value.
+@require_payload
 def get():
     # Check if a payload is given, and if so, get the identity name from the payload
     payload = request.body.read()
@@ -195,6 +202,7 @@ def get_all():
     return dict(data=marketplace_modules)
 
 # Get all the marketplace modules, as only the name and the id. Only modules that fall under the Community module type are returned.
+@require_payload
 def get_all_community_modules():
     payload = request.body.read()
     if not payload:
@@ -244,6 +252,7 @@ def remove():
     return dict(msg="Marketplace Module removed.")
 
 # Update a marketplace module by name. Throws an error if no name is given, or the marketplace module does not exist.
+@require_payload
 def update():
     name = decode_name(request.args(0))
     if not name:
