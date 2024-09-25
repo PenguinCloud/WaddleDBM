@@ -4215,3 +4215,57 @@ success!
 success!
 success!
 success!
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2024-09-25T09:02:41.500026
+CREATE TABLE "text_responses"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "community_id" INTEGER REFERENCES "communities" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "text_val" CHAR(512),
+    "response_val" CHAR(512)
+);
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2024-09-25T09:06:14.821681
+CREATE TABLE "text_responses"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "community_id" INTEGER REFERENCES "communities" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "text_val" CHAR(512),
+    "response_val" CHAR(512)
+);
+success!
+timestamp: 2024-09-25T09:06:14.826681
+CREATE TABLE "alias_commands"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "community_id" INTEGER REFERENCES "communities" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "alias_val" CHAR(512),
+    "command_val" CHAR(512)
+);
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2024-09-25T09:06:58.854234
+CREATE TABLE "alias_commands"(
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "community_id" INTEGER REFERENCES "communities" ("id") ON DELETE CASCADE ON UPDATE CASCADE  ,
+    "alias_val" CHAR(512),
+    "command_val" CHAR(512)
+);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
