@@ -40,6 +40,9 @@ def create_roles(community_id):
         db.roles.insert(name=name, description=description, community_id=community_id, priv_list=priv_list, requirements=requirements)
 
 # Get the owner role for a given community_id.
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
 def get_owner_role(community_id):
     return (
         db(
