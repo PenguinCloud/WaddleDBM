@@ -182,9 +182,9 @@ def create() -> dict:
         return dict(msg="Community does not exist. Please provide a valid community name.")
     
     # Check if a timeout is provided, if not, set it to 0
-    timeout = 0
-    if 'timeout' in payload:
-        timeout = payload['timeout']
+    timeout = payload["timeout"] if "timeout" in payload else 0
+    # if 'timeout' in payload:
+    #     timeout = payload['timeout']
 
     # Generate a giveaway guid
     guid = str(uuid.uuid4())
