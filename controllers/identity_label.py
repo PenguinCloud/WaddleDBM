@@ -5,14 +5,23 @@ import json
 # try something like
 def index(): return dict(message="hello from identity_label.py")
 
+# A helper function to parse the payload of a request.
+def parse_payload():
+    payload = request.body.read()
+    if not payload:
+        raise ValueError("No payload given.")
+    return payload
+
 # Function to create a new identity label for a given identity_name and community_name.
 # Throws an error if no identity_name or community_name is given, or the identity label already exists.
 # Also throws an error if the identity or the community does not exist.
 def create():
     # Define the payload.
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given.")
+    try:
+        payload = parse_payload()
+    except ValueError as e:
+        return dict(msg=str(e))
+    
     payload = json.loads(payload)
     
     # Check if the payload has the required fields identity name, community name and label.
@@ -41,9 +50,11 @@ def create():
 # Get all identity labels for a given identity name and community name in a payload object.
 def get_by_identity_and_community():
     # Define the payload.
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given.")
+    try:
+        payload = parse_payload()
+    except ValueError as e:
+        return dict(msg=str(e))
+    
     payload = json.loads(payload)
     
     # Check if the payload has the required fields identity name and community name.
@@ -69,9 +80,11 @@ def get_by_identity_and_community():
 # Throws an error if no identity name, community name or label is given, or the identity label does not exist.
 def update_by_identity_and_community():
     # Define the payload.
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given.")
+    try:
+        payload = parse_payload()
+    except ValueError as e:
+        return dict(msg=str(e))
+    
     payload = json.loads(payload)
     
     # Check if the payload has the required fields identity name, community name and label.
@@ -102,9 +115,11 @@ def update_by_identity_and_community():
 # Throws an error if no identity name or community name is given, or the identity label does not exist.
 def delete_by_identity_and_community():
     # Define the payload.
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given.")
+    try:
+        payload = parse_payload()
+    except ValueError as e:
+        return dict(msg=str(e))
+    
     payload = json.loads(payload)
     
     # Check if the payload has the required fields identity name and community name.
