@@ -1,0 +1,101 @@
+{{extend 'waddle_layout.html'}}
+<h1>WaddleBot Module Onboarding Platform</h1>
+
+<p>
+    Welcome to WaddleBot!
+</p>
+
+<p>
+    This form will allow you to onboard a new module to the bot for custom command use.
+    To get started, please fill out the form below.
+</p>
+
+<form action="#" enctype="multipart/form-data" method="post" id="module_form">
+    <div class="form-group">
+        <label for="module_name">Module Name</label>
+        <input type="text" class="form-control" id="module_name" name="name" required="required">
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description</label>
+        <input type="text" class="form-control" id="description" name="description" required="required">
+    </div>
+
+    <div class="form-group">
+        <label for="gateway_url">Gateway URL</label>
+        <input type="text" class="form-control" id="gateway_url" name="gateway_url" required="required">
+    </div>
+
+    <input type="hidden" name="_formname" value="module_form" />
+</form>
+
+<div>
+    <h2>Command Data</h2>
+    <p>
+        This section will allow you to add custom commands to your module. You can add as many commands as you like. Please fill out the values below before submitting the module.
+    </p>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <form action="#" enctype="multipart/form-data" method="post" id="command_form">
+            <div class="form-group">
+                <label for="command_name">Command Name</label>
+                <input type="text" class="form-control" id="command_name" name="command_name" required="required">
+            </div>
+    
+            <div class="form-group">
+                <label for="command_description">Command Description</label>
+                <input type="text" class="form-control" id="command_description" name="description" required="required">
+            </div>
+    
+            <div class="form-group">
+                <label for="command_url">Command URL</label>
+                <input type="text" class="form-control" id="command_url" name="action" required="required">
+            </div>
+    
+            <div class="form-group">
+                <label for="command_method">Command Method</label>
+                <select class="form-control" id="command_method" name="method" required="required">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+            </div>
+    
+            <div class="form-group">
+                <label for="command_params">Command Parameters</label>
+                <input type="text" class="form-control" id="command_params" name="parameters" required="required">
+            </div>
+    
+            <div class="form-group">
+                <label for="payload_keys">Payload Keys</label>
+                <input type="text" class="form-control" id="payload_keys" name="payload_keys" required="required">
+            </div>
+
+            <div class="form-group">
+                <label for="req_priv_list">Required Privileges</label>
+                <input type="text" class="form-control" id="req_priv_list" name="req_priv_list" required="required">
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Add Command" />
+            <input type="hidden" name="_formname" value="command_form" />
+        </form>
+    </div>
+    <div class="col-md-6">
+        <h3>List of Commands:</h3>
+        {{if len(command_list) > 0:}}
+            <ul>
+                {{for command in command_list:}}
+                    <li>{{=BEAUTIFY(command)}}</li>
+                {{pass}}
+            </ul>
+        {{else:}}
+            <p>No commands added yet.</p>
+        {{pass}}
+    </div>
+</div>
+
+
+<input type="submit" form="module_form"/>
