@@ -17,8 +17,10 @@ RUN ansible-playbook entrypoint.yml -c local --tags "build,run"
 # PUT YER ENVS in here
 ENV HELLO="WORLD"
 
+WORKDIR /var/www/html/web2py/
+
 # Switch to non-root user
-USER ptg-user
+# USER waddlebot
 
 # Entrypoint time (aka runtime)
 ENTRYPOINT ["/bin/bash","/opt/manager/waddledbm/entrypoint.sh"]

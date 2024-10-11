@@ -21,3 +21,10 @@
     owner: "{{ run.user }}"
     group: "{{ run.user }}"
     mode: '0755'
+    
+- name: Make sure web2py is executable by the run user
+  ansible.builtin.file:
+    dest: "/var/www/html/web2py/web2py.py"
+    owner: "{{ run.user }}"
+    group: "{{ run.user }}"
+    mode: '0755'
