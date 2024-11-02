@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 
+# Set logging level to INFO
+logging.basicConfig(level=logging.INFO)
 
 # try something like
 def index(): return dict(message="hello from communities.py")
@@ -13,6 +16,42 @@ def decode_name(name):
     name = name.replace("_", " ")
 
     return name
+
+# A helper function to create a list of roles for a newly created community, using its community_id.
+# TODO: Figure out how to add the requirements field to the roles table and implement it.
+def create_roles(community_id):
+
+    # Read the default roles from the default_roles.json file
+    filePath = "applications/WaddleDBM/models/default_roles.json"
+
+    try:
+        with open(filePath, "r") as file:
+            roles = json.load(file)
+    except FileNotFoundError:
+        return dict(msg="Default roles file not found. Unable to create default roles for the community.")  
+
+    requirements = ["None"]
+
+    for role in roles:
+        name = role['role']
+        description = role['description']
+        priv_list = role['permissions']
+
+        db.roles.insert(name=name, description=description, community_id=community_id, priv_list=priv_list, requirements=requirements)
+
+# Get the owner role for a given community_id.
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
+def get_owner_role(community_id):
+    return (
+        db(
+            (db.roles.community_id == community_id)
+            & (db.roles.name == "Owner")
+        )
+        .select()
+        .first()
+    )
 
 # Create a new community from a given payload. Throws an error if no payload is given, or the community already exists.
 def create():
@@ -37,14 +76,32 @@ def create_by_name():
     # Check if the community name and identity name fields are in the payload.
     if 'community_name' not in payload or 'identity_name' not in payload:
         return dict(msg="Payload missing required fields. Need community_name and identity_name.")
+    
+    # Check if the 'description' field is in the payload. If not, set it to an empty string.
+    if 'description' not in payload:
+        payload['description'] = ""
+
+    # Check if the community already exists.
     if db(db.communities.community_name == payload['community_name']).count() > 0:
         return dict(msg="Community already exists.")
-    db.communities.insert(community_name=payload['community_name'], community_description="")
+    
+    # Create the community with the given community name.
+    db.communities.insert(community_name=payload['community_name'], community_description=payload['description'])
+
+    # Create the default roles for the community.
+    community = db(db.communities.community_name == payload['community_name']).select().first()
+    create_roles(community.id)
 
     # After a community is created, add the identity as a member of the community with the Owner role from the roles table.
     community = db(db.communities.community_name == payload['community_name']).select().first()
     identity = db(db.identities.name == payload['identity_name']).select().first()
-    role = db(db.roles.name == "Owner").select().first()
+
+    # If the identity does not exist, return an error.
+    if not identity:
+        return dict(msg="Identity does not exist.")
+
+    # From the roles table, get the Owner role for the community.
+    role = get_owner_role(community.id)
     db.community_members.insert(community_id=community.id, identity_id=identity.id, role_id=role.id, currency=0)
 
     return dict(msg="Community created. You have been granted the Owner role of this community.")
