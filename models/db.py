@@ -166,6 +166,12 @@ db.define_table('communities',
                 Field('community_name'),
                 Field('community_description'))
 
+# Define a table that keeps track of labels for identities in a community
+db.define_table('identity_labels',
+                Field('identity_id', db.identities),
+                Field('community_id', db.communities),
+                Field('label', 'string'))
+
 # Define table for community modules
 db.define_table('community_modules', 
                 Field('module_id', 'integer'),
@@ -257,18 +263,23 @@ db.define_table('calendar',
                 Field('not_end_sent', 'boolean', default=False))
 
 
-# After defining the tables, create the "Global" community, if it does not exist
-if db(db.communities.community_name == "Global").count() == 0:
-    db.communities.insert(community_name="Global", community_description="The global community.")
 
-# After the Global community is created, create a routing entry for the Global community, if it does not exist
-global_community = db(db.communities.community_name == "Global").select().first()
-if db(db.routing.community_id == global_community.id).count() == 0:
-    db.routing.insert(channel="Global", community_id=global_community.id, gateways=[], aliases=[])
+# A function to initialize the database
+def initializeDB():
+    # After defining the tables, create the "Global" community, if it does not exist
+    if db(db.communities.community_name == "Global").count() == 0:
+        db.communities.insert(community_name="Global", community_description="The global community.")
 
-# Also create the "member" and "owner" roles, if they do not exist
-if db(db.roles.name == "member").count() == 0:
-    db.roles.insert(name="member", description="A member of a community.", privilages=["read", "write"], requirements=["reputation >= 0"])
+    # After the Global community is created, create a routing entry for the Global community, if it does not exist
+    global_community = db(db.communities.community_name == "Global").select().first()
+    if db(db.routing.community_id == global_community.id).count() == 0:
+        db.routing.insert(channel="Global", community_id=global_community.id, gateways=[], aliases=[])
 
-if db(db.roles.name == "owner").count() == 0:
-    db.roles.insert(name="owner", description="The owner of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
+    # Also create the "member" and "owner" roles, if they do not exist
+    if db(db.roles.name == "member").count() == 0:
+        db.roles.insert(name="member", description="A member of a community.", privilages=["read", "write"], requirements=["reputation >= 0"])
+
+    if db(db.roles.name == "owner").count() == 0:
+        db.roles.insert(name="owner", description="The owner of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
+
+initializeDB()
