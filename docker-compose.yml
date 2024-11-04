@@ -1,5 +1,8 @@
 ---
 version: "2.4"
 services:
-  app:
-    image: penguintech/core-ansible
+  waddlebot-waddledbm:
+    build: .
+    ports: 
+      - "8000:8000"
+    restart: always
