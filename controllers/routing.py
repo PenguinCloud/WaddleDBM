@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -44,7 +44,7 @@ def create_routing():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'name' not in payload or 'description' not in payload or 'priv_list' not in payload or 'requirements' not in payload:
         return dict(msg="Payload missing required fields.")
     if db(db.routing.name == payload['name']).count() > 0:
@@ -85,7 +85,7 @@ def update_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'name' not in payload or 'description' not in payload or 'priv_list' not in payload or 'requirements' not in payload:
         return dict(msg="Payload missing required fields.")
     routing = db(db.routing.name == name).select().first()
@@ -130,7 +130,7 @@ def add_route_to_community():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload:
         return dict(msg="Payload missing required fields. Remember to add the community name at the end of the command between [] brackets.")
     community_name = decode_name(payload['community_name'])
@@ -183,7 +183,7 @@ def remove_route_from_community():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload:
         return dict(msg="Payload missing required fields.")
     community_name = decode_name(payload['community_name'])

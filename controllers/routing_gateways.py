@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -19,7 +19,7 @@ def create_gateway():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.", status=400)
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'gateway_type_name' not in payload or 'gateway_server_name' not in payload or 'channel_id' not in payload or 'activation_key' not in payload:
         return dict(msg="Payload missing required fields.", status=400)
     # Check if the gateway_server exists in the gateway_servers table
@@ -47,7 +47,7 @@ def activate_gateway():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.", status=400)
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'activation_key' not in payload:
         return dict(msg="Payload missing required fields.", status=400)
     routing_gateway = db(db.routing_gateways.activation_key == payload['activation_key']).select().first()
@@ -94,7 +94,7 @@ def update_by_channel_id():
     if not payload:
         return dict(msg="No payload given.", status=400)
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     if 'channel_id' not in payload:
         return dict(msg="Payload missing required fields. Please provide the channel_id.", status=400)
@@ -131,7 +131,7 @@ def delete_by_channel_id_and_gateway_type():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.", status=400)
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'channel_id' not in payload or 'gateway_type_name' not in payload:
         return dict(msg="Payload missing required fields.", status=400)
     gateway_type = db(db.gateway_types.type_name == payload['gateway_type_name']).select().first()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -41,7 +41,7 @@ def set_alias_command():
     if not payload:
         return dict(msg="No payload given.", status=400)
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'alias' not in payload or 'command' not in payload:
         return dict(msg="Payload missing required fields.", status=400)
     
@@ -96,7 +96,7 @@ def get_by_alias():
     if not payload:
         return dict(msg="No payload given.", status=400)
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'alias' not in payload:
         return dict(msg="Payload missing required fields. Please provide the 'alias' field.", status=400)
 
@@ -121,7 +121,7 @@ def delete_by_alias():
     if not payload:
         return dict(msg="No payload given.", status=400)
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'alias' not in payload:
         return dict(msg="Payload missing required fields. Please provide the 'alias' field.", status=400)
     

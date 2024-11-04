@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -21,7 +21,7 @@ def get_reputation():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name and identity_name between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     identity_name = payload.get("identity_name")
     if not identity_name:
         return dict(msg="No identity_name given. Please provide an identity_name between [] characters.")
@@ -55,7 +55,7 @@ def add_reputation():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name, identity_name, and amount between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     # Check if the identity name and amount are given in the payload.
     if "identity_name" not in payload or "amount" not in payload:
         return dict(msg="Please provide an identity_name and amount between [] characters.")
@@ -95,7 +95,7 @@ def subtract_reputation():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name, identity_name, and amount between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     # Check if the identity name and amount are given in the payload.
     if "identity_name" not in payload or "amount" not in payload:
         return dict(msg="Please provide an identity_name and amount between [] characters.")
@@ -135,7 +135,7 @@ def set_reputation():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name, identity_name, and amount between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     # Check if the identity name and amount are given in the payload.
     if "identity_name" not in payload or "amount" not in payload:
         return dict(msg="Please provide an identity_name and amount between [] characters.")

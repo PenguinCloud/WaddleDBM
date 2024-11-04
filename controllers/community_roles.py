@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -38,7 +38,7 @@ def create_role():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     needed_fields = ['name', 'description', 'priv_list', 'requirements', 'community_name']
 
@@ -104,7 +104,7 @@ def update_by_name_and_community_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     required_fields = ['name', 'description', 'priv_list', 'requirements', 'community_name']
 
@@ -135,7 +135,7 @@ def update_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'name' not in payload or 'description' not in payload or 'priv_list' not in payload or 'requirements' not in payload:
         return dict(msg="Payload missing required fields.")
     role = db(db.roles.name == name).select().first()
@@ -163,7 +163,7 @@ def delete_by_name_and_community_name():
     if not payload:
         return dict(msg="No payload given.")
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     required_fields = ['name', 'community_name']
 

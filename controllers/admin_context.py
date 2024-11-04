@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import json
-import datetime
+from json import loads as jloads
+from datetime import datetime, timedelta
 import uuid
-import threading
+from threading import Thread
 import time
 import logging
 
@@ -23,7 +23,7 @@ def create_session():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = loads(payload)
 
     # Check if the payload contains the required fields.
     if 'identity_name' not in payload:
@@ -55,7 +55,7 @@ def create_session():
         return dict(msg="Identity is not an admin or owner of the community.")
     
     # Set a session expiration time of 1 hour.
-    expiration_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    expiration_time = datetime.now() + timedelta(hours=1)
 
     # Generate a unique session ID token.
     session_token = str(uuid.uuid4())
@@ -84,7 +84,7 @@ def get_by_community_and_identity():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = loads(payload)
 
     # Check if the payload contains the required fields.
     if 'community_name' not in payload or 'identity_name' not in payload:
@@ -124,7 +124,7 @@ def refresh_by_session_token():
         return dict(msg="Admin context session not found.")
     
     # Set a new session expiration time of 1 hour from now.
-    expiration_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    expiration_time = datetime.now() + timedelta(hours=1)
     admin_context.update_record(session_expires=expiration_time)
 
     return dict(msg="Admin context session refreshed.")
@@ -137,7 +137,7 @@ def check_module_in_community():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = loads(payload)
 
     # Check if the payload contains the required fields.
     if 'community_name' not in payload or 'identity_name' not in payload or 'module_id' not in payload:
@@ -185,7 +185,7 @@ def delete_by_community_and_identity():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     # Check if the payload contains the required fields.
     if 'identity_name' not in payload:
@@ -235,7 +235,7 @@ def delete_by_session_token():
 
 # Function to delete all expired admin context sessions. This function is called periodically by a scheduler.
 def delete_expired_sessions():
-    current_time = datetime.datetime.now()
+    current_time = datetime.now()
     db(db.admin_contexts.session_expires < current_time).delete()
     logging.info("Expired admin context sessions deleted.")
     return dict(msg="Expired admin context sessions deleted.")
@@ -248,6 +248,6 @@ def delete_expired_sessions_continuously():
 
 # Function to start a thread that continuously deletes expired admin context sessions.
 def start_delete_expired_sessions_thread():
-    thread = threading.Thread(target=delete_expired_sessions_continuously)
+    thread = Thread(target=delete_expired_sessions_continuously)
     thread.start()
     return dict(msg="Thread started.")

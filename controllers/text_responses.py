@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -32,7 +32,7 @@ def set_text_response():
     if not payload:
         return dict(msg="No payload given.", status=400)
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'text' not in payload or 'response' not in payload:
         return dict(msg="Payload missing required fields.", status=400)
     
@@ -62,7 +62,7 @@ def update_text_response():
     if not payload:
         return dict(msg="No payload given.", status=400)
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'text' not in payload or 'response' not in payload:
         return dict(msg="Payload missing required fields.", status=400)
     
@@ -102,7 +102,7 @@ def get_by_text():
     if not payload:
         return dict(msg="No payload given.", status=400)
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'text' not in payload:
         return dict(msg="Payload missing required fields. Please provide the 'text' field.", status=400)
 
@@ -127,7 +127,7 @@ def delete_by_text():
     if not payload:
         return dict(msg="No payload given.", status=400)
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'text' not in payload:
         return dict(msg="Payload missing required fields. Please provide the 'text' field.", status=400)
     

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 import logging
 
 # Set logging level to INFO
@@ -58,7 +58,7 @@ def create():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload or 'community_description' not in payload:
         return dict(msg="Payload missing required fields.")
     if db(db.communities.community_name == payload['community_name']).count() > 0:
@@ -71,7 +71,7 @@ def create_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     # Check if the community name and identity name fields are in the payload.
     if 'community_name' not in payload or 'identity_name' not in payload:
@@ -131,7 +131,7 @@ def update_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload or 'community_description' not in payload:
         return dict(msg="Payload missing required fields.")
     community = db(db.communities.community_name == community_name).select().first()
@@ -149,7 +149,7 @@ def update_desc_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_name' not in payload or 'community_description' not in payload:
         return dict(msg="Payload missing required fields.")
     community = db(db.communities.community_name == community_name).select().first()
@@ -177,7 +177,7 @@ def delete_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_name' not in payload:
         return dict(msg="Payload missing required fields.")
     community = db(db.communities.community_name == community_name).select().first()

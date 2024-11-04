@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 from urllib.parse import unquote
 import logging
 
@@ -132,7 +132,7 @@ def require_payload(f):
         payload = request.body.read()
         if not payload:
             return dict(msg="No payload given.")
-        return f(json.loads(payload), *args, **kwargs)
+        return f(jloads(payload), *args, **kwargs)
     return wrapper
 
 # Create a new marketplace module from a given payload. Throws an error if no payload is given, or the marketplace module already exists.
@@ -141,7 +141,7 @@ def create():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'name' not in payload or 'description' not in payload or 'gateway_url' not in payload or 'module_type_id' not in payload or 'metadata' not in payload:
         return dict(msg="Payload missing required fields.")
     if db(db.marketplace_modules.name == payload['name']).count() > 0:
@@ -161,7 +161,7 @@ def get():
     if not payload:
         return dict(msg="No payload given.")
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     # Ensure that the identity name and module name is present in the payload
     if 'name' not in payload or 'identity_name' not in payload:
@@ -221,7 +221,7 @@ def get_all_community_modules():
     if not payload:
         return dict(msg="No payload given.")
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
     module_type = payload.get("module_type", "Community")
     
     module_type_record = db(db.module_types.name == module_type).select().first()
@@ -276,7 +276,7 @@ def update():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     marketplace_module.update_record(**payload)
     return dict(msg="Marketplace Module updated.")
 

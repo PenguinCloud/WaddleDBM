@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 from urllib.parse import unquote
 
 
@@ -20,7 +20,7 @@ def create_module_type():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'name' not in payload or 'description' not in payload:
         return dict(msg="Payload missing required fields.")
     if db(db.module_types.name == payload['name']).count() > 0:
@@ -54,7 +54,7 @@ def update_module_type():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     db(db.module_types.name == name).update(**payload)
     return dict(msg="Module Type updated.")
 

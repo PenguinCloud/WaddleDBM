@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -10,7 +10,7 @@ def create_member():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload or 'identity_name' not in payload:
         return dict(msg="Missing the required fields. Need community_name and identity_name.")
     
@@ -89,7 +89,7 @@ def update_by_community_id_and_identity_id():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_id' not in payload or 'identity_id' not in payload or 'role_id' not in payload:
         return dict(msg="Payload missing required fields.")
     community_member = db((db.community_members.community_id == community_id) & (db.community_members.identity_id == identity_id)).select().first()
@@ -115,7 +115,7 @@ def remove_member():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload or 'identity_name' not in payload:
         return dict(msg="Missing the required fields. Need community_name between [] characters.")
     
@@ -157,7 +157,7 @@ def update_member_role():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name, identity_name, member_name, and role_name between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload or 'identity_name' not in payload or 'member_name' not in payload or 'role_name' not in payload:
         return dict(msg="Missing the required fields. Need community_name, identity_name, member_name, and role_name between [] characters.")
     
@@ -213,7 +213,7 @@ def get_currency():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name and identity_name between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_name' not in payload:
         return dict(msg="Missing the required fields. Need community_name and identity_name between [] characters.")
     
@@ -240,7 +240,7 @@ def add_currency():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name, identity_name, and amount between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_name' not in payload or 'amount' not in payload:
         return dict(msg="Missing the required fields. Need community_name, identity_name, and amount between [] characters.")
     
@@ -276,7 +276,7 @@ def subtract_currency():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name, identity_name, and amount between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_name' not in payload or 'amount' not in payload:
         return dict(msg="Missing the required fields. Need community_name, identity_name, and amount between [] characters.")
     
@@ -312,7 +312,7 @@ def set_currency():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name, identity_name, and amount between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_name' not in payload or 'amount' not in payload:
         return dict(msg="Missing the required fields. Need community_name, identity_name, and amount between [] characters.")
     
@@ -349,7 +349,7 @@ def transfer_currency():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a community_name, identity_name, receiver_name, and amount between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_name' not in payload or 'receiver_name' not in payload or 'amount' not in payload:
         return dict(msg="Missing the required fields. Need community_name, identity_name, receiver_name, and amount between [] characters.")
     

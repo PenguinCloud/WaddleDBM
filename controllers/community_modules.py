@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -87,7 +87,7 @@ def update_by_community_id_and_module_id():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'module_id' not in payload or 'community_id' not in payload or 'enabled' not in payload or 'priv_list' not in payload:
         return dict(msg="Payload missing required fields.")
     community_module = db((db.community_modules.community_id == community_id) & (db.community_modules.module_id == module_id)).select().first()
@@ -116,7 +116,7 @@ def install_by_community_name():
     if not community_name or not payload:
         return dict(msg="Missing community name or payload.")
 
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'module_name' not in payload or 'identity_name' not in payload:
         return dict(msg="Payload missing required fields: module_name and identity_name.")
 
@@ -171,7 +171,7 @@ def uninstall_by_community_name():
         return dict(msg="No payload given.")
     
     # Check if the payload contains the module_name  and identity_name fields
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'module_name' not in payload or 'identity_name' not in payload:
         return dict(msg="Payload missing required fields. Please provide module_name and identity_name fields.")
     

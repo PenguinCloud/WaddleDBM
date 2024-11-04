@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -19,7 +19,7 @@ def create_gateway_server_type():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.", status=400)
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'type_name' not in payload or 'description' not in payload:
         return dict(msg="Payload missing required fields.", status=400)
     # Check if a record exists that matches the given payload exactly
@@ -63,7 +63,7 @@ def update_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.", status=400)
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'description' not in payload:
         return dict(msg="Payload missing required fields.", status=400)
 
