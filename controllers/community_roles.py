@@ -8,20 +8,20 @@ def index(): return dict(message="hello from roles.py")
 # Function to decode names with special characters in them.
 from urllib.parse import unquote
 
-def decode_name(name):
+def decode_name(name: str) -> str:
     return None if not name else unquote(name)
 
 # Helper function to get a community record by its name.
-def get_community_record_by_name(name):
+def get_community_record_by_name(name: str):
     return db(db.communities.community_name == name).select().first()
 
 # Helper function to get an identity record by its name.
-def get_identity_record_by_name(name):
+def get_identity_record_by_name(name: str):
     return db(db.identities.name == name).select().first()
 
 # Helper function to set the role of all identities in a community to the default "Member" role when a role is deleted.
 # Only identities with the deleted role are affected.
-def set_default_role_for_identities_in_community(community_id, role_id):
+def set_default_role_for_identities_in_community(community_id: int, role_id: int):
     db(
         (db.community_members.community_id == community_id) &
         (db.community_members.role_id == role_id)

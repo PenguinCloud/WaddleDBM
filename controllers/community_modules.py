@@ -5,11 +5,11 @@ import json
 # try something like
 def index(): return dict(message="hello from communities_modules.py")
 
-def get_identity(identity_name):
+def get_identity(identity_name: str) -> dict:
     return db(db.identities.name == identity_name).select().first()
 
 # A helper function that checks if a given identity exists in a given community. Returns True if the identity exists in the community, False otherwise.
-def identity_in_community(identity_name, community_name):
+def identity_in_community(identity_name: str, community_name: str) -> bool:
     identity = db(db.identities.name == identity_name).select(db.identities.id).first()
     community = db(db.communities.community_name == community_name).select(db.communities.id).first()
     
@@ -22,7 +22,7 @@ def identity_in_community(identity_name, community_name):
     return bool(membership)
 
 # A helper function that checks if a given identity is an admin of a given community. Returns True if the identity is an admin, False otherwise.
-def identity_is_admin(identity_name, community_name):
+def identity_is_admin(identity_name: str, community_name: str) -> bool:
     identity = db(db.identities.name == identity_name).select(db.identities.id).first()
     community = db(db.communities.community_name == community_name).select(db.communities.id).first()
     
@@ -36,7 +36,7 @@ def identity_is_admin(identity_name, community_name):
     role = db(db.roles.id == membership.role_id).select().first()
     return role.name in ['Admin', 'Owner', 'admin', 'owner']
 
-def is_community_module(module):
+def is_community_module(module) -> bool:
     module_type = db(db.module_types.id == module.module_type_id).select().first()
     return module_type.name == "Community"
 

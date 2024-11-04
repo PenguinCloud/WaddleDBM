@@ -6,7 +6,7 @@ import json
 def index(): return dict(message="hello from communities.py")
 
 # Function to decode names with space in
-def decode_name(name):
+def decode_name(name: str) -> str:
     if not name:
         return None
     name = name.replace("%20", " ")
@@ -16,7 +16,7 @@ def decode_name(name):
 
 # A helper function to create a list of roles for a newly created community, using its community_id.
 # TODO: Figure out how to add the requirements field to the roles table and implement it.
-def create_roles(community_id):
+def create_roles(community_id: int) -> None:
     roles = ['Member', 'Admin', 'Owner']
 
     requirements = ["None"]
@@ -41,7 +41,7 @@ def create_roles(community_id):
         db.roles.insert(name=role, description=description, community_id=community_id, priv_list=priv_list, requirements=requirements)
 
 # Get the owner role for a given community_id.
-def get_owner_role(community_id):
+def get_owner_role(community_id: int):
     return (
         db(
             (db.roles.community_id == community_id)

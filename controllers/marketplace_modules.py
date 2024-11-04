@@ -10,7 +10,7 @@ def index(): return dict(message="hello from marketplace.py")
 # Function to decode names with space in
 from urllib.parse import unquote
 
-def decode_name(name):
+def decode_name(name: str) -> str:
     outName = unquote(name)
 
     # If the name contains a _ character, replace it with a space
@@ -20,15 +20,15 @@ def decode_name(name):
     return outName
 
 # A helper function to return an identity record from a given identity_name
-def get_identity_record(identity_name):
+def get_identity_record(identity_name: str):
     return db(db.identities.name == identity_name).select().first()
 
 # A helper function to return a community record from a given community_name
-def get_community_record_by_id(community_id):
+def get_community_record_by_id(community_id: int):
     return db(db.communities.id == community_id).select().first()
 
 # A helper function to get the current community context of a given identity_name
-def get_community_context(identity_name):
+def get_community_context(identity_name: str):
     identity = get_identity_record(identity_name)
     # If the identity does not exist, return None. Else, return the community context of the identity.
     if identity is None:
@@ -37,7 +37,7 @@ def get_community_context(identity_name):
         return db(db.context.identity_id == identity.id).select().first()
 
 # A helper function to return a given identity_name as a community member from a community name
-def get_community_member(identity_name, community_id):
+def get_community_member(identity_name: str, community_id: int):
     identity = get_identity_record(identity_name)
     community = get_community_record_by_id(community_id)
 
@@ -47,7 +47,7 @@ def get_community_member(identity_name, community_id):
         return db((db.community_members.identity_id == identity.id) & (db.community_members.community_id == community.id)).select().first()
     
 # A helper function to use a given identity_name and retrieve a list of priv_list that the identity has in a given community, according to the community context.
-def get_priv_list(identity_name) -> list:
+def get_priv_list(identity_name: str) -> list:
     community_context = get_community_context(identity_name)
     if community_context is None:
         return None
@@ -71,7 +71,7 @@ def get_priv_list(identity_name) -> list:
         
 # A helper function to get an admin context session by a given identity name. The identity name is used to derive the current community context of the identity.
 # Returns an admin context session if one exists for the identity and the identity is an admin of the community context. Else, returns None.
-def get_admin_context_session(identity_name):
+def get_admin_context_session(identity_name: str):
     community_context = get_community_context(identity_name)
     if community_context is None:
         return None

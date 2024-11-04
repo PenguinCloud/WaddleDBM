@@ -6,7 +6,7 @@ import json
 def index(): return dict(message="hello from routing.py")
 
 # Function to decode names with special characters in them.
-def decode_name(name):
+def decode_name(name: str) -> str:
     if not name:
         return None
     name = name.replace("%20", " ")
@@ -15,7 +15,7 @@ def decode_name(name):
     return name
 
 # Function to return a routing_gateway by a given channel_id and account. If it doesnt exist, return null.
-def get_routing_gateway(channel_id, account):
+def get_routing_gateway(channel_id: str, account: str):
     # First, split the account into the protocol and the server name by splitting the account string by the first dot.
     account_split = account.split(".", 1)
     if len(account_split) != 2:
@@ -34,7 +34,7 @@ def get_routing_gateway(channel_id, account):
     return routing_gateway
 
 #Function to replace the first character of a string with a hash if it is an underscore.
-def replace_first_char(name):
+def replace_first_char(name: str) -> str:
     if name[0] == "_":
         name = "#" + name[1:]
     return name

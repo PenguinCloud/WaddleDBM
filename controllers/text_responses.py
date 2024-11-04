@@ -6,7 +6,7 @@ import json
 def index(): return dict(message="hello from text_response.py")
 
 # Helper function to decode names with space in
-def decode_name(name):
+def decode_name(name: str) -> str:
     if not name:
         return None
     name = name.replace("%20", " ")
@@ -15,11 +15,11 @@ def decode_name(name):
     return name
 
 # Helper function to retrieve a community object from a given name
-def get_community(name):
+def get_community(name: str):
     return db(db.communities.community_name == name).select().first()
 
 # Helper function to return a text response object from a given text value and a community id
-def get_text_response(text, community_id):    
+def get_text_response(text: str, community_id: int):    
     return db((db.text_responses.community_id == community_id) & (db.text_responses.text_val == text)).select().first()
 
 # From a given payload, create a new text response using a text value and a response value found in the payload. If the text response already exists, return an error.

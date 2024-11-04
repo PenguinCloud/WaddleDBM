@@ -15,7 +15,7 @@ stop_threads = False
 def index(): return dict(message="hello from calendar.py")
 
 # Function to decode names with space in
-def decode_name(name):
+def decode_name(name: str) -> str:
     if not name:
         return None
     name = name.replace("%20", " ")
@@ -24,14 +24,14 @@ def decode_name(name):
     return name
 
 # Function to get a routing_gateway channel_id from a given routing_gateway_id. If it doesnt exist, return null.
-def get_channel_id(routing_gateway_id):
+def get_channel_id(routing_gateway_id: int) -> str:
     routing_gateway = db(db.routing_gateways.id == routing_gateway_id).select().first()
     if not routing_gateway:
         return None
     return routing_gateway.channel_id
 
 # Function to get the account as a combination of the protocol and the server name from a given routing_gateway_id. If it doesnt exist, return null.
-def get_account(routing_gateway_id):
+def get_account(routing_gateway_id: int) -> str:
     routing_gateway = db(db.routing_gateways.id == routing_gateway_id).select().first()
     if not routing_gateway:
         return None
@@ -290,13 +290,3 @@ def start_event_check():
     event_end_check_thread.start()
 
     return dict(msg="Event check loop started.")
-
-
-# # Function to stop the check_events loop.
-# def stop_event_check():
-#     stop_threads = True
-#     event_check_thread.join()
-    
-#     print('thread killed')
-
-#     return dict(msg="Event check loop stopped.")
