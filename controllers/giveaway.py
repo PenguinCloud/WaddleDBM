@@ -6,6 +6,7 @@ import requests
 import time
 import logging
 import random
+import os
 
 from dataclasses import asdict
 from WaddleDBM.dataclasses.matterbridge_classes import matterbridgePayload
@@ -13,8 +14,8 @@ from WaddleDBM.dataclasses.matterbridge_classes import matterbridgePayload
 # Set the logger configuration
 logging.basicConfig(level=logging.INFO)
 
-# TODO: Get the below variables from a config file or environment variables
-matterbridgePostURL = 'http://localhost:4200/api/message'
+# Get the Matterbridge URL from the config file or environment variables
+matterbridgePostURL = os.getenv("MATTERBRIDGE_URL")
 
 # try something like
 def index(): return dict(message="hello from giveaway.py")

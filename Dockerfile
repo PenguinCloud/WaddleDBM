@@ -15,7 +15,7 @@ ARG APP_TITLE="PTGAPP" # Change this to actual title for Default
 RUN ansible-playbook build.yml -c local
 
 # PUT YER ENVS in here
-ENV HELLO="WORLD"
+ENV MATTERBRIDGE_URL="http://localhost:4200/api/message"
 
 # Switch to non-root user
 USER ptg-user
