@@ -202,7 +202,7 @@ def insert():
     table_name = payload.get("table_name")
     data = payload.get("data")
     
-    # Get all the tables in the database.
+    # Get all the tables in the database. 
     tables = db.tables()
 
     # Check if the table exists.
