@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
+import logging
 
+# Set logging level to INFO
+logging.basicConfig(level=logging.INFO)
 
 # try something like
 def index(): return dict(message="hello from communities.py")
@@ -16,32 +19,31 @@ def decode_name(name: str) -> str:
 
 # A helper function to create a list of roles for a newly created community, using its community_id.
 # TODO: Figure out how to add the requirements field to the roles table and implement it.
-def create_roles(community_id: int) -> None:
-    roles = ['Member', 'Admin', 'Owner']
+def create_roles(community_id):
+
+    # Read the default roles from the default_roles.json file
+    filePath = "applications/WaddleDBM/models/default_roles.json"
+
+    try:
+        with open(filePath, "r") as file:
+            roles = json.load(file)
+    except FileNotFoundError:
+        return dict(msg="Default roles file not found. Unable to create default roles for the community.")  
 
     requirements = ["None"]
 
     for role in roles:
-        priv_list = []
-        description = ""
+        name = role['role']
+        description = role['description']
+        priv_list = role['permissions']
 
-        # If the role is member, set the priv_list to read only.
-        if role == "Member":
-            priv_list = ["read"]
-            description = "This role is the default role for all members of the community. Members can only read data from the community."
-        # Else, if the role is admin, set the priv_list to read, write and admin.
-        elif role == "Admin":
-            priv_list = ["read", "write", "admin"]
-            description = "This role is for community admins. Admins can read, write and admin the community."
-        # Else, if the role is owner, set the priv_list to read, write, update, delete, admin and owner.
-        elif role == "Owner":
-            priv_list = ["read", "write", "update", "delete", "admin", "owner"]
-            description = "This role is for the owner of the community. Owners can read, write, update, delete, admin and owner the community."
-
-        db.roles.insert(name=role, description=description, community_id=community_id, priv_list=priv_list, requirements=requirements)
+        db.roles.insert(name=name, description=description, community_id=community_id, priv_list=priv_list, requirements=requirements)
 
 # Get the owner role for a given community_id.
-def get_owner_role(community_id: int):
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
+def get_owner_role(community_id):
     return (
         db(
             (db.roles.community_id == community_id)
@@ -56,7 +58,7 @@ def create():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload or 'community_description' not in payload:
         return dict(msg="Payload missing required fields.")
     if db(db.communities.community_name == payload['community_name']).count() > 0:
@@ -69,7 +71,7 @@ def create_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     # Check if the community name and identity name fields are in the payload.
     if 'community_name' not in payload or 'identity_name' not in payload:
@@ -129,7 +131,7 @@ def update_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload or 'community_description' not in payload:
         return dict(msg="Payload missing required fields.")
     community = db(db.communities.community_name == community_name).select().first()
@@ -147,7 +149,7 @@ def update_desc_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_name' not in payload or 'community_description' not in payload:
         return dict(msg="Payload missing required fields.")
     community = db(db.communities.community_name == community_name).select().first()
@@ -175,7 +177,7 @@ def delete_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_name' not in payload:
         return dict(msg="Payload missing required fields.")
     community = db(db.communities.community_name == community_name).select().first()

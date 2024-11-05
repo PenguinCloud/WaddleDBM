@@ -10,7 +10,7 @@ if response.view == 'generic.jsonp':
    raise HTTP(501,'generic.jsonp disabled for security reasons')
 
 try:
-       from gluon.serializers import json
+       from gluon.serializers from json import loads as jloads
        result = "%s(%s)" % (request.vars['callback'], json(response._vars))
        response.write(result, escape=False)
        response.headers['Content-Type'] = 'application/jsonp'

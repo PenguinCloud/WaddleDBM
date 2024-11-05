@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -28,9 +28,7 @@ def set_default_role_for_identities_in_community(community_id: int, role_id: int
     ).update(role_id=DEFAULT_ROLE_ID)
     identities = db(db.community_members.community_id == community_id).select()
 
-    if not identities:
-        return
-    else:
+    if identities:
         for identity in identities:
             if identity.role_id == role_id:
                 identity.update_record(role_id=1)
@@ -40,7 +38,7 @@ def create_role():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     needed_fields = ['name', 'description', 'priv_list', 'requirements', 'community_name']
 
@@ -76,9 +74,7 @@ def get_by_name():
     if not name:
         return dict(msg="No name given.")
     role = db(db.roles.name == name).select().first()
-    if not role:
-        return dict(msg="Role does not exist.")
-    return dict(data=role)
+    return dict(msg="Role does not exist.") if not role else dict(data=role)
 
 # Get a role by community name. If the role does not exist, return an error.
 def get_by_community_name():
@@ -95,7 +91,8 @@ def get_by_community_name():
     role = db(db.roles.community_id == community.id).select()
     if not role:
         return dict(msg="Role does not exist.")
-    return dict(data=role)
+    else:
+        return dict(data=role)
 
 # Update a role by a given payload name and community name. If the role does not exist, return an error.
 def update_by_name_and_community_name():
@@ -107,7 +104,7 @@ def update_by_name_and_community_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     required_fields = ['name', 'description', 'priv_list', 'requirements', 'community_name']
 
@@ -138,7 +135,7 @@ def update_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'name' not in payload or 'description' not in payload or 'priv_list' not in payload or 'requirements' not in payload:
         return dict(msg="Payload missing required fields.")
     role = db(db.roles.name == name).select().first()
@@ -166,7 +163,7 @@ def delete_by_name_and_community_name():
     if not payload:
         return dict(msg="No payload given.")
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     required_fields = ['name', 'community_name']
 

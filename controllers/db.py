@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -104,7 +104,7 @@ def initialize():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a table_name and fields between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     
     # Check if the table_name and column fields are given in the payload.
     if "table_name" not in payload or "columns" not in payload:
@@ -148,7 +148,7 @@ def read():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a table_name and query between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     
     # Check if the table, column, matchColumn, and matchValue are given in the payload.
     if "table" not in payload or "column" not in payload or "matchColumn" not in payload or "matchValue" not in payload:
@@ -193,7 +193,7 @@ def insert():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a table_name and data between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     
     # Check if the table_name and data are given in the payload.
     if "table_name" not in payload or "data" not in payload:
@@ -235,7 +235,7 @@ def update():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given. Please provide a table_name and data between [] characters.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     
     # Check if the table, column, matchColumn, matchValue, updateValue are given in the payload.
     if "table" not in payload or "column" not in payload or "matchColumn" not in payload or "matchValue" not in payload or "updateValue" not in payload:

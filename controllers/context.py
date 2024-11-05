@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -24,7 +24,7 @@ def initialize_user():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_name' not in payload:
         return dict(msg="Payload missing required fields.")
     identity_name = decode_name(payload['identity_name'])
@@ -79,7 +79,7 @@ def set_context():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
 
     # Check if the channel exists.
     if not channel:
@@ -185,7 +185,7 @@ def update_by_identity_id():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_id' not in payload or 'community_id' not in payload:
         return dict(msg="Payload missing required fields.")
     context = db(db.context.identity_id == identity_id).select().first()
@@ -223,7 +223,7 @@ def update_by_community_id():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_id' not in payload or 'community_id' not in payload:
         return dict(msg="Payload missing required fields.")
     context = db(db.context.community_id == community_id).select().first()
@@ -263,7 +263,7 @@ def update_by_identity_and_community_id():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'identity_id' not in payload or 'community_id' not in payload:
         return dict(msg="Payload missing required fields.")
     context = db((db.context.identity_id == identity_id) & (db.context.community_id == community_id)).select().first()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -19,7 +19,7 @@ def create_gateway_server():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.", status=400)
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'name' not in payload or 'server_type_name' not in payload or 'server_nick' not in payload or "server_id" not in payload:
         return dict(msg="Payload missing required fields. Please provide the name, server_type_name, server_nick and server_id.", status=400)
     # Check if the server type exists in the gateway_server_types table
@@ -72,7 +72,7 @@ def update_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.", status=400)
-    payload = json.loads(payload)
+    payload = jloads(payload)
     # if 'server_type_name' not in payload or 'server_nick' not in payload or 'server_id' not in payload:
     #     return dict(msg="Payload missing required fields.", status=400)
     # Check if the server type exists in the gateway_server_types table

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -19,7 +19,7 @@ def create():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'type_name' not in payload or 'description' not in payload:
         return dict(msg="Payload missing required fields.")
     if db(db.account_types.type_name == payload['type_name']).count() > 0:
@@ -51,7 +51,7 @@ def update_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'type_name' in payload:
         account_type.type_name = payload['type_name']
     if 'description' in payload:

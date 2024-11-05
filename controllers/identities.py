@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -19,7 +19,7 @@ def create():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'name' not in payload or 'country' not in payload or 'ip_address' not in payload or 'browser_fingerprints' not in payload:
         return dict(msg="Payload missing required fields.")
     if db(db.identities.name == payload['name']).count() > 0:
@@ -52,7 +52,7 @@ def update_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'name' not in payload or 'country' not in payload or 'ip_address' not in payload or 'browser_fingerprints' not in payload:
         return dict(msg="Payload missing required fields.")
     identity = db(db.identities.name == name).select().first()

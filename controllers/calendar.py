@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import json
-import datetime
-import threading
+from json import loads as jloads
+from datetime import datetime, timedelta
+from threading import Thread
 import requests
 import time
 import logging
@@ -45,7 +45,7 @@ def create():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload or 'event_name' not in payload or 'event_description' not in payload or 'event_start' not in payload or 'event_end' not in payload:
         return dict(msg="Payload missing required fields.")
     # Get the community id from the community name
@@ -76,7 +76,7 @@ def get_by_community():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload:
         return dict(msg="The community_name value is missing.")
     community = db(db.communities.community_name == payload['community_name']).select().first()
@@ -84,8 +84,8 @@ def get_by_community():
         return dict(msg="Community not found.")
     
     # The start and end date are optional. The start date is the current date and the end date is the current date plus 30 days.
-    start_date = datetime.datetime.now()
-    end_date = start_date + datetime.timedelta(days=30)
+    start_date = datetime.now()
+    end_date = start_date + timedelta(days=30)
 
     if 'start_date' in payload:
         start_date = payload['start_date']
@@ -105,7 +105,7 @@ def update_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     
     if 'community_name' not in payload:
         return dict(msg="The community name has not been provided.")
@@ -132,7 +132,7 @@ def delete_by_name():
     payload = request.body.read()
     if not payload:
         return dict(msg="No payload given.")
-    payload = json.loads(payload)
+    payload = jloads(payload)
     if 'community_name' not in payload or 'event_name' not in payload:
         return dict(msg="The community name or event_name has not been provided.")
     
@@ -159,7 +159,7 @@ def check_events_start():
         if events:
             print("Events found. Checking if any events are starting in 30 minutes.")
             for event in events:
-                if (event.event_start - datetime.timedelta(minutes=30) <= datetime.datetime.now() <= event.event_start) and event.not_start_sent == False:
+                if (event.event_start - timedelta(minutes=30) <= datetime.now() <= event.event_start) and event.not_start_sent == False:
                     event_name = event.event_name
 
                     # Using the event's community id, get the community name
@@ -224,7 +224,7 @@ def check_events_end():
         if events:
             print("Events found. Checking if any events are ending.")
             for event in events:
-                if event.event_end >= datetime.datetime.now() and event.not_end_sent == False:
+                if event.event_end >= datetime.now() and event.not_end_sent == False:
                     event_name = event.event_name
 
                     # Using the event's community id, get the community name
@@ -283,10 +283,10 @@ def check_events_end():
 
 # Function to start the check_events loop in a new thread.
 def start_event_check():
-    event_start_check_thread = threading.Thread(target=check_events_start)
+    event_start_check_thread = Thread(target=check_events_start)
     event_start_check_thread.start()
 
-    event_end_check_thread = threading.Thread(target=check_events_end)
+    event_end_check_thread = Thread(target=check_events_end)
     event_end_check_thread.start()
 
     return dict(msg="Event check loop started.")

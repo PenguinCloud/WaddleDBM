@@ -248,7 +248,7 @@
       <link rel="stylesheet" href="{{=URL('admin','static','css/d3_graph.css')}}"/>
       <script>
         // Define the d3 input data
-        {{from gluon.serializers import json }}
+        {{from gluon.serializers from json import loads as jloads }}
         var nodes = {{=XML(json(nodes))}};
         var links = {{=XML(json(links))}};
         d3_graph();
