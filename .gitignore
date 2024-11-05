@@ -5,3 +5,5 @@ id_rsa*
 venv/
 .idea/
 
+databases/
+errors/

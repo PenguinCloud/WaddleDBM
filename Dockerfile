@@ -15,7 +15,7 @@ ARG APP_TITLE="WB-dbm" #Change this to actual title for Default
 RUN ansible-playbook entrypoint.yml -c local --tags "build,run"
 
 # PUT YER ENVS in here
-ENV HELLO="WORLD"
+ENV MATTERBRIDGE_URL="http://localhost:4200/api/message"
 
 WORKDIR /var/www/html/web2py/
 
