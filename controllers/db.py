@@ -8,7 +8,7 @@ def index(): return dict(message="hello from db.py")
 # This controller is responsible for creating DB tables, querying the DB, and inserting data into the DB.
 
 # Function to insert a given table_name and columns into a configuration file.
-def insert_table_into_config(table_name, columns):
+def insert_table_into_config(table_name: str, columns: dict):
     # Check if the table_name and columns are given.
     if not table_name or not columns:
         return dict(msg="Please provide a table_name and columns.")

@@ -154,6 +154,23 @@ if configuration.get('scheduler.enabled'):
 # -------------------------------------------------------------------------
 # auth.enable_record_versioning(db)
 
+# -------------------------------------------------------------------------
+# Core Module Tables
+# -------------------------------------------------------------------------
+
+# Define the module types table
+db.define_table('module_types',
+                Field('name', 'string'),
+                Field('description', 'string'))
+
+# Define the marketplace table
+db.define_table('marketplace_modules', 
+                Field('name', 'string'),
+                Field('description', 'string'),
+                Field('gateway_url', 'string'),
+                Field('module_type_id', db.module_types),
+                Field('metadata', 'json'))
+
 # Define the identities table
 db.define_table('identities', 
                 Field('name', 'string'),
@@ -174,16 +191,17 @@ db.define_table('identity_labels',
 
 # Define table for community modules
 db.define_table('community_modules', 
-                Field('module_id', 'integer'),
+                Field('module_id', db.marketplace_modules),
                 Field('community_id', db.communities),
                 Field('enabled', 'boolean', default=True),
-                Field('privilages', 'list:string'))
+                Field('priv_list', 'list:string'))
 
 # Define a table for roles
 db.define_table('roles',
                 Field('name', 'string'),
+                Field('community_id', db.communities),
                 Field('description', 'string'),
-                Field('privilages', 'list:string'),
+                Field('priv_list', 'list:string'),
                 Field('requirements', 'list:string'))
 
 # Define a table for community members table
@@ -262,6 +280,18 @@ db.define_table('calendar',
                 Field('not_start_sent', 'boolean', default=False),
                 Field('not_end_sent', 'boolean', default=False))
 
+# Define a table that stores an admin context session for a community, per identity
+db.define_table('admin_contexts',
+                Field('identity_id', db.identities),
+                Field('community_id', db.communities),
+                Field('session_token', 'string'),
+                Field('session_expires', 'datetime'))
+
+# Define a table that maps a text value to a response value, per community
+db.define_table('text_responses',
+                Field('community_id', db.communities),
+                Field('text_val', 'string'),
+                Field('response_val', 'string'))
 # Define a table that keeps track of prize statuses
 db.define_table('prize_statuses',
                 Field('status_name', 'string'),

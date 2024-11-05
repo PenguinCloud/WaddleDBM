@@ -6,7 +6,7 @@ import json
 def index(): return dict(message="hello from identities.py")
 
 # Function to decode names with special characters in them.
-def decode_name(name):
+def decode_name(name: str) -> str:
     if not name:
         return None
     name = name.replace("%20", " ")

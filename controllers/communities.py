@@ -6,13 +6,50 @@ import json
 def index(): return dict(message="hello from communities.py")
 
 # Function to decode names with space in
-def decode_name(name):
+def decode_name(name: str) -> str:
     if not name:
         return None
     name = name.replace("%20", " ")
     name = name.replace("_", " ")
 
     return name
+
+# A helper function to create a list of roles for a newly created community, using its community_id.
+# TODO: Figure out how to add the requirements field to the roles table and implement it.
+def create_roles(community_id: int) -> None:
+    roles = ['Member', 'Admin', 'Owner']
+
+    requirements = ["None"]
+
+    for role in roles:
+        priv_list = []
+        description = ""
+
+        # If the role is member, set the priv_list to read only.
+        if role == "Member":
+            priv_list = ["read"]
+            description = "This role is the default role for all members of the community. Members can only read data from the community."
+        # Else, if the role is admin, set the priv_list to read, write and admin.
+        elif role == "Admin":
+            priv_list = ["read", "write", "admin"]
+            description = "This role is for community admins. Admins can read, write and admin the community."
+        # Else, if the role is owner, set the priv_list to read, write, update, delete, admin and owner.
+        elif role == "Owner":
+            priv_list = ["read", "write", "update", "delete", "admin", "owner"]
+            description = "This role is for the owner of the community. Owners can read, write, update, delete, admin and owner the community."
+
+        db.roles.insert(name=role, description=description, community_id=community_id, priv_list=priv_list, requirements=requirements)
+
+# Get the owner role for a given community_id.
+def get_owner_role(community_id: int):
+    return (
+        db(
+            (db.roles.community_id == community_id)
+            & (db.roles.name == "Owner")
+        )
+        .select()
+        .first()
+    )
 
 # Create a new community from a given payload. Throws an error if no payload is given, or the community already exists.
 def create():
@@ -37,14 +74,32 @@ def create_by_name():
     # Check if the community name and identity name fields are in the payload.
     if 'community_name' not in payload or 'identity_name' not in payload:
         return dict(msg="Payload missing required fields. Need community_name and identity_name.")
+    
+    # Check if the 'description' field is in the payload. If not, set it to an empty string.
+    if 'description' not in payload:
+        payload['description'] = ""
+
+    # Check if the community already exists.
     if db(db.communities.community_name == payload['community_name']).count() > 0:
         return dict(msg="Community already exists.")
-    db.communities.insert(community_name=payload['community_name'], community_description="")
+    
+    # Create the community with the given community name.
+    db.communities.insert(community_name=payload['community_name'], community_description=payload['description'])
+
+    # Create the default roles for the community.
+    community = db(db.communities.community_name == payload['community_name']).select().first()
+    create_roles(community.id)
 
     # After a community is created, add the identity as a member of the community with the Owner role from the roles table.
     community = db(db.communities.community_name == payload['community_name']).select().first()
     identity = db(db.identities.name == payload['identity_name']).select().first()
-    role = db(db.roles.name == "Owner").select().first()
+
+    # If the identity does not exist, return an error.
+    if not identity:
+        return dict(msg="Identity does not exist.")
+
+    # From the roles table, get the Owner role for the community.
+    role = get_owner_role(community.id)
     db.community_members.insert(community_id=community.id, identity_id=identity.id, role_id=role.id, currency=0)
 
     return dict(msg="Community created. You have been granted the Owner role of this community.")
