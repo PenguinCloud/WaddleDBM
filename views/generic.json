@@ -1,1 +1,1 @@
-{{from gluon.serializers from json import loads as jloads}}{{=XML(json(response._vars))}}
+{{from gluon.serializers import json}}{{=XML(json(response._vars))}}
