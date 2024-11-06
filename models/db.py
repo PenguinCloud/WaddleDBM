@@ -166,11 +166,22 @@ db.define_table('module_types',
 
 # Define the marketplace table
 db.define_table('marketplace_modules', 
-                Field('name', 'string'),
-                Field('description', 'string'),
-                Field('gateway_url', 'string'),
+                Field('name', 'string', requires=IS_NOT_EMPTY()),
+                Field('description', 'string', requires=IS_NOT_EMPTY()),
+                Field('gateway_url', 'string', requires=IS_NOT_EMPTY()),
                 Field('module_type_id', db.module_types),
                 Field('metadata', 'json'))
+
+# Define the module metadata table.
+db.define_table('module_commands',
+                Field('module_id', db.marketplace_modules),
+                Field('command_name', 'string', requires=IS_NOT_EMPTY()),
+                Field('action_url', 'string', requires=IS_NOT_EMPTY()),
+                Field('description', 'string', requires=IS_NOT_EMPTY()),
+                Field('request_method', 'string', requires=IS_NOT_EMPTY()),
+                Field('request_parameters', 'list:string'),
+                Field('payload_keys', 'list:string'),
+                Field('req_priv_list', 'list:string'))
 
 # Define the identities table
 db.define_table('identities', 
