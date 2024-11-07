@@ -11,3 +11,4 @@ sql.txt
 *.log
 *.log.*
 *.table
+sessions/
