@@ -117,7 +117,7 @@ def get_marketplace_module_by_alias(alias, identity_name):
         return (
             db(
                 (
-                    db.marketplace_modules.metadata.like(
+                    db.modules.metadata.like(
                         f'%"{replace_spaces(alias_command.command_val)}"%'
                     )
                 )
@@ -144,9 +144,9 @@ def create():
     payload = jloads(payload)
     if 'name' not in payload or 'description' not in payload or 'gateway_url' not in payload or 'module_type_id' not in payload or 'metadata' not in payload:
         return dict(msg="Payload missing required fields.")
-    if db(db.marketplace_modules.name == payload['name']).count() > 0:
+    if db(db.modules.name == payload['name']).count() > 0:
         return dict(msg="Marketplace Module already exists.")
-    db.marketplace_modules.insert(**payload)
+    db.modules.insert(**payload)
     return dict(msg="Marketplace Module created.")
 
 # Get a marketplace module by name. Throws an error if no name is given, or the marketplace module does not exist.
@@ -173,7 +173,7 @@ def get():
     if identity_name:
         # Get the marketplace module. If it does not exists, check if the name can be used as an alias to get the marketplace module.
         # If the marketplace module still does not exist, return an error.
-        marketplace_module = db(db.marketplace_modules.name == name).select().first()
+        marketplace_module = db(db.modules.name == name).select().first()
 
         aliased_command = None
 
@@ -207,12 +207,12 @@ def get():
 
 # Get all marketplace modules.
 def get_all():
-    marketplace_modules = db(db.marketplace_modules).select()
+    modules = db(db.modules).select()
     # Add the module type name to each marketplace module
-    for marketplace_module in marketplace_modules:
+    for marketplace_module in modules:
         module_type = db(db.module_types.id == marketplace_module.module_type_id).select().first()
         marketplace_module.module_type_name = module_type.name
-    return dict(data=marketplace_modules)
+    return dict(data=modules)
 
 # Get all the marketplace modules, as only the name and the id. Only modules that fall under the Community module type are returned.
 @require_payload
@@ -228,10 +228,10 @@ def get_all_community_modules():
     if not module_type_record:
         return dict(msg=f"Module type '{module_type}' not found.")
     
-    marketplace_modules = db(db.marketplace_modules.module_type_id == module_type_record.id).select(
-        db.marketplace_modules.id, db.marketplace_modules.name
+    modules = db(db.modules.module_type_id == module_type_record.id).select(
+        db.modules.id, db.modules.name
     )
-    return dict(data=marketplace_modules)
+    return dict(data=modules)
 
 # Get a marketplace module by URL. Throws an error if no URL is given, or the marketplace module does not exist. Also returns the module type name.
 def get_by_url():
@@ -242,7 +242,7 @@ def get_by_url():
 
     url = unquote(url)
 
-    marketplace_module = db(db.marketplace_modules.gateway_url == url).select().first()
+    marketplace_module = db(db.modules.gateway_url == url).select().first()
     if not marketplace_module:
         return dict(msg="Marketplace Module does not exist.")
     
@@ -258,10 +258,10 @@ def remove():
     name = decode_name(request.args(0))
     if not name:
         return dict(msg="No name given.")
-    marketplace_module = db(db.marketplace_modules.name == name).select().first()
+    marketplace_module = db(db.modules.name == name).select().first()
     if not marketplace_module:
         return dict(msg="Marketplace Module does not exist.")
-    db(db.marketplace_modules.name == name).delete()
+    db(db.modules.name == name).delete()
     return dict(msg="Marketplace Module removed.")
 
 # Update a marketplace module by name. Throws an error if no name is given, or the marketplace module does not exist.
@@ -270,7 +270,7 @@ def update():
     name = decode_name(request.args(0))
     if not name:
         return dict(msg="No name given.")
-    marketplace_module = db(db.marketplace_modules.name == name).select().first()
+    marketplace_module = db(db.modules.name == name).select().first()
     if not marketplace_module:
         return dict(msg="Marketplace Module does not exist.")
     payload = request.body.read()

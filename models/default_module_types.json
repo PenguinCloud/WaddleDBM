@@ -1,0 +1,10 @@
+[
+    {
+        "name": "Core",
+        "description": "Core module types"
+    },
+    {
+        "name": "Community",
+        "description": "Community module types"
+    }
+]

@@ -1,0 +1,12 @@
+[
+    {
+        "account_name": "irc.Twitch",
+        "account_type": 1,
+        "is_default": true
+    },
+    {
+        "account_name": "discord.PenguinzRockExample",
+        "account_type": 2,
+        "is_default": true
+    }
+]

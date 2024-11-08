@@ -7,6 +7,9 @@
 from gluon.contrib.appconfig import AppConfig
 from gluon.tools import Auth
 
+# Import the db_initializer class from the WaddleDBM init_db scripts module
+from applications.WaddleDBM.scripts.init_db import db_initializer
+
 # -------------------------------------------------------------------------
 # This scaffolding model makes your app work on Google App Engine too
 # File is released under public domain and you can use without limitations
@@ -165,7 +168,7 @@ db.define_table('module_types',
                 Field('description', 'string'))
 
 # Define the marketplace table
-db.define_table('marketplace_modules', 
+db.define_table('modules', 
                 Field('name', 'string', requires=IS_NOT_EMPTY()),
                 Field('description', 'string', requires=IS_NOT_EMPTY()),
                 Field('gateway_url', 'string', requires=IS_NOT_EMPTY()),
@@ -174,7 +177,7 @@ db.define_table('marketplace_modules',
 
 # Define the module metadata table.
 db.define_table('module_commands',
-                Field('module_id', db.marketplace_modules),
+                Field('module_id', db.modules),
                 Field('command_name', 'string', requires=IS_NOT_EMPTY()),
                 Field('action_url', 'string', requires=IS_NOT_EMPTY()),
                 Field('description', 'string', requires=IS_NOT_EMPTY()),
@@ -203,7 +206,7 @@ db.define_table('identity_labels',
 
 # Define table for community modules
 db.define_table('community_modules', 
-                Field('module_id', db.marketplace_modules),
+                Field('module_id', db.modules),
                 Field('community_id', db.communities),
                 Field('enabled', 'boolean', default=True),
                 Field('priv_list', 'list:string'))
@@ -269,6 +272,12 @@ db.define_table('account_types',
                 Field('type_name', 'string'),
                 Field('description', 'string'))
 
+# Define a table that stores matterbridge account types
+db.define_table('gateway_accounts',
+                Field('account_name', 'string'),
+                Field('account_type', db.account_types),
+                Field('is_default', 'boolean', default=False))
+
 # Define a table that stores routing gateway types
 db.define_table('gateway_types',
                 Field('type_name', 'string'),
@@ -325,41 +334,14 @@ db.define_table('prize_entries',
                 Field('prize_id', db.prizes),
                 Field('identity_id', db.identities))
 
-# Initialive the database with some initial data to some tables, if they do not exist
-def initializeDB():
-    # Define a table that maps an alias to specific command for a community
-    db.define_table('alias_commands',
-                    Field('community_id', db.communities),
-                    Field('alias_val', 'string'),
-                    Field('command_val', 'string'))
+# Define a table that maps an alias to specific command for a community
+db.define_table('alias_commands',
+                Field('community_id', db.communities),
+                Field('alias_val', 'string'),
+                Field('command_val', 'string'))
 
-    # After defining the tables, create the "Global" community, if it does not exist
-    if db(db.communities.community_name == "Global").count() == 0:
-        db.communities.insert(community_name="Global", community_description="The global community.")
+# Create a DB initializer object
+db_init = db_initializer(db)
 
-    # After the Global community is created, create a routing entry for the Global community, if it does not exist
-    global_community = db(db.communities.community_name == "Global").select().first()
-    if db(db.routing.community_id == global_community.id).count() == 0:
-        db.routing.insert(channel="Global", community_id=global_community.id, gateways=[], aliases=[])
-
-    # Also create the "member", "owner" and "admin" roles, if they do not exist
-    if db(db.roles.name == "member").count() == 0:
-        db.roles.insert(name="member", description="A member of a community.", privilages=["read", "write"], requirements=["reputation >= 0"])
-
-    if db(db.roles.name == "owner").count() == 0:
-        db.roles.insert(name="owner", description="The owner of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
-
-    if db(db.roles.name == "admin").count() == 0:
-        db.roles.insert(name="admin", description="An admin of a community.", privilages=["read", "write", "admin"], requirements=["reputation >= 0"])
-
-    # Create the prize statuses Open, Claiming, and Closed, if they do not exist
-    if db(db.prize_statuses.status_name == "Open").count() == 0:
-        db.prize_statuses.insert(status_name="Open", description="The prize is open for entries.")
-    
-    if db(db.prize_statuses.status_name == "Claiming").count() == 0:
-        db.prize_statuses.insert(status_name="Claiming", description="The prize is in the claiming phase.")
-    
-    if db(db.prize_statuses.status_name == "Closed").count() == 0:
-        db.prize_statuses.insert(status_name="Closed", description="The prize is closed.")
-
-initializeDB()
+# Initialize the DB
+db_init.init_db()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json
+from json import loads as jloads
 
 
 # try something like
@@ -22,10 +22,13 @@ def create():
     except ValueError as e:
         return dict(msg=str(e))
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
+
+    # Get the community name from the arguments.
+    community_name = request.args(0)
     
     # Check if the payload has the required fields identity name, community name and label.
-    if 'identity_name' not in payload or 'community_name' not in payload or 'label' not in payload:
+    if 'identity_name' not in payload or 'label' not in payload:
         return dict(msg="Payload missing required fields.")
     
     # Check if the identity exists.
@@ -34,7 +37,7 @@ def create():
         return dict(msg="Identity does not exist.")
     
     # Check if the community exists.
-    community = db(db.communities.community_name == payload['community_name']).select().first()
+    community = db(db.communities.community_name == community_name).select().first()
     if not community:
         return dict(msg="Community does not exist.")
     
@@ -55,10 +58,13 @@ def get_by_identity_and_community():
     except ValueError as e:
         return dict(msg=str(e))
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
+
+    # Get the community name from the arguments.
+    community_name = request.args(0)
     
     # Check if the payload has the required fields identity name and community name.
-    if 'identity_name' not in payload or 'community_name' not in payload:
+    if 'identity_name' not in payload:
         return dict(msg="Payload missing required fields.")
     
     # Check if the identity exists.
@@ -67,7 +73,7 @@ def get_by_identity_and_community():
         return dict(msg="Identity does not exist.")
     
     # Check if the community exists.
-    community = db(db.communities.community_name == payload['community_name']).select().first()
+    community = db(db.communities.community_name == community_name).select().first()
     if not community:
         return dict(msg="Community does not exist.")
 
@@ -85,10 +91,13 @@ def update_by_identity_and_community():
     except ValueError as e:
         return dict(msg=str(e))
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
+
+    # Get the community name from the arguments.
+    community_name = request.args(0)
     
     # Check if the payload has the required fields identity name, community name and label.
-    if 'identity_name' not in payload or 'community_name' not in payload or 'label' not in payload:
+    if 'identity_name' not in payload or 'label' not in payload:
         return dict(msg="Payload missing required fields.")
     
     # Check if the identity exists.
@@ -97,7 +106,7 @@ def update_by_identity_and_community():
         return dict(msg="Identity does not exist.")
     
     # Check if the community exists.
-    community = db(db.communities.community_name == payload['community_name']).select().first()
+    community = db(db.communities.community_name == community_name).select().first()
     if not community:
         return dict(msg="Community does not exist.")
     
@@ -120,10 +129,13 @@ def delete_by_identity_and_community():
     except ValueError as e:
         return dict(msg=str(e))
     
-    payload = json.loads(payload)
+    payload = jloads(payload)
+
+    # Get the community name from the arguments.
+    community_name = request.args(0)
     
     # Check if the payload has the required fields identity name and community name.
-    if 'identity_name' not in payload or 'community_name' not in payload:
+    if 'identity_name' not in payload:
         return dict(msg="Payload missing required fields.")
     
     # Check if the identity exists.
@@ -132,7 +144,7 @@ def delete_by_identity_and_community():
         return dict(msg="Identity does not exist.")
     
     # Check if the community exists.
-    community = db(db.communities.community_name == payload['community_name']).select().first()
+    community = db(db.communities.community_name == community_name).select().first()
     if not community:
         return dict(msg="Community does not exist.")
     

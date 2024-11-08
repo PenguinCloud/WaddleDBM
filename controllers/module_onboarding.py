@@ -104,7 +104,7 @@ def convert_command_values_to_list(command):
     return command
 
 def onboard_form():
-    module_form = SQLFORM(db.marketplace_modules, fields=['name', 'description', 'gateway_url'])
+    module_form = SQLFORM(db.modules, fields=['name', 'description', 'gateway_url'])
 
     # Get the community module type id
     module_type_id = get_community_module_type_id()
@@ -117,7 +117,7 @@ def onboard_form():
         print(module_form.vars)
 
         # Check if the module exists with the given module name
-        module = db(db.marketplace_modules.name == module_form.vars.name).select().first()
+        module = db(db.modules.name == module_form.vars.name).select().first()
 
         # Check if the module exists
         if module:
@@ -125,7 +125,7 @@ def onboard_form():
             response.flash = 'Module already exists. Please choose a different name.'
         else:
             # Insert the module form into the database
-            module_id = db.marketplace_modules.insert(**module_form.vars)
+            module_id = db.modules.insert(**module_form.vars)
 
             # Set the module id in the session
             session.module_id = module_id
@@ -155,7 +155,7 @@ def manage_commands():
     module_id = request.vars['module_id']
 
     # Get the module from the database
-    module = db(db.marketplace_modules.id == module_id).select().first()
+    module = db(db.modules.id == module_id).select().first()
 
     # Check if the module exists
     if not module:

@@ -26,10 +26,10 @@ def get_alias_command(alias, community_id):
 def replace_spaces(command):
     return command.replace(" ", "_")
 
-# Helper function to check if a given command exists in the marketplace_modules table
+# Helper function to check if a given command exists in the modules table
 def command_exists(command):
     command = replace_spaces(command)
-    return db(db.marketplace_modules.metadata.like(f'%"{command}"%')).select().first()
+    return db(db.modules.metadata.like(f'%"{command}"%')).select().first()
 
 # From a given payload, create a new alias command using an alias value and a command value found in the payload. If the alias command already exists, return an error.
 # This is stored per community name found in the arguments.
@@ -50,11 +50,11 @@ def set_alias_command():
     if not community:
         return dict(msg="Community does not exist.", status=404)
 
-    # Check if the given alias value is the same as a command in the marketplace_modules table. If it is, return an error.
+    # Check if the given alias value is the same as a command in the modules table. If it is, return an error.
     if command_exists(payload['alias']):
         return dict(msg="Alias value cannot be the same as an existing command. Please choose a different alias value.", status=400)
 
-    # Check if the command exists in the marketplace_modules table
+    # Check if the command exists in the modules table
     if not command_exists(payload['command']):
         return dict(msg="Command does not exist on Waddlebot. Please check the spelling of the command.", status=404)
     

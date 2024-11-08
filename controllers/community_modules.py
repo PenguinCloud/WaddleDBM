@@ -123,14 +123,14 @@ def install_by_community_name():
     # Combine queries for community, identity, module, and membership
     query = (db.communities.community_name == community_name) & \
             (db.identities.name == payload['identity_name']) & \
-            (db.marketplace_modules.name == payload['module_name']) & \
+            (db.modules.name == payload['module_name']) & \
             (db.community_members.community_id == db.communities.id) & \
             (db.community_members.identity_id == db.identities.id) & \
             (db.roles.id == db.community_members.role_id)
 
     result = db(query).select(db.communities.ALL, 
                               db.identities.ALL, 
-                              db.marketplace_modules.ALL,
+                              db.modules.ALL,
                               db.roles.name.with_alias('role_name')).first()
 
     if not result:
@@ -142,17 +142,17 @@ def install_by_community_name():
     if result.role_name not in ['Admin', 'Owner', 'admin', 'owner']:
         return dict(msg="Identity is not an admin of the community.")
 
-    module_type = db(db.module_types.id == result.marketplace_modules.module_type_id).select(db.module_types.name).first()
+    module_type = db(db.module_types.id == result.modules.module_type_id).select(db.module_types.name).first()
     if module_type.name != "Community":
         return dict(msg="This operation is only allowed for Community modules.")
 
     existing_module = db((db.community_modules.community_id == result.communities.id) & 
-                         (db.community_modules.module_id == result.marketplace_modules.id)).select().first()
+                         (db.community_modules.module_id == result.modules.id)).select().first()
     if existing_module:
         return dict(msg="This module is already installed in this community.")
 
     new_module = {
-        'module_id': result.marketplace_modules.id,
+        'module_id': result.modules.id,
         'community_id': result.communities.id,
         'enabled': payload.get('enabled', True),
         'privilages': payload.get('privilages', [])
@@ -178,7 +178,7 @@ def uninstall_by_community_name():
     # Combine queries for community, identity, and module
     community = db(db.communities.community_name == community_name).select().first()
     identity = db(db.identities.name == payload['identity_name']).select().first()
-    module = db(db.marketplace_modules.name == payload['module_name']).select().first()
+    module = db(db.modules.name == payload['module_name']).select().first()
 
     if not all([community, identity, module]):
         return dict(msg="Invalid community, identity, or module.")

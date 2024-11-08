@@ -17,27 +17,7 @@ def decode_name(name: str) -> str:
 
     return name
 
-# A helper function to create a list of roles for a newly created community, using its community_id.
-# TODO: Figure out how to add the requirements field to the roles table and implement it.
-def create_roles(community_id):
 
-    # Read the default roles from the default_roles.json file
-    filePath = "applications/WaddleDBM/models/default_roles.json"
-
-    try:
-        with open(filePath, "r") as file:
-            roles = json.load(file)
-    except FileNotFoundError:
-        return dict(msg="Default roles file not found. Unable to create default roles for the community.")  
-
-    requirements = ["None"]
-
-    for role in roles:
-        name = role['role']
-        description = role['description']
-        priv_list = role['permissions']
-
-        db.roles.insert(name=name, description=description, community_id=community_id, priv_list=priv_list, requirements=requirements)
 
 # Get the owner role for a given community_id.
 from functools import lru_cache
@@ -88,9 +68,10 @@ def create_by_name():
     # Create the community with the given community name.
     db.communities.insert(community_name=payload['community_name'], community_description=payload['description'])
 
-    # Create the default roles for the community.
+    # Create the default roles for the community, using the community_id of the newly created community, as well as the
+    # the db_initialization.py file's create_roles function.
     community = db(db.communities.community_name == payload['community_name']).select().first()
-    create_roles(community.id)
+    db_init.create_roles(community.id)
 
     # After a community is created, add the identity as a member of the community with the Owner role from the roles table.
     community = db(db.communities.community_name == payload['community_name']).select().first()
