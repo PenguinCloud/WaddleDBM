@@ -265,3 +265,34 @@ def update():
     
     return dict(msg=f"Data updated in table {table}.")
 
+# A function to delete a record from a pydal table.
+def delete():
+    define_tables_from_config()
+
+    payload = request.body.read()
+    if not payload:
+        return dict(msg="No payload given. Please provide a table_name and matchValue between [] characters.")
+    payload = jloads(payload)
+    
+    # Check if the table, matchColumn, and matchValue are given in the payload.
+    if "table" not in payload or "matchColumn" not in payload or "matchValue" not in payload:
+        return dict(msg="Please provide a table, matchColumn, and matchValue payload values.")
+    
+    table = payload.get("table")
+    matchColumn = payload.get("matchColumn")
+    matchValue = payload.get("matchValue")
+
+    # Check if the table exists.
+    if not db.get(table):
+        return dict(msg=f"Table {table} does not exist.")
+    
+    # Get the table object.
+    table = db[table]
+    
+    try:
+        # Delete the record from the table.
+        db(table[matchColumn] == matchValue).delete()
+    except Exception as e:
+        return dict(msg=f"Error deleting data from table {table}. Error: {e}")
+    
+    return dict(msg=f"Data deleted from table {table}.")
