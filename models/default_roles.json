@@ -1,15 +1,6 @@
 [
     {
-        "role": "Admin",
-        "permissions": [
-            "read", 
-            "write", 
-            "admin"
-        ],
-        "description": "Admins can read, write, and admin"
-    },
-    {
-        "role": "Owner",
+        "role": "Administrator",
         "permissions": [
             "read", 
             "write", 
@@ -18,10 +9,20 @@
             "admin", 
             "owner"
         ],
+        "description": "Admins can read, write, and admin"
+    },
+    {
+        "role": "Moderator",
+        "permissions": [
+            "read", 
+            "write", 
+            "update", 
+            "delete"
+        ],
         "description": "Owners can read, write, update, delete, admin, and owner"
     },
     {
-        "role": "Member",
+        "role": "User",
         "permissions": [
             "read"
         ],
