@@ -12,3 +12,4 @@ sql.txt
 *.log.*
 *.table
 sessions/
+__pycache__/
