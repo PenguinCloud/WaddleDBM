@@ -33,7 +33,7 @@
         "description": "Owners can read, write, update, delete, admin, and owner"
     },
     {
-        "role": "User",
+        "role": "Member",
         "permissions": [
             "read"
         ],
