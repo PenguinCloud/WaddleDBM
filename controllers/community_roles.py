@@ -66,6 +66,65 @@ def get_by_community_name():
     else:
         return dict(data=role)
 
+# Set the role of a given identity by its name and community name. If the role does not exist, return an error.
+# The function accepts 2 identity names, a role name, and a community name. The first identity is the identity
+# whose role is to be set, and the second identity is the identity of the user making the request.
+# Only an identity with admin privileges can set the role of another identity.
+def set_role():
+    # Check if there is a request argument. If not, return an error.
+    re = request.args(0)
+    if not re:
+        return dict(msg="No community name given in the URL path.")
+    
+    # Check if the community exists. If not, return an error.
+    community_name = re
+    community = waddle_helpers.get_community(community_name)
+
+    if not community:
+        return dict(msg="Community does not exist.")
+
+    payload = request.body.read()
+    if not payload:
+        return dict(msg="No payload given.")
+    
+    payload = jloads(payload)
+
+    required_fields = ['identity_name', 'role_name', 'role_receiver']
+
+    if not all(field in payload for field in required_fields):
+        return dict(msg=f"Payload missing required fields. Required fields are: {required_fields}")
+    
+    identity_name = payload['identity_name']
+    role_name = payload['role_name']
+    role_receiver_name = payload['role_receiver']
+    
+    # Get the role by name and community id
+    role = db((db.roles.name == role_name) & (db.roles.community_id == community.id)).select().first()
+    if not role:
+        return dict(msg="Role does not exist.")
+    
+    # Get the role_receiver identity by name
+    role_receiver = waddle_helpers.get_identity(role_receiver_name)
+    if not role_receiver:
+        return dict(msg="Identity does not exist.")
+    
+    # Check that the receiver is in the community
+    if not waddle_helpers.identity_in_community(role_receiver_name, community_name):
+        return dict(msg="Identity is not in the community.")
+    
+    # Get the identity of the requester
+    requester = waddle_helpers.get_identity(identity_name)
+    if not requester:
+        return dict(msg="Requester does not exist.")
+    
+    # Check if the requester has admin privileges
+    if not waddle_helpers.identity_is_admin(identity_name, community_name):
+        return dict(msg="Requester does not have admin privileges.")
+    
+    # Set the role of the identity
+    message = waddle_helpers.set_role(role_receiver, role, community)
+    return dict(msg=message)
+
 # Update a role by a given payload name and community name. If the role does not exist, return an error.
 def update_by_name_and_community_name():
     name = request.args(0)

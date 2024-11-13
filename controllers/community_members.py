@@ -14,22 +14,17 @@ def create_member():
     if 'community_name' not in payload or 'identity_name' not in payload:
         return dict(msg="Missing the required fields. Need community_name and identity_name.")
     
-    # Set the default role_id to that of a Member in the roles table.
-    role = db(db.roles.name == "Member").select().first()
-
-    # If the Member role does not exist, set the id to 1.
-    role_id = 1
-    if role:
-        role_id = role.id
     
-    # If the payload contains a role_id, set the role_id to that value.
-    if 'role_id' in payload:
-        role_id = payload['role_id']
 
     # Get the community_id from the communities table, using the community_name, if it exists.
     community = db(db.communities.community_name == payload['community_name']).select().first()
     if not community:
         return dict(msg="Community does not exist.")
+    
+    # Set the default role_id to that of a Member in the roles table.
+    role_id = waddle_helpers.get_member_role_id(community.id)
+    if not role_id:
+        return dict(msg="Member role does not exist.")
     
     # Get the identity_id from the identities table, using the identity_name, if it exists.
     identity = db(db.identities.name == payload['identity_name']).select().first()

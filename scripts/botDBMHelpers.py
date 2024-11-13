@@ -101,6 +101,25 @@ class dbm_helpers:
             return False
         role = self.db(self.db.roles.id == membership.role_id).select().first()
         return role.name in ['Admin', 'Owner', 'admin', 'owner']
+    
+    # A helper function that sets the role of a given identity name in a given community, to a given role name.
+    # The table that needs to be updated is the community_members table. Returns a dictionary with a message.
+    def set_role(self, receiver: identity, role: role, community: community) -> dict:
+        if not receiver or not role or not community:
+            return dict(msg="Please provide a receiver, role and community.")
+        
+        # Get the membership record of the receiver in the community.
+        membership = self.db(
+            (self.db.community_members.identity_id == receiver.id) &
+            (self.db.community_members.community_id == community.id)
+        ).select().first()
+
+        if not membership:
+            return dict(msg="Receiver is not a member of the community.")
+        
+        # Update the role of the receiver in the community.
+        membership.update_record(role_id=role.id)
+        return dict(msg="Role updated.")
 
     def is_community_module(self, module: module) -> bool:
         module_type = self.db(self.db.module_types.id == module.module_type_id).select().first()

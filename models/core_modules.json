@@ -2,7 +2,111 @@
     {
         "description": "A test set of commands for the community",
         "gateway_url": "http://127.0.0.1:8000/WaddleDBM/",
-        "metadata": {"!community_join": {"action": "http://127.0.0.1:8000/WaddleDBM/community_members/create_member.json", "description": "Creates a new member for a given community. Example: !community join [my_community]", "method": "POST", "parameters": [], "payload_keys": ["community_name", "identity_name"], "req_priv_list": []}, "!community_leave": {"action": "http://127.0.0.1:8000/WaddleDBM/community_members/remove_member.json", "description": "Leaves the given community. Example: !community leave [my_community]", "method": "DELETE", "parameters": [], "payload_keys": ["community_name", "identity_name"], "req_priv_list": []}, "!community_manage_add": {"action": "http://127.0.0.1:8000/WaddleDBM/communities/create_by_name.json", "description": "Add a new community. Example: !community manage add [my_community]", "method": "POST", "parameters": [], "payload_keys": ["identity_name", "community_name"], "req_priv_list": []}, "!community_manage_desc": {"action": "http://127.0.0.1:8000/WaddleDBM/communities/update_desc_by_name.json", "description": "Add a description to a community. Example: !community manage desc [My community description] <my_community>", "method": "PUT", "parameters": [{"description": "The name of the community", "name": "community_name", "required": true}], "payload_keys": ["identity_name", "community_description"], "req_priv_list": ["write", "admin"]}, "!community_manage_ls": {"action": "http://127.0.0.1:8000/WaddleDBM/communities/get_all.json", "description": "List all the communities. Example: !community manage ls", "method": "GET", "parameters": [], "payload_keys": [], "req_priv_list": []}, "!community_manage_rem": {"action": "http://127.0.0.1:8000/WaddleDBM/communities/delete_by_name.json", "description": "Remove a community. Example: !community manage rem <my_community>", "method": "DELETE", "parameters": [], "payload_keys": ["identity_name", "community_name"], "req_priv_list": ["admin", "delete"]}, "!community_members_ls": {"action": "http://127.0.0.1:8000/WaddleDBM/community_members/get_names_by_community_name.json", "description": "Returns a list of all the members of the current community. Example: !community members ls", "method": "GET", "parameters": ["community_name"], "payload_keys": [], "req_priv_list": ["read"]}, "!community_update_role": {"action": "http://127.0.0.1:8000/WaddleDBM/community_members/update_member_role.json", "description": "Updates the roll of a given member in a community. The member updating the roll, must be the owner of the community. Example: !community update role[member_name_to_update_role] [name_of_the_role]", "method": "PUT", "parameters": ["community_name"], "payload_keys": ["identity_name", "member_name", "role_name"], "req_priv_list": ["admin"]}},
+        "metadata": {
+            "!community_join": {
+              "action": "http://127.0.0.1:8000/WaddleDBM/community_members/create_member.json",
+              "description": "Creates a new member for a given community. Example: !community join [my_community]",
+              "method": "POST",
+              "parameters": [],
+              "payload_keys": [
+                "community_name",
+                "identity_name"
+              ],
+              "req_priv_list": []
+            },
+            "!community_leave": {
+              "action": "http://127.0.0.1:8000/WaddleDBM/community_members/remove_member.json",
+              "description": "Leaves the given community. Example: !community leave [my_community]",
+              "method": "DELETE",
+              "parameters": [],
+              "payload_keys": [
+                "community_name",
+                "identity_name"
+              ],
+              "req_priv_list": []
+            },
+            "!community_manage_add": {
+              "action": "http://127.0.0.1:8000/WaddleDBM/communities/create_by_name.json",
+              "description": "Add a new community. Example: !community manage add [my_community]",
+              "method": "POST",
+              "parameters": [],
+              "payload_keys": [
+                "identity_name",
+                "community_name"
+              ],
+              "req_priv_list": []
+            },
+            "!community_manage_desc": {
+              "action": "http://127.0.0.1:8000/WaddleDBM/communities/update_desc_by_name.json",
+              "description": "Add a description to a community. Example: !community manage desc [My community description] <my_community>",
+              "method": "PUT",
+              "parameters": [
+                {
+                  "description": "The name of the community",
+                  "name": "community_name",
+                  "required": true
+                }
+              ],
+              "payload_keys": [
+                "identity_name",
+                "community_description"
+              ],
+              "req_priv_list": [
+                "write",
+                "admin"
+              ]
+            },
+            "!community_manage_ls": {
+              "action": "http://127.0.0.1:8000/WaddleDBM/communities/get_all.json",
+              "description": "List all the communities. Example: !community manage ls",
+              "method": "GET",
+              "parameters": [],
+              "payload_keys": [],
+              "req_priv_list": []
+            },
+            "!community_manage_rem": {
+              "action": "http://127.0.0.1:8000/WaddleDBM/communities/delete_by_name.json",
+              "description": "Remove a community. Example: !community manage rem <my_community>",
+              "method": "DELETE",
+              "parameters": [],
+              "payload_keys": [
+                "identity_name",
+                "community_name"
+              ],
+              "req_priv_list": [
+                "admin",
+                "delete"
+              ]
+            },
+            "!community_members_ls": {
+              "action": "http://127.0.0.1:8000/WaddleDBM/community_members/get_names_by_community_name.json",
+              "description": "Returns a list of all the members of the current community. Example: !community members ls",
+              "method": "GET",
+              "parameters": [
+                "community_name"
+              ],
+              "payload_keys": [],
+              "req_priv_list": [
+                "read"
+              ]
+            },
+            "!community_set_role": {
+              "action": "http://127.0.0.1:8000/WaddleDBM/community_members/set_role.json",
+              "description": "Updates the roll of a given member in a community. The member updating the roll, must be the owner of the community, or have admin privilages. Example: !community update role [member_name_to_update_role] [name_of_the_role]",
+              "method": "PUT",
+              "parameters": [
+                "community_name"
+              ],
+              "payload_keys": [
+                "identity_name",
+                "role_receiver",
+                "role_name"
+              ],
+              "req_priv_list": [
+                "admin"
+              ]
+            }
+          },
         "module_type_id": 1,
         "name": "Community"
     },
