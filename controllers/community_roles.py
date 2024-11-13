@@ -5,34 +5,6 @@ from json import loads as jloads
 # try something like
 def index(): return dict(message="hello from roles.py")
 
-# Function to decode names with special characters in them.
-from urllib.parse import unquote
-
-def decode_name(name: str) -> str:
-    return None if not name else unquote(name)
-
-# Helper function to get a community record by its name.
-def get_community_record_by_name(name: str):
-    return db(db.communities.community_name == name).select().first()
-
-# Helper function to get an identity record by its name.
-def get_identity_record_by_name(name: str):
-    return db(db.identities.name == name).select().first()
-
-# Helper function to set the role of all identities in a community to the default "Member" role when a role is deleted.
-# Only identities with the deleted role are affected.
-def set_default_role_for_identities_in_community(community_id: int, role_id: int):
-    db(
-        (db.community_members.community_id == community_id) &
-        (db.community_members.role_id == role_id)
-    ).update(role_id=DEFAULT_ROLE_ID)
-    identities = db(db.community_members.community_id == community_id).select()
-
-    if identities:
-        for identity in identities:
-            if identity.role_id == role_id:
-                identity.update_record(role_id=1)
-
 # Create a new role from a given payload. Throws an error if no payload is given, or the role already exists.
 def create_role():
     payload = request.body.read()
@@ -46,7 +18,7 @@ def create_role():
         return dict(msg=f"Payload missing required fields. Required fields are: {needed_fields}")
     
     # Get the community by name
-    community = get_community_record_by_name(payload['community_name'])
+    community = waddle_helpers.get_community_record_by_name(payload['community_name'])
 
     # Check if the community exists
     if not community:
@@ -70,7 +42,7 @@ def get_all():
 # Get a role by its name. If the role does not exist, return an error.
 def get_by_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     role = db(db.roles.name == name).select().first()
@@ -79,7 +51,7 @@ def get_by_name():
 # Get a role by community name. If the role does not exist, return an error.
 def get_by_community_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     
@@ -97,7 +69,7 @@ def get_by_community_name():
 # Update a role by a given payload name and community name. If the role does not exist, return an error.
 def update_by_name_and_community_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
 
@@ -112,7 +84,7 @@ def update_by_name_and_community_name():
         return dict(msg="Payload missing required fields. Required fields are: name, description, priv_list, requirements, community_name")
     
     # Get the community by name
-    community = get_community_record_by_name(payload['community_name'])
+    community = waddle_helpers.get_community_record_by_name(payload['community_name'])
     if not community:
         return dict(msg="Community does not exist.")
     
@@ -129,7 +101,7 @@ def update_by_name_and_community_name():
 # Update a role by its name. If the role does not exist, return an error.
 def update_by_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     payload = request.body.read()
@@ -147,7 +119,7 @@ def update_by_name():
 # Delete a role by its name. If the role does not exist, return an error.
 def delete_by_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     role = db(db.roles.name == name).select().first()
@@ -174,7 +146,7 @@ def delete_by_name_and_community_name():
     community_name = payload['community_name']
     
     # Get the community by name
-    community = get_community_record_by_name(community_name)
+    community = waddle_helpers.get_community_record_by_name(community_name)
     if not community:
         return dict(msg="Community does not exist.")
     
@@ -184,7 +156,7 @@ def delete_by_name_and_community_name():
         return dict(msg="Role does not exist.")
     
     # Set the role of all identities in the community to the default "Member" role
-    set_default_role_for_identities_in_community(community.id, role.id)
+    waddle_helpers.set_default_role_for_identities_in_community(community.id, role.id)
 
     # Delete the role
     role.delete_record()

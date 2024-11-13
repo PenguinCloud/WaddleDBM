@@ -5,40 +5,6 @@ from json import loads as jloads
 # try something like
 def index(): return dict(message="hello from routing.py")
 
-# Function to decode names with special characters in them.
-def decode_name(name: str) -> str:
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
-
-# Function to return a routing_gateway by a given channel_id and account. If it doesnt exist, return null.
-def get_routing_gateway(channel_id: str, account: str):
-    # First, split the account into the protocol and the server name by splitting the account string by the first dot.
-    account_split = account.split(".", 1)
-    if len(account_split) != 2:
-        return None
-    
-    protocol = account_split[0]
-    server_name = account_split[1]
-
-    gateway_server = db((db.gateway_servers.protocol == protocol) & (db.gateway_servers.name == server_name)).select().first()
-
-    if not gateway_server:
-        return None
-    
-    routing_gateway = db((db.routing_gateways.channel_id == channel_id) & (db.routing_gateways.gateway_server == gateway_server.id)).select().first()
-
-    return routing_gateway
-
-#Function to replace the first character of a string with a hash if it is an underscore.
-def replace_first_char(name: str) -> str:
-    if name[0] == "_":
-        name = "#" + name[1:]
-    return name
-
 # Create a new routing from a given payload. Throws an error if no payload is given, or the routing already exists.
 def create_routing():
     payload = request.body.read()
@@ -68,7 +34,7 @@ def get_all_community_routes():
 # Get a routing by its name. If the routing does not exist, return an error.
 def get_by_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     routing = db(db.routing.name == name).select().first()
@@ -79,7 +45,7 @@ def get_by_name():
 # Update a routing by its name. If the routing does not exist, return an error.
 def update_by_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     payload = request.body.read()
@@ -98,7 +64,7 @@ def update_by_name():
 # Delete a routing by its name. If the routing does not exist, return an error.
 def delete_by_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     routing = db(db.routing.name == name).select().first()
@@ -110,7 +76,7 @@ def delete_by_name():
 # Get all routings for a specific community name.
 def get_by_community_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     community = db(db.communities.community_name == name).select().first()
@@ -133,7 +99,7 @@ def add_route_to_community():
     payload = jloads(payload)
     if 'community_name' not in payload:
         return dict(msg="Payload missing required fields. Remember to add the community name at the end of the command between [] brackets.")
-    community_name = decode_name(payload['community_name'])
+    community_name = waddle_helpers.decode_name(payload['community_name'])
     
     # Checkif the channel_id is given in the arguments.
     print(channel_id)
@@ -159,7 +125,7 @@ def add_route_to_community():
         routing_gateway_ids = []
 
     # Get the routing gateway by the channel_id and account.
-    routing_gateway = get_routing_gateway(channel_id, account)
+    routing_gateway = waddle_helpers.get_routing_gateway(channel_id, account)
 
     # Check if the routing gateway is not null.
     if not routing_gateway:
@@ -186,7 +152,7 @@ def remove_route_from_community():
     payload = jloads(payload)
     if 'community_name' not in payload:
         return dict(msg="Payload missing required fields.")
-    community_name = decode_name(payload['community_name'])
+    community_name = waddle_helpers.decode_name(payload['community_name'])
     
     # Checkif the channel_id is given in the arguments.
     if not channel_id:
@@ -206,7 +172,7 @@ def remove_route_from_community():
         return dict(msg="Community does not exist in the routings table.")
 
     # Get the routing gateway by the channel_id and account.
-    routing_gateway = get_routing_gateway(channel_id, account)
+    routing_gateway = waddle_helpers.get_routing_gateway(channel_id, account)
 
     # Remove the routing gateway from the routing record, if it exists.
     routing_gateway_ids = routing.routing_gateway_ids

@@ -10,6 +10,12 @@ from gluon.tools import Auth
 # Import the db_initializer class from the WaddleDBM init_db scripts module
 from applications.WaddleDBM.scripts.init_db import db_initializer
 
+# Import the the waddledbm_helpers class from the WaddleDBM botDBMHelpers scripts module
+from applications.WaddleDBM.scripts.botDBMHelpers import dbm_helpers
+
+# Import the matterbridge_helpers class from the WaddleDBM botMatterbridgeHelpers scripts module
+from applications.WaddleDBM.scripts.botMatterbridgeHelpers import matterbridge_helpers
+
 # -------------------------------------------------------------------------
 # This scaffolding model makes your app work on Google App Engine too
 # File is released under public domain and you can use without limitations
@@ -191,7 +197,8 @@ db.define_table('identities',
                 Field('name', 'string'),
                 Field('country', 'string'),
                 Field('ip_address', 'string'),
-                Field('browser_fingerprints', 'list:string'))
+                Field('browser_fingerprints', 'list:string'),
+                Field('reputation', 'integer', default=0))
 
 # Define the communities table
 db.define_table('communities', 
@@ -342,6 +349,12 @@ db.define_table('alias_commands',
 
 # Create a DB initializer object
 db_init = db_initializer(db)
+
+# Create a WaddleDBM_Helpers object
+waddle_helpers = dbm_helpers(db)
+
+# Create a Matterbridge_Helpers object
+mat_helpers = matterbridge_helpers(db)
 
 # Initialize the DB
 db_init.init_db()

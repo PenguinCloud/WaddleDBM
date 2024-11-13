@@ -5,15 +5,6 @@ from json import loads as jloads
 # try something like
 def index(): return dict(message="hello from account_types.py")
 
-# Function to decode names with space in
-def decode_name(name: str) -> str:
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
-
 # Create a new account type from a given payload. Throws an error if no payload is given, or the account type already exists.
 def create():
     payload = request.body.read()
@@ -35,7 +26,7 @@ def get_all():
 # Get an account type by its name. If the account type does not exist, return an error.
 def get_by_name():
     type_name = request.args(0)
-    type_name = decode_name(type_name)
+    type_name = waddle_helpers.decode_name(type_name)
     account_type = db(db.account_types.type_name == type_name).select().first()
     if not account_type:
         return dict(msg="Account type not found.")
@@ -44,7 +35,7 @@ def get_by_name():
 # Update an account type by its name. If the account type does not exist, return an error.
 def update_by_name():
     type_name = request.args(0)
-    type_name = decode_name(type_name)
+    type_name = waddle_helpers.decode_name(type_name)
     account_type = db(db.account_types.type_name == type_name).select().first()
     if not account_type:
         return dict(msg="Account type not found.")
@@ -62,7 +53,7 @@ def update_by_name():
 # Delete an account type by its name. If the account type does not exist, return an error.
 def delete_by_name():
     type_name = request.args(0)
-    type_name = decode_name(type_name)
+    type_name = waddle_helpers.decode_name(type_name)
     account_type = db(db.account_types.type_name == type_name).select().first()
     if not account_type:
         return dict(msg="Account type not found.")

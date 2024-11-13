@@ -5,15 +5,6 @@ from json import loads as jloads
 # try something like
 def index(): return dict(message="hello from gateway_server_types.py")
 
-# Function to decode names with space in
-def decode_name(name: str) -> str:
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
-
 # Create a new gateway server type from a given payload. Throws an error if no payload is given, or the gateway server type already exists.
 def create_gateway_server_type():
     payload = request.body.read()

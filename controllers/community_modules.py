@@ -5,41 +5,6 @@ from json import loads as jloads
 # try something like
 def index(): return dict(message="hello from communities_modules.py")
 
-def get_identity(identity_name: str) -> dict:
-    return db(db.identities.name == identity_name).select().first()
-
-# A helper function that checks if a given identity exists in a given community. Returns True if the identity exists in the community, False otherwise.
-def identity_in_community(identity_name: str, community_name: str) -> bool:
-    identity = db(db.identities.name == identity_name).select(db.identities.id).first()
-    community = db(db.communities.community_name == community_name).select(db.communities.id).first()
-    
-    if not identity or not community:
-        return False
-    
-    membership = db((db.community_members.identity_id == identity.id) &
-                    (db.community_members.community_id == community.id)).select().first()
-    
-    return bool(membership)
-
-# A helper function that checks if a given identity is an admin of a given community. Returns True if the identity is an admin, False otherwise.
-def identity_is_admin(identity_name: str, community_name: str) -> bool:
-    identity = db(db.identities.name == identity_name).select(db.identities.id).first()
-    community = db(db.communities.community_name == community_name).select(db.communities.id).first()
-    
-    if not identity or not community:
-        return False
-    
-    membership = db((db.community_members.identity_id == identity.id) &
-                    (db.community_members.community_id == community.id)).select().first()
-    if not membership:
-        return False
-    role = db(db.roles.id == membership.role_id).select().first()
-    return role.name in ['Admin', 'Owner', 'admin', 'owner']
-
-def is_community_module(module) -> bool:
-    module_type = db(db.module_types.id == module.module_type_id).select().first()
-    return module_type.name == "Community"
-
 # Get all community modules accross all communities.
 def get_all():
     community_modules = db(db.community_modules).select()
@@ -186,10 +151,10 @@ def uninstall_by_community_name():
     if community.community_name == "Global":
         return dict(msg="Cannot install community module in Global community.")
 
-    if not identity_in_community(payload['identity_name'], community_name):
+    if not waddle_helpers.identity_in_community(payload['identity_name'], community_name):
         return dict(msg="Identity is not a member of the community.")
 
-    if not identity_is_admin(payload['identity_name'], community_name):
+    if not waddle_helpers.identity_is_admin(payload['identity_name'], community_name):
         return dict(msg="Identity is not an admin of the community.")
 
     # Check that the module exists

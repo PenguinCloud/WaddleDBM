@@ -1,37 +1,18 @@
 # -*- coding: utf-8 -*-
 from json import loads as jloads
+
 import logging
+from dataclasses import dataclass
+
+# Import the necessary classes from the botclasses module
+# TODO: Change the import path to the correct path when the waddlebot-libs module is renamed
+from applications.WaddleDBM.dataclasses.botClasses import role, community, identity, community_member
 
 # Set logging level to INFO
 logging.basicConfig(level=logging.INFO)
 
 # try something like
 def index(): return dict(message="hello from communities.py")
-
-# Function to decode names with space in
-def decode_name(name: str) -> str:
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
-
-
-
-# Get the owner role for a given community_id.
-from functools import lru_cache
-
-@lru_cache(maxsize=128)
-def get_owner_role(community_id):
-    return (
-        db(
-            (db.roles.community_id == community_id)
-            & (db.roles.name == "Owner")
-        )
-        .select()
-        .first()
-    )
 
 # Create a new community from a given payload. Throws an error if no payload is given, or the community already exists.
 def create():
@@ -82,7 +63,7 @@ def create_by_name():
         return dict(msg="Identity does not exist.")
 
     # From the roles table, get the Owner role for the community.
-    role = get_owner_role(community.id)
+    role = waddle_helpers.get_owner_role(community.id)
     db.community_members.insert(community_id=community.id, identity_id=identity.id, role_id=role.id, currency=0)
 
     return dict(msg="Community created. You have been granted the Owner role of this community.")
@@ -95,7 +76,7 @@ def get_all():
 # Get a community by its name. If the community does not exist, return an error.
 def get_by_name():
     community_name = request.args(0)
-    community_name = decode_name(community_name)
+    community_name = waddle_helpers.decode_name(community_name)
     if not community_name:
         return dict(msg="No community name given.")
     community = db(db.communities.community_name == community_name).select().first()
@@ -106,7 +87,7 @@ def get_by_name():
 # Update a community by its name. If the community does not exist, return an error.
 def update_by_name():
     community_name = request.args(0)
-    community_name = decode_name(community_name)
+    community_name = waddle_helpers.decode_name(community_name)
     if not community_name:
         return dict(msg="No community name given.")
     payload = request.body.read()
@@ -124,7 +105,7 @@ def update_by_name():
 # Update a community's description by its name. This can only be done by an identity_name that is part of the community with the Owner role. If the community does not exist, return an error.
 def update_desc_by_name():
     community_name = request.args(0)
-    community_name = decode_name(community_name)
+    community_name = waddle_helpers.decode_name(community_name)
     if not community_name:
         return dict(msg="No community name given.")
     payload = request.body.read()
@@ -152,7 +133,7 @@ def update_desc_by_name():
 # Delete a community by its name. This can only be done by an identity_name that is part of the community with the Owner role. If the community does not exist, return an error. 
 def delete_by_name():
     community_name = request.args(0)
-    community_name = decode_name(community_name)
+    community_name = waddle_helpers.decode_name(community_name)
     if not community_name:
         return dict(msg="No community name given.")
     payload = request.body.read()

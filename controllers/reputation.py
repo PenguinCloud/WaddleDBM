@@ -5,15 +5,6 @@ from json import loads as jloads
 # try something like
 def index(): return dict(message="hello from reputation.py")
 
-# Function to decode names with space in
-def decode_name(name: str) -> str:
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
-
 # Using a community name in the arguments and an identity name in the payload, get the reputation of the identity in the community. 
 # If the community or identity does not exist, return an error.
 def get_reputation():

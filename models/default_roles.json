@@ -1,6 +1,6 @@
 [
     {
-        "role": "Administrator",
+        "role": "Owner",
         "permissions": [
             "read", 
             "write", 
@@ -8,6 +8,17 @@
             "delete", 
             "admin", 
             "owner"
+        ],
+        "description": "Owners can read, write, update, delete, admin, and owner"
+    },
+    {
+        "role": "Administrator",
+        "permissions": [
+            "read", 
+            "write", 
+            "update", 
+            "delete", 
+            "admin"
         ],
         "description": "Admins can read, write, and admin"
     },

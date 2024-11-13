@@ -5,15 +5,6 @@ from json import loads as jloads
 # try something like
 def index(): return dict(message="hello from gateway_servers.py")
 
-# Function to decode names with space in
-def decode_name(name: str) -> str:
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
-
 # Create a new gateway server from a given payload. Throws an error if no payload is given, or the gateway server already exists.
 def create_gateway_server():
     payload = request.body.read()
@@ -43,7 +34,7 @@ def get_all():
         server_type = db(db.gateway_server_types.id == gateway_server.server_type).select().first()
         data.append(dict(
             name=gateway_server.name,
-            server_type=decode_name(server_type.type_name),
+            server_type=waddle_helpers.decode_name(server_type.type_name),
             server_nick=gateway_server.server_nick,
             server_id=gateway_server.server_id
         ))
@@ -58,7 +49,7 @@ def get_by_name():
     if not gateway_server:
         return dict(msg="Gateway server does not exist.", status=404)
     server_type = db(db.gateway_server_types.id == gateway_server.server_type).select().first()
-    return dict(name=gateway_server.name, server_type=decode_name(server_type.type_name), server_nick=gateway_server.server_nick)
+    return dict(name=gateway_server.name, server_type=waddle_helpers.decode_name(server_type.type_name), server_nick=gateway_server.server_nick)
 
 # Update a gateway server by its name. If the gateway server does not exist, return an error.
 def update_by_name():

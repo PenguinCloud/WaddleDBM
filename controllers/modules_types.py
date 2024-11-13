@@ -6,15 +6,6 @@ from urllib.parse import unquote
 # try something like
 def index(): return dict(message="hello from marketplace.py")
 
-# Function to decode names with space in
-def decode_name(name: str) -> str:
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
-
 # Create a new module type from a given payload. Throws an error if no payload is given, or the module type already exists.
 def create_module_type():
     payload = request.body.read()
@@ -31,7 +22,7 @@ def create_module_type():
 
 # Get a module type by name. Throws an error if no name is given, or the module type does not exist.
 def get_module_type():
-    if name := decode_name(request.args(0)) is None:
+    if name := waddle_helpers.decode_name(request.args(0)) is None:
         return dict(msg="No name given.")
     elif module_type := db(db.module_types.name == name).select().first() is None:
         return dict(msg="Module Type does not exist.")
@@ -45,7 +36,7 @@ def get_all_module_types():
 
 # Update a module type by name. Throws an error if no name is given, or the module type does not exist.
 def update_module_type():
-    name = decode_name(request.args(0))
+    name = waddle_helpers.decode_name(request.args(0))
     if not name:
         return dict(msg="No name given.")
     module_type = db(db.module_types.name == name).select().first()
@@ -60,7 +51,7 @@ def update_module_type():
 
 # Delete a module type by name. Throws an error if no name is given, or the module type does not exist.
 def delete_module_type():
-    name = decode_name(request.args(0))
+    name = waddle_helpers.decode_name(request.args(0))
     if not name:
         return dict(msg="No name given.")
     module_type = db(db.module_types.name == name).select().first()

@@ -5,15 +5,6 @@ from json import loads as jloads
 # try something like
 def index(): return dict(message="hello from identities.py")
 
-# Function to decode names with special characters in them.
-def decode_name(name: str) -> str:
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
-
 # Create a new identity from a given payload. Throws an error if no payload is given, or the identity already exists.
 def create():
     payload = request.body.read()
@@ -35,7 +26,7 @@ def get_all():
 # Get an identity by its name. If the identity does not exist, return an error.
 def get_by_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     identity = db(db.identities.name == name).select().first()
@@ -46,7 +37,7 @@ def get_by_name():
 # Update an identity by its name. If the identity does not exist, return an error.
 def update_by_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     payload = request.body.read()
@@ -64,7 +55,7 @@ def update_by_name():
 # Delete an identity by its name. If the identity does not exist, return an error.
 def delete_by_name():
     name = request.args(0)
-    name = decode_name(name)
+    name = waddle_helpers.decode_name(name)
     if not name:
         return dict(msg="No name given.")
     identity = db(db.identities.name == name).select().first()

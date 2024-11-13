@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from json import loads as jloads
 from datetime import datetime, timedelta
-import uuid
+from uuid import uuid4
 from threading import Thread
-import time
+from time import sleep
 import logging
 
 # Set logging level to INFO
@@ -58,7 +58,7 @@ def create_session():
     expiration_time = datetime.now() + timedelta(hours=1)
 
     # Generate a unique session ID token.
-    session_token = str(uuid.uuid4())
+    session_token = str(uuid4())
 
     # If an admin context session already exists for the community and identity, update the session expiration time.
     admin_context = db((db.admin_contexts.community_id == community.id) & (db.admin_contexts.identity_id == identity.id)).select().first()
@@ -244,7 +244,7 @@ def delete_expired_sessions():
 def delete_expired_sessions_continuously():
     while True:
         delete_expired_sessions()
-        time.sleep(300)
+        sleep(300)
 
 # Function to start a thread that continuously deletes expired admin context sessions.
 def start_delete_expired_sessions_thread():

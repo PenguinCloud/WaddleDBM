@@ -5,18 +5,6 @@ from json import loads as jloads
 # try something like
 def index(): return dict(message="hello from context.py")
 
-# Function to decode names with special characters in them.
-from urllib.parse import unquote
-def decode_name(name: str) -> str:
-    return unquote(name) if name else None 
-
-#Function to replace the first character of a string with a hash if it is an underscore.
-def replace_first_char(name: str) -> str:
-    if name[0] == "_":
-        name = "#" + name[1:]
-    return name
-
-
 # Create the initial context of a identity_name, by adding the given identity_name to the "Global" community and then setting the context to the "Global" community. 
 # If the identity_name already exists in the community, as well as the context, return an error. If the identity_name does not exist, return an error.
 # If the community does not exist, return an error. If the identity_name is already in the community, return an error.  
@@ -27,7 +15,7 @@ def initialize_user():
     payload = jloads(payload)
     if 'identity_name' not in payload:
         return dict(msg="Payload missing required fields.")
-    identity_name = decode_name(payload['identity_name'])
+    identity_name = waddle_helpers.decode_name(payload['identity_name'])
     identity = db(db.identities.name == identity_name).select().first()
 
     # Create a new identity if the identity does not exist.
@@ -73,8 +61,8 @@ def initialize_user():
 # Throws an error if no payload is given, or the context already exists. The payload 
 # must contain the identity name and community name to get their respective ID's
 def set_context():
-    channel = replace_first_char(request.args(0))
-    account = replace_first_char(request.args(1))
+    channel = waddle_helpers.replace_first_char(request.args(0))
+    account = waddle_helpers.replace_first_char(request.args(1))
 
     payload = request.body.read()
     if not payload:
@@ -87,8 +75,8 @@ def set_context():
 
     if 'identity_name' not in payload or 'community_name' not in payload:
         return dict(msg="Payload missing required fields. Please provide the identity name and community name.")
-    identity_name = decode_name(payload['identity_name'])
-    community_name = decode_name(payload['community_name'])
+    identity_name = waddle_helpers.decode_name(payload['identity_name'])
+    community_name = waddle_helpers.decode_name(payload['community_name'])
 
     identity = db(db.identities.name == identity_name).select().first()
     community = db(db.communities.community_name == community_name).select().first()
@@ -166,7 +154,7 @@ def get_by_identity_name():
     identity_name = request.args(0)
     if not identity_name:
         return dict(msg="No identity name given.")
-    identity_name = decode_name(identity_name)
+    identity_name = waddle_helpers.decode_name(identity_name)
     identity = db(db.identities.name == identity_name).select().first()
     if not identity:
         return dict(msg="Identity does not exist.")

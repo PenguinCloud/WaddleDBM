@@ -5,15 +5,6 @@ from json import loads as jloads
 # try something like
 def index(): return dict(message="hello from routing_gateways.py")
 
-# Function to decode names with space in
-def decode_name(name: str) -> str:
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
-
 # Create a new routing gateway from a given payload. Throws an error if no payload is given, or the routing gateway already exists.
 def create_gateway():
     payload = request.body.read()
@@ -65,14 +56,14 @@ def get_all():
         gateway_server = db(db.gateway_servers.id == routing_gateway.gateway_server).select().first()
         if gateway_server:
             data.append(dict(
-                gateway_type=decode_name(gateway_type.type_name),
-                gateway_server=decode_name(gateway_server.name),
+                gateway_type=waddle_helpers.decode_name(gateway_type.type_name),
+                gateway_server=waddle_helpers.decode_name(gateway_server.name),
                 channel_id=routing_gateway.channel_id,
                 is_active=routing_gateway.is_active
             ))
         else:
             data.append(dict(
-                gateway_type=decode_name(gateway_type.type_name),
+                gateway_type=waddle_helpers.decode_name(gateway_type.type_name),
                 gateway_server="Gateway Server not found",
                 channel_id=routing_gateway.channel_id,
                 is_active=routing_gateway.is_active

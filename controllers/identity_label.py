@@ -6,7 +6,7 @@ from json import loads as jloads
 def index(): return dict(message="hello from identity_label.py")
 
 # A helper function to parse the payload of a request.
-def parse_payload():
+def parse_payload() -> dict:
     payload = request.body.read()
     if not payload:
         raise ValueError("No payload given.")

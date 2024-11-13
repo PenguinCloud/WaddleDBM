@@ -14,15 +14,6 @@ stop_threads = False
 # try something like
 def index(): return dict(message="hello from calendar.py")
 
-# Function to decode names with space in
-def decode_name(name: str) -> str:
-    if not name:
-        return None
-    name = name.replace("%20", " ")
-    name = name.replace("_", " ")
-
-    return name
-
 # Function to get a routing_gateway channel_id from a given routing_gateway_id. If it doesnt exist, return null.
 def get_channel_id(routing_gateway_id: int) -> str:
     routing_gateway = db(db.routing_gateways.id == routing_gateway_id).select().first()
@@ -65,7 +56,7 @@ def get_all():
 # Get a calender event by its name. If the event does not exist, return an error.
 def get_by_name():
     event_name = request.args(0)
-    event_name = decode_name(event_name)
+    event_name = waddle_helpers.decode_name(event_name)
     event = db(db.calendar.event_name == event_name).select().first()
     if not event:
         return dict(msg="Event not found.")
@@ -98,7 +89,7 @@ def get_by_community():
 # Update a calendar event by its event name and community name. If the event does not exist, return an error.
 def update_by_name():
     event_name = request.args(0)
-    event_name = decode_name(event_name)
+    event_name = waddle_helpers.decode_name(event_name)
     event = db(db.calendar.event_name == event_name).select().first()
     if not event:
         return dict(msg="Event not found.")
