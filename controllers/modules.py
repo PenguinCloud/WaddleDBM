@@ -280,4 +280,8 @@ def update():
     marketplace_module.update_record(**payload)
     return dict(msg="Marketplace Module updated.")
 
-
+# Function to output the URL of the module onboarding page.
+def start_module_onboard():
+    # TODO: Implement a place to store the onboarding page URL
+    onboardUrl = "http://127.0.0.1:8000/WaddleDBM/module_onboarding/onboard_form"
+    return dict(msg=f"Thank you for choosing Waddlebot! If you wish to onboard a new module, please visit the following URL: {onboardUrl}")

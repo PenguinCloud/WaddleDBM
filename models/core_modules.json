@@ -127,7 +127,45 @@
     {
         "description": "A list of commands that handle the installation of marketplace modules into communities.",
         "gateway_url": "http://127.0.0.1:8000/WaddleDBM/community_modules/",
-        "metadata": {"!marketplace_install": {"action": "http://127.0.0.1:8000/WaddleDBM/community_members/install_by_community_name.json", "description": "This command installs a marketplace module into the given community. Example: !marketplace install <my_community> [module_id]", "method": "GET", "parameters": ["community_name"], "payload_keys": ["module_id"], "req_priv_list": ["admin"]}, "!marketplace_uninstall": {"action": "http://127.0.0.1:8000/WaddleDBM/community_members/uninstall_by_community_name.json", "description": "This command uninstalls a module from a community. Example: !marketplace install <my_community> [module_id]", "method": "GET", "parameters": ["community_name"], "payload_keys": ["module_id"], "req_priv_list": ["admin"]}},
+        "metadata": {
+            "!marketplace_install": {
+                "action": "http://127.0.0.1:8000/WaddleDBM/community_members/install_by_community_name.json",
+                "description": "This command installs a marketplace module into the given community. Example: !marketplace install <my_community> [module_id]",
+                "method": "GET",
+                "parameters": [
+                    "community_name"
+                ],
+                "payload_keys": [
+                    "module_id"
+                ],
+                "req_priv_list": [
+                    "admin"
+                ]
+            },
+            "!marketplace_uninstall": {
+                "action": "http://127.0.0.1:8000/WaddleDBM/community_members/uninstall_by_community_name.json",
+                "description": "This command uninstalls a module from a community. Example: !marketplace install <my_community> [module_id]",
+                "method": "GET",
+                "parameters": [
+                    "community_name"
+                ],
+                "payload_keys": [
+                    "module_id"
+                ],
+                "req_priv_list": [
+                    "admin"
+                ]
+            },
+            "!marketplace_onboard_module": {
+                "action": "http://127.0.0.1:8000/WaddleDBM/modules/start_module_onboard.json",
+                "description": "This command starts the onboarding process for a module, by displaying a link to a module onboarding form. Example: !marketplace onboard module",
+                "method": "GET",
+                "parameters": [],
+                "payload_keys": [],
+                "req_priv_list": []
+            }
+
+        },
         "module_type_id": 1,
         "name": "Marketplace Community"
     },
