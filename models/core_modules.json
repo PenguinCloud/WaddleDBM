@@ -371,5 +371,90 @@
         },
         "module_type_id": 1,
         "name": "Identity Label"
+    },
+    {
+        "description": "A list of commands to manage giveaways.",
+        "gateway_url": "http://127.0.0.1:8000/WaddleDBM/",
+        "metadata": {
+            "!giveaway_create": {
+                "action": "http://127.0.0.1:8000/WaddleDBM/giveaway/create.json",
+                "description": "This command creates a giveaway for the current community. Example: !giveaway create [prize_name] [prize_description] [timeout]",
+                "method": "GET",
+                "parameters": [
+                    
+                ],
+                "payload_keys": [
+                    "community_name",
+                    "identity_name",
+                    "prize_name",
+                    "prize_description",
+                    "timeout"
+                ],
+                "req_priv_list": [
+                    "admin",
+                    "write",
+                    "read"
+                ]
+            },
+            "!giveaway_get_all": {
+                "action": "http://127.0.0.1:8000/WaddleDBM/giveaway/get_all_by_community_name.json",
+                "description": "This command fetches all the giveaways for the current community. Example: !giveaway get all",
+                "method": "GET",
+                "parameters": [
+                ],
+                "payload_keys": [
+                    "community_name"
+                ],
+                "req_priv_list": [
+                    "read"
+                ]
+            },
+            "!giveaway_enter": {
+                "action": "http://127.0.0.1:8000/WaddleDBM/giveaway/enter.json",
+                "description": "This command allows the current identity to enter a given giveaway through a given giveaway GUID. Example: !giveaway enter [giveaway_guid]",
+                "method": "GET",
+                "parameters": [
+                ],
+                "payload_keys": [
+                    "community_name",
+                    "identity_name",
+                    "guid"
+                ],
+                "req_priv_list": [
+                    "read"
+                ]
+            },
+            "!giveaway_get_entries": {
+                "action": "http://127.0.0.1:8000/WaddleDBM/giveaway/get_entries.json",
+                "description": "This command retrieves all the entries for a given giveaway. Example: !giveaway get entries [giveaway_guid]",
+                "method": "GET",
+                "parameters": [
+                ],
+                "payload_keys": [
+                    "guid"
+                ],
+                "req_priv_list": [
+                    "read"
+                ]
+            },
+            "!giveaway_close_with_winner": {
+                "action": "http://127.0.0.1:8000/WaddleDBM/giveaway/close_with_winner.json",
+                "description": "This command closes a giveaway and selects a winner. Example: !giveaway close with winner [giveaway_guid] [winner_name]",
+                "method": "GET",
+                "parameters": [
+                ],
+                "payload_keys": [
+                    "guid",
+                    "winner_identity_name"
+                ],
+                "req_priv_list": [
+                    "read",
+                    "write",
+                    "admin"
+                ]
+            }
+        },
+        "module_type_id": 1,
+        "name": "Giveaway"
     }
 ]
