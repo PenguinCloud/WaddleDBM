@@ -7,11 +7,8 @@ import logging
 
 # Import the necessary dataclasses from the Waddlebot-libs module
 # Might need to change the name of the module to Waddlebot_libs, because python is case sensitive
-from importlib import import_module
-
-# Import the necessary dataclasses from the Waddlebot-libs module
-module = import_module("applications.WaddleDBM.Waddlebot-libs.botClasses").module
-module_command_metadata = import_module("applications.WaddleDBM.Waddlebot-libs.botClasses").module_command_metadata
+from applications.WaddleDBM.WaddlebotLibs.botClasses import module
+from applications.WaddleDBM.WaddlebotLibs.botClasses import module_command_metadata
 
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)

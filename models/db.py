@@ -6,15 +6,19 @@
 # -------------------------------------------------------------------------
 from gluon.contrib.appconfig import AppConfig
 from gluon.tools import Auth
+import sys
 
 # Import the db_initializer class from the WaddleDBM init_db scripts module
 from applications.WaddleDBM.scripts.init_db import db_initializer
 
 # Import the the waddledbm_helpers class from the WaddleDBM botDBMHelpers scripts module
-from applications.WaddleDBM.WaddlebotLibs.botDBMHelpers import dbm_helpers
+sys.path.append('applications/WaddleDBM/WaddlebotLibs')
+from botDBMHelpers import dbm_helpers
+# from ..WaddlebotLibs.botDBMHelpers import dbm_helpers
 
 # Import the matterbridge_helpers class from the WaddleDBM botMatterbridgeHelpers scripts module
-from applications.WaddleDBM.WaddlebotLibs.matterbridge_classes import matterbridge_helpers
+from botMatterbridgeHelpers import matterbridge_helpers
+# from ..WaddlebotLibs.botMatterbridgeHelpers import matterbridge_helpers
 
 # -------------------------------------------------------------------------
 # This scaffolding model makes your app work on Google App Engine too
