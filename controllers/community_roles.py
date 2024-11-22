@@ -39,6 +39,39 @@ def get_all():
     roles = db(db.roles).select()
     return dict(data=roles)
 
+# Function to get the role that is allocated to a given identity in a given community.
+def get_role_by_identity_and_community():
+    payload = request.body.read()
+    if not payload:
+        return dict(msg="No payload given.")
+    
+    payload = jloads(payload)
+
+    required_fields = ['identity_name', 'community_name']
+
+    if not all(field in payload for field in required_fields):
+        return dict(msg=f"Payload missing required fields. Required fields are: {required_fields}")
+    
+    identity_name = payload['identity_name']
+    community_name = payload['community_name']
+    
+    # Get the community by name
+    community = waddle_helpers.get_community_record_by_name(community_name)
+    if not community:
+        return dict(msg="Community does not exist.")
+    
+    # Get the identity by name
+    identity = waddle_helpers.get_identity(identity_name)
+    if not identity:
+        return dict(msg="Identity does not exist.")
+    
+    # Check if the identity is in the community
+    if not waddle_helpers.identity_in_community(identity_name, community_name):
+        return dict(msg="Identity is not in the community.")
+    
+    role = waddle_helpers.get_identity_role_in_community(identity_name, community_name)
+    return dict(data=role)
+
 # Get a role by its name. If the role does not exist, return an error.
 def get_by_name():
     name = request.args(0)
