@@ -68,8 +68,8 @@ else:
 # none otherwise. a pattern can be 'controller/function.extension'
 # -------------------------------------------------------------------------
 response.generic_patterns = [] 
-if request.is_local and not configuration.get('app.production'):
-    response.generic_patterns.append('*')
+# if request.is_local and not configuration.get('app.production'):
+response.generic_patterns.append('*')
 
 # -------------------------------------------------------------------------
 # choose a style for forms

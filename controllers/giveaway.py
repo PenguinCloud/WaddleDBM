@@ -8,8 +8,6 @@ import logging
 import random
 import os
 
-from dataclasses import asdict
-
 # Set the logger configuration
 logging.basicConfig(level=logging.INFO)
 

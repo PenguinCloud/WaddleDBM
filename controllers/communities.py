@@ -2,11 +2,6 @@
 from json import loads as jloads
 
 import logging
-from dataclasses import dataclass
-
-# Import the necessary classes from the botclasses module
-# TODO: Change the import path to the correct path when the waddlebot-libs module is renamed
-from applications.WaddleDBM.dataclasses.botClasses import role, community, identity, community_member
 
 # Set logging level to INFO
 logging.basicConfig(level=logging.INFO)
