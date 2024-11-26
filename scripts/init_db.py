@@ -41,7 +41,7 @@ class db_initializer:
         self.create_default_data("applications/WaddleDBM/models/default_gateway_server_types.json", "gateway_server_types", "type_name")
 
         # Create the default data for the gateway types
-        self.create_default_data("applications/WaddleDBM/models/default_gateway_types.json", "gateway_server_types", "type_name")
+        self.create_default_data("applications/WaddleDBM/models/default_gateway_types.json", "gateway_types", "type_name")
 
         # Create the default data for the gateway accounts
         self.create_default_data("applications/WaddleDBM/models/default_gateway_accounts.json", "gateway_accounts", "account_name")
