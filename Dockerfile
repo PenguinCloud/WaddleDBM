@@ -4,12 +4,15 @@ LABEL org.opencontainers.image.authors="info@penguintech.group"
 LABEL license="GNU AGPL3"
 
 # GET THE FILES WHERE WE NEED THEM!
-COPY . /opt/manager/waddledbm/
-WORKDIR /opt/manager/waddledbm
+COPY . /opt/manager/WaddleDBM/
+WORKDIR /opt/manager/WaddleDBM
 
 
 # PUT YER ARGS in here
 ARG APP_TITLE="WB-dbm" #Change this to actual title for Default
+
+# Install dependancies
+RUN pip install -r requirements.txt
 
 # BUILD IT!
 RUN ansible-playbook entrypoint.yml -c local --tags "build,run"
@@ -23,4 +26,4 @@ WORKDIR /var/www/html/web2py/
 # USER waddlebot
 
 # Entrypoint time (aka runtime)
-ENTRYPOINT ["/bin/bash","/opt/manager/waddledbm/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash","/opt/manager/WaddleDBM/entrypoint.sh"]

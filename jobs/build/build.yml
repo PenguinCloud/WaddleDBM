@@ -16,8 +16,8 @@
 
 - name: Copy file with owner and permissions
   ansible.builtin.copy:
-    src: /opt/manager/waddledbm/
-    dest: /var/www/html/web2py/applications/waddledbm/
+    src: "/opt/manager/WaddleDBM/"
+    dest: "/var/www/html/web2py/applications/WaddleDBM/"
     owner: "{{ run.user }}"
     group: "{{ run.user }}"
     mode: '0755'

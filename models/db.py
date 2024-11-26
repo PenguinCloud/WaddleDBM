@@ -12,12 +12,11 @@ import sys
 from applications.WaddleDBM.scripts.init_db import db_initializer
 
 # Import the the waddledbm_helpers class from the WaddleDBM botDBMHelpers scripts module
-sys.path.append('applications/WaddleDBM/WaddlebotLibs')
-from botDBMHelpers import dbm_helpers
+from applications.WaddleDBM.WaddlebotLibs.botDBMHelpers import dbm_helpers
 # from ..WaddlebotLibs.botDBMHelpers import dbm_helpers
 
 # Import the matterbridge_helpers class from the WaddleDBM botMatterbridgeHelpers scripts module
-from botMatterbridgeHelpers import matterbridge_helpers
+from applications.WaddleDBM.WaddlebotLibs.botMatterbridgeHelpers import matterbridge_helpers
 # from ..WaddlebotLibs.botMatterbridgeHelpers import matterbridge_helpers
 
 # -------------------------------------------------------------------------
