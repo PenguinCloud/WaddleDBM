@@ -43,7 +43,7 @@ Documentation: ./docs/
 Premium Support: https://support.penguintech.group 
 Community Bugs / Issues: -/issues
 
-# How to setup for testing
+# How to setup for testing with web2py
 
 To setup and run this module for testing puproses in web2py, do the following:
 
@@ -51,7 +51,17 @@ To setup and run this module for testing puproses in web2py, do the following:
 
 2. Navigate to the "applications" folder of web2py, found in its root directory.
 
-3. Copy the top level folder of this project (in this case its "WaddleDBM") into the "applications" folder.
+3. Run the following command to clone the project into your web2py application:
+
+```
+git clone https://github.com/PenguinCloud/WaddleDBM.git --recursive
+```
+
+If you are running a different branch with new modules and forgot to clone with the "--recursive" parameter, run the following command:
+
+```
+git submodule update --init
+```
 
 4. In the root folder of web2py, run web2py.exe
 
@@ -60,3 +70,29 @@ To setup and run this module for testing puproses in web2py, do the following:
 6. Click on "start server"
 
 7. Web2py should be running now. To view that the application is setup correctly, navigate to: http://127.0.0.1:8000/WaddleDBM/default/index
+
+# How to setup testing with docker
+
+To setup and run this module for testing puproses in docker, do the following:
+
+1. Ensure that you have docker installed and running on your pc.
+
+2. Run the following command to clone the project into your web2py application:
+
+```
+git clone https://github.com/PenguinCloud/WaddleDBM.git --recursive
+```
+
+If you are running a different branch with new modules and forgot to clone with the "--recursive" parameter, run the following command:
+
+```
+git submodule update --init
+```
+
+3. In the root folder of the newly cloned directory (where docker-compose.yml is located), run the following command:
+
+```
+docker-compose up
+```
+
+4. Web2py should be running now. To view that the application is setup correctly, navigate to: http://127.0.0.1:8000/WaddleDBM/default/index
