@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from json import loads as jloads
+from json import dumps as jdumps
 from datetime import datetime, timedelta
 from threading import Thread
 import requests
@@ -33,122 +34,151 @@ def get_account(routing_gateway_id: int) -> str:
 
 # Create a new calender event from a given payload. Throws an error if no payload is given.
 def create():
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'community_name' not in payload or 'event_name' not in payload or 'event_description' not in payload or 'event_start' not in payload or 'event_end' not in payload:
-        return dict(msg="Payload missing required fields.")
-    # Get the community id from the community name
-    community = db(db.communities.community_name == payload['community_name']).select().first()
-    if not community:
-        return dict(msg="Community not found. Please try again.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True)
+    
+    community = payload['community']
+    command_str_list = payload['command_string']
+
+    # Set the event name to that of the first element in the command string list
+    event_name = command_str_list[0]
+
+    # Set the event description to that of the second element in the command string list
+    event_description = command_str_list[1]
+
+    # Set the event start to that of the third element in the command string list
+    event_start = command_str_list[2]
+
+    # Set the event end to that of the fourth element in the command string list
+    event_end = command_str_list[3]
     
     # Create the event
-    db.calendar.insert(community_id=community.id, event_name=payload['event_name'], event_description=payload['event_description'], event_start=payload['event_start'], event_end=payload['event_end'], notification_sent=False)
-    return dict(msg="Event created.")
+    db.calendar.insert(community_id=community.id, event_name=event_name, event_description=event_description, event_start=event_start, event_end=event_end, notification_sent=False)
+    return dict(msg="Event created.", status=201)
 
 # Get all calender events.
 def get_all():
     events = db(db.calendar).select()
-    return dict(data=events)
+    return dict(data=events, status=200)
 
 # Get a calender event by its name. If the event does not exist, return an error.
 def get_by_name():
-    event_name = request.args(0)
-    event_name = waddle_helpers.decode_name(event_name)
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True)
+    
+    command_str_list = payload['command_string']
+
+    # Set the event name to that of the first element in the command string list
+    event_name = command_str_list[0]
+
     event = db(db.calendar.event_name == event_name).select().first()
     if not event:
-        return dict(msg="Event not found.")
-    return dict(data=event)
+        return dict(msg="Event not found.", status=404)
+    return dict(data=event, status=200)
 
 # Get calendar events by a community name and between a start and end date from a payload. Return an error if the community does not exist.
 def get_by_community():
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'community_name' not in payload:
-        return dict(msg="The community_name value is missing.")
-    community = db(db.communities.community_name == payload['community_name']).select().first()
-    if not community:
-        return dict(msg="Community not found.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True)
+    
+    community = payload['community']
+    command_str_list = payload['command_string']
     
     # The start and end date are optional. The start date is the current date and the end date is the current date plus 30 days.
     start_date = datetime.now()
     end_date = start_date + timedelta(days=30)
 
-    if 'start_date' in payload:
-        start_date = payload['start_date']
-    if 'end_date' in payload:
-        end_date = payload['end_date']
+    # If the start and end date are provided, set them to the given values.
+    if len(command_str_list) > 0:
+        start_date = command_str_list[0]
+        end_date = command_str_list[1]
 
     events = db((db.calendar.community_id == community.id) & (db.calendar.event_start >= start_date) & (db.calendar.event_start <= end_date)).select()
-    return dict(data=events)
+    return dict(data=events, status=200)
 
 # Update a calendar event by its event name and community name. If the event does not exist, return an error.
 def update_by_name():
-    event_name = request.args(0)
-    event_name = waddle_helpers.decode_name(event_name)
-    event = db(db.calendar.event_name == event_name).select().first()
-    if not event:
-        return dict(msg="Event not found.")
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    
-    if 'community_name' not in payload:
-        return dict(msg="The community name has not been provided.")
-    # Get the community id from the community name
-    community = db(db.communities.community_name == payload['community_name']).select().first()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if community:
-        event.community_id = community.id
-    else:
-        return dict(msg="Community not found.")
-    if 'event_name' in payload:
-        event.event_name = payload['event_name']
-    if 'event_description' in payload:
-        event.event_description = payload['event_description']
-    if 'event_start' in payload:
-        event.event_start = payload['event_start']
-    if 'event_end' in payload:
-        event.event_end = payload['event_end']
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
+    community = payload['community']
+    command_str_list = payload['command_string']
+
+    # Set the event name to that of the first element in the command string list
+    event_name = command_str_list[0]
+
+    event = db(db.calendar.event_name == event_name).select().first()
+
+    if not event:
+        return dict(msg="Event not found.", status=404)
+    
+    # Set the event description to that of the second element in the command string list
+    event_description = command_str_list[1]
+
+    # Set the event start to that of the third element in the command string list
+    event_start = command_str_list[2]
+
+    # set the event end to that of the fourth element in the command string list
+    event_end = command_str_list[3]
+
+    # Set the community id to that of the community
+    event.community_id = community.id
+    
+    # Update the event
+    if event_description:
+        event.event_description = event_description
+    if event_start:
+        event.event_start = event_start
+    if event_end:
+        event.event_end = event_end
+    
     event.update_record()
-    return dict(msg="Event updated.")
+    return dict(msg="Event updated.", status=200)
 
 # Delete a calendar event by its name and community name in a payload. If the event does not exist, return an error.
 def delete_by_name():
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'community_name' not in payload or 'event_name' not in payload:
-        return dict(msg="The community name or event_name has not been provided.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    event_name = payload['event_name']
+    community = payload['community']
+    command_str_list = payload['command_string']
+
+    # Set the event name to that of the first element in the command string list
+    event_name = command_str_list[0]
+
     event = db(db.calendar.event_name == event_name).select().first()
     if not event:
-        return dict(msg="Event not found.")
-    # Get the community id from the community name
-    community = db(db.communities.community_name == payload['community_name']).select().first()
-    if not community:
-        return dict(msg="Community not found.")
+        return dict(msg="Event not found.", status=404)
+
     if event.community_id == community.id:
         event.delete_record()
-        return dict(msg="Event deleted.")
+        return dict(msg="Event deleted.", status=200)
     else:
-        return dict(msg="Event not found.")
+        return dict(msg="Event not found.", status=404)
     
 # A loop function to check if an event is starting in 30 minutes. If it is, send a message to the Matterbridge.
 def check_events_start():
-    print("Starting calendar event check loop.")
+    logging.warning("Starting calendar event check loop.")
     while True:
-        print("Checking for events.")
+        logging.warning("Checking for events.")
         events = db(db.calendar).select()
         if events:
-            print("Events found. Checking if any events are starting in 30 minutes.")
+            logging.warning("Events found. Checking if any events are starting in 30 minutes.")
             for event in events:
                 if (event.event_start - timedelta(minutes=30) <= datetime.now() <= event.event_start) and event.not_start_sent == False:
                     event_name = event.event_name
@@ -190,11 +220,11 @@ def check_events_start():
                                 "account": account,
                                 "text": message
                             }
-                            requests.post(matterbridgePostURL, data=json.dumps(payload), headers={'Content-Type': 'application/json'})
+                            requests.post(matterbridgePostURL, data=jdumps(payload), headers={'Content-Type': 'application/json'})
                         except Exception as e:
                             logging.error(f"Error sending message to Matterbridge: {e}")
                     
-                    print(f"Event {event_name} is starting in 30 minutes. Messages sent to the Matterbridge.")
+                    logging.warning(f"Event {event_name} is starting in 30 minutes. Messages sent to the Matterbridge.")
 
                     # Update the notification sent field in the event record
                     event.update_record(not_start_sent=True)
@@ -208,12 +238,12 @@ def check_events_start():
 
 # A loop function to check if an event has ended. If it has, send a message to the Matterbridge.
 def check_events_end():
-    print("Starting calendar event check loop.")
+    logging.warning("Starting calendar event check loop.")
     while True:
-        print("Checking for events.")
+        logging.warning("Checking for events.")
         events = db(db.calendar).select()
         if events:
-            print("Events found. Checking if any events are ending.")
+            logging.warning("Events found. Checking if any events are ending.")
             for event in events:
                 if event.event_end >= datetime.now() and event.not_end_sent == False:
                     event_name = event.event_name
@@ -255,11 +285,11 @@ def check_events_end():
                                 "account": account,
                                 "text": message
                             }
-                            requests.post(matterbridgePostURL, data=json.dumps(payload), headers={'Content-Type': 'application/json'})
+                            requests.post(matterbridgePostURL, data=jdumps(payload), headers={'Content-Type': 'application/json'})
                         except Exception as e:
                             logging.error(f"Error sending message to Matterbridge: {e}")
                     
-                    print(f"Event {event_name} is ending. Messages sent to the Matterbridge.")
+                    logging.warning(f"Event {event_name} is ending. Messages sent to the Matterbridge.")
 
                     # Update the notification sent field in the event record
                     event.update_record(not_end_sent=True)

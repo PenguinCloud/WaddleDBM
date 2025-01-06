@@ -60,30 +60,25 @@ def initialize_user():
 # Create a new context from a given payload. Only one context can exist per identity. 
 # Throws an error if no payload is given, or the context already exists. The payload 
 # must contain the identity name and community name to get their respective ID's
-def set_context():
-    channel = waddle_helpers.replace_first_char(request.args(0))
-    account = waddle_helpers.replace_first_char(request.args(1))
+def set_context():    
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    payload = request.body.read()
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-
-    # Check if the channel exists.
-    if not channel:
-        return dict(msg="No channel given.")
-
-    if 'identity_name' not in payload or 'community_name' not in payload:
-        return dict(msg="Payload missing required fields. Please provide the identity name and community name.")
-    identity_name = waddle_helpers.decode_name(payload['identity_name'])
-    community_name = waddle_helpers.decode_name(payload['community_name'])
-
-    identity = db(db.identities.name == identity_name).select().first()
-    community = db(db.communities.community_name == community_name).select().first()
-
-    if not identity or not community:
-        return dict(msg="Identity or community does not exist.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
+    identity = payload['identity']
+    channel = payload["channel_id"]
+    account = payload["account"]
+    command_str_list = payload['command_string']
+    
+    # Set the community name to the first element of the command_str_list.
+    community_name = command_str_list[0]
+
+    # Check if the community exists in the database.
+    community = db(db.communities.community_name == community_name).select().first()
+    if not community:
+        return dict(msg="Community does not exist. Please create the community first.")
 
     # Check if the channel exists in the given community routing, by checking the gateways column of the routing table for the given community. If it doesnt exist, create it.
     routing = db(db.routing.community_id == community.id).select().first()

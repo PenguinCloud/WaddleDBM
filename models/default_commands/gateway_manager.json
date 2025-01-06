@@ -7,8 +7,11 @@
         "request_method": "POST",
         "request_parameters": [],
         "payload_keys": [
-            "gateway_type_name",
-            "channel_id"
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
         ],
         "req_priv_list": [
             "admin"
@@ -21,8 +24,11 @@
         "request_method": "DELETE",
         "request_parameters": [],
         "payload_keys": [
-            "gateway_type_name",
-            "channel_id"
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
         ],
         "req_priv_list": [
             "admin"

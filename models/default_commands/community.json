@@ -7,7 +7,8 @@
     "request_parameters": [],
     "payload_keys": [
       "community_name",
-      "identity_name"
+      "identity_name",
+      "command_string"
     ],
     "req_priv_list": []
   },
@@ -19,7 +20,8 @@
     "request_parameters": [],
     "payload_keys": [
       "community_name",
-      "identity_name"
+      "identity_name",
+      "command_string"
     ],
     "req_priv_list": []
   },
@@ -30,8 +32,9 @@
     "request_method": "POST",
     "request_parameters": [],
     "payload_keys": [
+      "community_name",
       "identity_name",
-      "community_name"
+      "command_string"
     ],
     "req_priv_list": []
   },
@@ -40,16 +43,11 @@
     "action_url": "http://127.0.0.1:8000/WaddleDBM/communities/update_desc_by_name.json",
     "description": "Add a description to a community. Example: !community manage desc [My community description] <my_community>",
     "request_method": "PUT",
-    "request_parameters": [
-      {
-        "description": "The name of the community",
-        "name": "community_name",
-        "required": true
-      }
-    ],
+    "request_parameters": [],
     "payload_keys": [
+      "community_name",
       "identity_name",
-      "community_description"
+      "command_string"
     ],
     "req_priv_list": [
       "write",
@@ -62,7 +60,11 @@
     "description": "List all the communities. Example: !community manage ls",
     "request_method": "GET",
     "request_parameters": [],
-    "payload_keys": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
     "req_priv_list": []
   },
   {
@@ -72,8 +74,9 @@
     "request_method": "DELETE",
     "request_parameters": [],
     "payload_keys": [
+      "community_name",
       "identity_name",
-      "community_name"
+      "command_string"
     ],
     "req_priv_list": [
       "admin",
@@ -85,10 +88,12 @@
     "action_url": "http://127.0.0.1:8000/WaddleDBM/community_members/get_names_by_community_name.json",
     "description": "Returns a list of all the members of the current community. Example: !community members ls",
     "request_method": "GET",
-    "request_parameters": [
-      "community_name"
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
     ],
-    "payload_keys": [],
     "req_priv_list": [
       "read"
     ]
@@ -98,13 +103,11 @@
     "action_url": "http://127.0.0.1:8000/WaddleDBM/community_members/set_role.json",
     "description": "Updates the roll of a given member in a community. The member updating the roll, must be the owner of the community, or have admin privilages. Example: !community update role [member_name_to_update_role] [name_of_the_role]",
     "request_method": "PUT",
-    "request_parameters": [
-      "community_name"
-    ],
+    "request_parameters": [],
     "payload_keys": [
+      "community_name",
       "identity_name",
-      "role_receiver",
-      "role_name"
+      "command_string"
     ],
     "req_priv_list": [
       "admin"
@@ -118,8 +121,9 @@
     "request_parameters": [
     ],
     "payload_keys": [
+      "community_name",
       "identity_name",
-      "community_name"
+      "command_string"
     ],
     "req_priv_list": [
       "read"

@@ -90,29 +90,23 @@ def get_by_community_name():
 # Add a routing gateway to a community's list of gateways, if it doesnt exist, by their community name. If the community or 
 # routing does not exist, return an error. The  is passed as an argument. The community_name is passed as a payload.
 def add_route_to_community():
-    channel_id = replace_first_char(request.args(0))
-    account = request.args(1)
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    payload = request.body.read()
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'community_name' not in payload:
-        return dict(msg="Payload missing required fields. Remember to add the community name at the end of the command between [] brackets.")
-    community_name = waddle_helpers.decode_name(payload['community_name'])
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    # Checkif the channel_id is given in the arguments.
-    print(channel_id)
-    if not channel_id:
-        return dict(msg="No channel ID given in the arguments.")
+    channel_id = payload["channel_id"]
+    account = payload["account"]
+    command_str_list = payload['command_string']
+    
+    # Set the community name to the first element of the command_str_list.
+    community_name = command_str_list[0]
 
-    # Check if the community is given in the payload.
-    if not community_name:
-        return dict(msg="No community name given in the payload. Remember to add the community name at the end of the command between [] brackets.")
-
+    # Get the community
     community = db(db.communities.community_name == community_name).select().first()
     if not community:
-        return dict(msg="Community does not exist.")
+        return dict(msg="Community does not exist.", error=True, status=400)
 
     # Get the routing record from the routing table by the community_id. If it doesnt exist, create it.
     routing = db(db.routing.community_id == community.id).select().first()
@@ -142,29 +136,23 @@ def add_route_to_community():
 # Remove a routing gateway from a community's list of gateways, if it exists, by their community name. If the community or 
 # routing does not exist, return an error. The channel ID is passed as an argument. The community_name is passed as a payload.
 def remove_route_from_community():
-    channel_id = replace_first_char(request.args(0))
-    account = request.args(1)
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    print(channel_id)
-    payload = request.body.read()
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'community_name' not in payload:
-        return dict(msg="Payload missing required fields.")
-    community_name = waddle_helpers.decode_name(payload['community_name'])
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    # Checkif the channel_id is given in the arguments.
-    if not channel_id:
-        return dict(msg="No channel ID given in the arguments.")
+    channel_id = payload["channel_id"]
+    account = payload["account"]
+    command_str_list = payload['command_string']
+    
+    # Set the community name to the first element of the command_str_list.
+    community_name = command_str_list[0]
 
-    # Check if the community is given in the payload.
-    if not community_name:
-        return dict(msg="No community name given in the payload. Remember to add the community name at the end of the command between [] brackets.")
-
+    # Get the community
     community = db(db.communities.community_name == community_name).select().first()
     if not community:
-        return dict(msg="Community does not exist.")
+        return dict(msg="Community does not exist.", error=True, status=400)
 
     # Get the routing record from the routing table by the community_id. If it doesnt exist, throw an error.
     routing = db(db.routing.community_id == community.id).select().first()

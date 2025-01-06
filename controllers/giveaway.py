@@ -133,21 +133,18 @@ def announce_winner(giveaway, winner):
 
 # Function to add a giveaway to the database, via the prizes table, per community name. Throws an error if no payload is given.
 def create() :
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
     if not payload:
-        return dict(msg="No payload given.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    payload = json.loads(payload)
+    community = payload['community']
+    command_str_list = payload['command_string']
 
-    # The community_name, prize_name and prize_description are required fields
-    if 'community_name' not in payload or 'prize_name' not in payload or 'prize_description' not in payload:
-        return dict(msg="Payload missing required fields.")
-    
-    # Check if the community exists
-    community = db(db.communities.community_name == payload['community_name']).select().first()
-    if not community:
-        return dict(msg="Community does not exist. Please provide a valid community name.")
+    # Set the prize_name and prize_description to the first and second elements in the command string list.
+    prize_name = command_str_list[0]
+    prize_description = command_str_list[1]
     
     # Check if a timeout is provided, if not, set it to 0
     timeout = payload["timeout"] if "timeout" in payload else 0
@@ -165,8 +162,8 @@ def create() :
         guid=guid,
         community_id=community.id,
         prize_guid=guid,
-        prize_name=payload['prize_name'],
-        prize_description=payload['prize_description'],
+        prize_name=prize_name,
+        prize_description=prize_description,
         winner_identity_id=None,
         prize_status=status.id,
         timeout=timeout
@@ -178,26 +175,17 @@ def create() :
         thread.start()
 
     # Return a success message
-    return dict(msg=f"Giveaway created under the name {payload['prize_name']}. If you want to enter the giveaway, type !giveaway enter {guid} in the chat.")
+    return dict(msg=f"Giveaway created under the name {prize_name}. If you want to enter the giveaway, type !giveaway enter {guid} in the chat.")
 
 # Function to get all giveways for a given community_name in a payload. Throws an error if no community name is given, or the community does not exist.
 def get_all_by_community_name() :
-    # Check that the payload is provided
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
     if not payload:
-        return dict(msg="No payload given.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    payload = json.loads(payload)
-
-    # Check that the community_name is provided in the payload
-    if 'community_name' not in payload:
-        return dict(msg="Payload missing required fields. Please provide a community name in the payload.")
-    
-    # Check if the community exists
-    community = db(db.communities.community_name == payload['community_name']).select().first()
-    if not community:
-        return dict(msg="Community does not exist. Please provide a valid community name.")
+    community = payload['community']
     
     # Get all the giveaways for the community
     giveaways = db(db.prizes.community_id == community.id).select()
@@ -229,27 +217,23 @@ def get_all_by_community_name() :
 # and must not have already entered the giveaway.
 
 def enter() :
-    # Check that the payload is provided
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
     if not payload:
-        return dict(msg="No payload given.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    payload = json.loads(payload)
+    community = payload['community']
+    identity = payload['identity']
+    command_str_list = payload['command_string']
 
-    # Check that the guid and identity_name are provided in the payload
-    if 'guid' not in payload or 'identity_name' not in payload:
-        return dict(msg="Payload missing required fields. Please provide a guid and identity_name in the payload.")
+    # Set the guid to the first element in the command string list.
+    guid = command_str_list[0]
     
     # Check if the giveaway exists
-    giveaway = db(db.prizes.guid == payload['guid']).select().first()
+    giveaway = db(db.prizes.guid == guid).select().first()
     if not giveaway:
         return dict(msg="Giveaway does not exist. Please provide a valid guid.")
-    
-    # Check if the identity exists
-    identity = db(db.identities.identity_name == payload['identity_name']).select().first()
-    if not identity:
-        return dict(msg="Identity does not exist. Please provide a valid identity name.")
     
     # Check if the identity is in the same community as the giveaway
     community = db(db.communities.id == giveaway.community_id).select().first()
@@ -277,20 +261,20 @@ def enter() :
 
 # Function to get all the entries for a given giveaway guid. Throws an error if no guid is provided, or the guid does not exist.
 def get_entries() :
-    # Check that the payload is provided
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
     if not payload:
-        return dict(msg="No payload given.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    payload = json.loads(payload)
+    identity = payload['identity']
+    command_str_list = payload['command_string']
 
-    # Check that the guid is provided in the payload
-    if 'guid' not in payload:
-        return dict(msg="Payload missing required fields. Please provide a guid in the payload.")
+    # Set the guid to the first element in the command string list.
+    guid = command_str_list[0]
     
     # Check if the giveaway exists
-    giveaway = db(db.prizes.guid == payload['guid']).select().first()
+    giveaway = db(db.prizes.guid == guid).select().first()
     if not giveaway:
         return dict(msg="Giveaway does not exist. Please provide a valid guid.")
     
@@ -311,33 +295,43 @@ def get_entries() :
 
 # Function to remove a giveaway with a given guid. Throws an error if no guid is provided, or the guid does not exist.
 def remove() :
-    # Check that the payload is provided
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
     if not payload:
-        return dict(msg="No payload given.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    payload = json.loads(payload)
+    community = payload['community']
+    identity = payload['identity']
+    command_str_list = payload['command_string']
 
-    # Check that the guid is provided in the payload
-    if 'guid' not in payload:
-        return dict(msg="Payload missing required fields. Please provide a guid in the payload.")
+    # Set the guid to the first element in the command string list.
+    guid = command_str_list[0]
     
     # Check if the giveaway exists
-    giveaway = db(db.prizes.guid == payload['guid']).select().first()
+    giveaway = db(db.prizes.guid == guid).select().first()
     if not giveaway:
         return dict(msg="Giveaway does not exist. Please provide a valid guid.")
     
     # Delete the giveaway from the prizes table
-    db(db.prizes.guid == payload['guid']).delete()
+    db(db.prizes.guid == guid).delete()
 
     # Return a success message
-    return dict(msg=f"Giveaway with guid {payload['guid']} has been removed.")
+    return dict(msg=f"Giveaway with guid {guid} has been removed.")
 
 # Function to close a giveaway with a given guid and set a winner. If no winner_identity_name is provided, a random winner is selected from the entries.
 def close_with_winner():
-    payload = json.loads(request.body.read())
-    guid = payload.get('guid')
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+
+    command_str_list = payload['command_string']
+
+    # Set the guid to the first element in the command string list.
+    guid = command_str_list[0]
+    
     if not guid:
         return dict(msg="Please provide a guid in the payload.")
 

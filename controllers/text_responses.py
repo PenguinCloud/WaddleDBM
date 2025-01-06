@@ -8,31 +8,30 @@ def index(): return dict(message="hello from text_response.py")
 # From a given payload, create a new text response using a text value and a response value found in the payload. If the text response already exists, return an error.
 # This is stored per community name found in the arguments.
 def set_text_response():
-    community_name = request.args(0)
-    payload = request.body.read()
-    
-    # Check if the payload is valid
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
     if not payload:
-        return dict(msg="No payload given.", status=400)
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    payload = jloads(payload)
-    if 'text' not in payload or 'response' not in payload:
-        return dict(msg="Payload missing required fields.", status=400)
-    
-    # Check if the community exists in the communities table
-    community = waddle_helpers.get_community(community_name)
-    if not community:
-        return dict(msg="Community does not exist.", status=404)
+    community = payload['community']
+    command_str_list = payload['command_string']
+
+    # Set the text variable to the first element in the command str_list
+    text = command_str_list[0]
+
+    # Set the response variable to the first element in the command str_list
+    response = command_str_list[1]
     
     # Check if the text response already exists. If it does, update the response value. Else create a new text response.
-    text_response = waddle_helpers.get_text_response(payload['text'], community.id)
+    text_response = waddle_helpers.get_text_response(text, community.id)
     if text_response:
-        text_response.update_record(response_val=payload['response'])
+        text_response.update_record(response_val=response)
     else:
         insertObj = {
             'community_id': community.id,
-            'text_val': payload['text'],
-            'response_val': payload['response']
+            'text_val': text,
+            'response_val': response
         }
         db.text_responses.insert(**insertObj)
 
@@ -40,35 +39,37 @@ def set_text_response():
 
 # This function updates a text response by a given text value. If the text response does not exist, return an error.
 def update_text_response():
-    community_name = request.args(0)
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
     if not payload:
-        return dict(msg="No payload given.", status=400)
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    payload = jloads(payload)
-    if 'text' not in payload or 'response' not in payload:
-        return dict(msg="Payload missing required fields.", status=400)
+    community = payload['community']
+    command_str_list = payload['command_string']
+
+    # Set the text variable to the first element in the command str_list
+    text = command_str_list[0]
+
+    # Set the response variable to the first element in the command str_list
+    response = command_str_list[1]
     
-    # Check if the community exists in the communities table
-    community = waddle_helpers.get_community(community_name)
-    if not community:
-        return dict(msg="Community does not exist.", status=404)
-    
-    text_response = waddle_helpers.get_text_response(payload['text'], community.id)
+    text_response = waddle_helpers.get_text_response(text, community.id)
     if not text_response:
         return dict(msg="Text response not found.", status=404)
     
-    text_response.update_record(response_val=payload['response'])
+    text_response.update_record(response_val=response)
     return dict(msg="Text response updated.", status=200)
 
 # Get a list of the text responses for a given community name
 def get_all():
-    community_name = request.args(0)
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    # Check if the community exists in the communities table
-    community = waddle_helpers.get_community(community_name)
-    if not community:
-        return dict(msg="Community does not exist.", status=404)
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
+    community = payload['community']
     
     # Get all text responses for the given community
     text_responses = db(db.text_responses.community_id == community.id).select()
@@ -78,24 +79,20 @@ def get_all():
 
 # Get a text response by its text value. If the text response does not exist, return an error.
 def get_by_text():
-    community_name = request.args(0)
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    # Check if the payload is valid
-    payload = request.body.read()
     if not payload:
-        return dict(msg="No payload given.", status=400)
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    payload = jloads(payload)
-    if 'text' not in payload:
-        return dict(msg="Payload missing required fields. Please provide the 'text' field.", status=400)
+    community = payload['community']
+    command_str_list = payload['command_string']
 
-    # Check if the community exists in the communities table
-    community = waddle_helpers.get_community(community_name)
-    if not community:
-        return dict(msg="Community does not exist.", status=404)
+    # Set the text variable to the first element in the command str_list
+    text = command_str_list[0]
     
     # Check if the text response exists
-    text_response = waddle_helpers.get_text_response(payload['text'], community.id)
+    text_response = waddle_helpers.get_text_response(text, community.id)
     if not text_response:
         return dict(msg="Text response not found.", status=404)
     
@@ -103,24 +100,20 @@ def get_by_text():
 
 # Delete a text response by its text value. If the text response does not exist, return an error.
 def delete_by_text():
-    community_name = request.args(0)
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    # Check if the payload is valid
-    payload = request.body.read()
     if not payload:
-        return dict(msg="No payload given.", status=400)
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    payload = jloads(payload)
-    if 'text' not in payload:
-        return dict(msg="Payload missing required fields. Please provide the 'text' field.", status=400)
-    
-    # Check if the community exists in the communities table
-    community = waddle_helpers.get_community(community_name)
-    if not community:
-        return dict(msg="Community does not exist.", status=404)
+    community = payload['community']
+    command_str_list = payload['command_string']
+
+    # Set the text variable to the first element in the command str_list
+    text = command_str_list[0]
     
     # Check if the text response exists
-    text_response = waddle_helpers.get_text_response(payload['text'], community.id)
+    text_response = waddle_helpers.get_text_response(text, community.id)
     if not text_response:
         return dict(msg="Text response not found.", status=404)
     

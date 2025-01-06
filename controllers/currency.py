@@ -8,23 +8,14 @@ def index(): return dict(message="hello from currency.py")
 # Using a community name in the arguments and an identity name in the payload, get the currency of the identity in the community. 
 # If the community or identity does not exist, return an error.
 def get_currency():
-    community_name = request.args(0)
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
     if not payload:
-        return dict(msg="No payload given. Please provide a community_name and identity_name between [] characters.")
-    payload = jloads(payload)
-    identity_name = payload.get("identity_name")
-    if not identity_name:
-        return dict(msg="No identity_name given. Please provide an identity_name between [] characters.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    community = db(db.community.name == community_name).select().first()
-    if not community:
-        return dict(msg="Community does not exist.")
-    
-    # Check if the identity exists.
-    identity = db((db.identities.name == identity_name)).select().first()
-    if not identity:
-        return dict(msg="Identity does not exist.")
+    community = payload['community']
+    identity = payload['identity']
     
     # Check if the member is a member of the community.
     community_member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
@@ -37,31 +28,23 @@ def get_currency():
     if not currency:
         currency = db.currency.insert(identity_id=identity.id, community_id=community.id)
 
-    return dict(msg=f"{payload['identity_name']} has {community_member.currency} currency in the community {community_name}.")
+    return dict(msg=f"{payload['identity_name']} has {community_member.currency} currency in the community {community.name}.")
 
 # Using a community name, identity name, and amount, add the amount to the member's currency in the community. If the community or 
 # member does not exist, return an error.
 def add_currency():
-    community_name = request.args(0)
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given. Please provide a community_name, identity_name, and amount between [] characters.")
-    payload = jloads(payload)
-    # Check if the identity name and amount are given in the payload.
-    if "identity_name" not in payload or "amount" not in payload:
-        return dict(msg="Please provide an identity_name and amount between [] characters.")
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    identity_name = payload.get("identity_name")
-    amount = payload.get("amount")
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    community = db(db.community.name == community_name).select().first()
-    if not community:
-        return dict(msg="Community does not exist.")
-    
-    # Check if the identity exists.
-    identity = db((db.identities.name == identity_name)).select().first()
-    if not identity:
-        return dict(msg="Identity does not exist.")
+    community = payload['community']
+    identity = payload['identity']
+    command_str_list = payload['command_string']
+
+    # Set the amount to the first element in the command string list.
+    amount = command_str_list[0]
     
     # Check if the member is a member of the community.
     community_member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
@@ -77,31 +60,23 @@ def add_currency():
     # Add the amount to the member's currency.
     currency.update_record(currency=currency.currency + amount)
 
-    return dict(msg=f"{payload['identity_name']} has {currency.currency} currency in the community {community_name}.")
+    return dict(msg=f"{payload['identity_name']} has {currency.currency} currency in the community {community.name}.")
 
 # Using a community name, identity name, and amount, subtract the amount from the member's currency in the community. If the community or
 # member does not exist, return an error.
 def subtract_currency():
-    community_name = request.args(0)
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given. Please provide a community_name, identity_name, and amount between [] characters.")
-    payload = jloads(payload)
-    # Check if the identity name and amount are given in the payload.
-    if "identity_name" not in payload or "amount" not in payload:
-        return dict(msg="Please provide an identity_name and amount between [] characters.")
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    identity_name = payload.get("identity_name")
-    amount = payload.get("amount")
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    community = db(db.community.name == community_name).select().first()
-    if not community:
-        return dict(msg="Community does not exist.")
-    
-    # Check if the identity exists.
-    identity = db((db.identities.name == identity_name)).select().first()
-    if not identity:
-        return dict(msg="Identity does not exist.")
+    community = payload['community']
+    identity = payload['identity']
+    command_str_list = payload['command_string']
+
+    # Set the amount to the first element in the command string list.
+    amount = command_str_list[0]
     
     # Check if the member is a member of the community.
     community_member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
@@ -117,31 +92,23 @@ def subtract_currency():
     # Subtract the amount from the member's currency.
     currency.update_record(currency=currency.currency - amount)
 
-    return dict(msg=f"{payload['identity_name']} has {currency.currency} currency in the community {community_name}.")
+    return dict(msg=f"{payload['identity_name']} has {currency.currency} currency in the community {community.name}.")
 
 # Using a community name, identity name, and amount, set the member's currency in the community to the amount. If the community or
 # member does not exist, return an error.
 def set_currency():
-    community_name = request.args(0)
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given. Please provide a community_name, identity_name, and amount between [] characters.")
-    payload = jloads(payload)
-    # Check if the identity name and amount are given in the payload.
-    if "identity_name" not in payload or "amount" not in payload:
-        return dict(msg="Please provide an identity_name and amount between [] characters.")
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    identity_name = payload.get("identity_name")
-    amount = payload.get("amount")
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    community = db(db.community.name == community_name).select().first()
-    if not community:
-        return dict(msg="Community does not exist.")
-    
-    # Check if the identity exists.
-    identity = db((db.identities.name == identity_name)).select().first()
-    if not identity:
-        return dict(msg="Identity does not exist.")
+    community = payload['community']
+    identity = payload['identity']
+    command_str_list = payload['command_string']
+
+    # Set the amount to the first element in the command string list.
+    amount = command_str_list[0]
     
     # Check if the member is a member of the community.
     community_member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
@@ -157,30 +124,27 @@ def set_currency():
     # Set the member's currency to the amount.
     currency.update_record(currency=amount)
 
-    return dict(msg=f"{payload['identity_name']} has {currency.currency} currency in the community {community_name}.")
+    return dict(msg=f"{payload['identity_name']} has {currency.currency} currency in the community {community.name}.")
 
 # Using a community name, a sender member name, a receiver member name, and an amount, transfer the amount from the sender to the receiver. 
 # If the community, sender, or receiver does not exist, return an error. If the sender does not have enough currency, return an error.
 def transfer_currency():
-    community_name = request.args(0)
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given. Please provide a community_name, sender_name, receiver_name, and amount between [] characters.")
-    payload = jloads(payload)
-    # Check if the sender name, receiver name, and amount are given in the payload.
-    if "sender_name" not in payload or "receiver_name" not in payload or "amount" not in payload:
-        return dict(msg="Please provide a sender_name, receiver_name, and amount between [] characters.")
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    sender_name = payload.get("sender_name")
-    receiver_name = payload.get("receiver_name")
-    amount = payload.get("amount")
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    community = db(db.community.name == community_name).select().first()
-    if not community:
-        return dict(msg="Community does not exist.")
+    community = payload['community']
+    identity = payload['identity']
+    command_str_list = payload['command_string']
+
+    # Set the receiver name to the first element and the amount to the second element in the command string list.
+    receiver_name = command_str_list[0]
+    amount = command_str_list[1]
     
     # Check if the sender exists.
-    sender = db((db.identities.name == sender_name)).select().first()
+    sender = db((db.identities.name == identity.name)).select().first()
     if not sender:
         return dict(msg="Sender does not exist.")
     
@@ -220,4 +184,4 @@ def transfer_currency():
     # Add the amount to the receiver's currency.
     receiver_currency.update_record(currency=receiver_currency.currency + amount)
 
-    return dict(msg=f"{sender_name} has {sender_currency.currency} currency and {receiver_name} has {receiver_currency.currency} currency in the community {community_name}.")
+    return dict(msg=f"{sender.name} has {sender_currency.currency} currency and {receiver_name} has {receiver_currency.currency} currency in the community {community.name}.")

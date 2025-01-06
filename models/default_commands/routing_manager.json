@@ -4,12 +4,13 @@
         "action_url": "http://127.0.0.1:8000/WaddleDBM/routing/add_route_to_community.json",
         "description": "This command adds a channel to a community. Example: !route add [community name]",
         "request_method": "PUT",
-        "request_parameters": [
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
             "channel_id",
             "account"
-        ],
-        "payload_keys": [
-            "community_name"
         ],
         "req_priv_list": [
             "admin"
@@ -20,12 +21,13 @@
         "action_url": "http://127.0.0.1:8000/WaddleDBM/routing/remove_route_from_community.json",
         "description": "This command removes a channel from a community. Example: !route rem [community name]",
         "request_method": "DELETE",
-        "request_parameters": [
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
             "channel_id",
             "account"
-        ],
-        "payload_keys": [
-            "community_name"
         ],
         "req_priv_list": [
             "admin"

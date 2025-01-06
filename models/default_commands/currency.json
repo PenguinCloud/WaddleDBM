@@ -4,12 +4,13 @@
         "action_url": "http://127.0.0.1:8000/WaddleDBM/currency/add_currency.json",
         "description": "This command adds a given amount of currency to the current user. Example: !currency add [amount]",
         "request_method": "POST",
-        "request_parameters": [
-            "community_name"
-        ],
+        "request_parameters": [],
         "payload_keys": [
+            "community_name",
             "identity_name",
-            "amount"
+            "command_string",
+            "channel_id",
+            "account"
         ],
         "req_priv_list": [
             "read",
@@ -22,11 +23,13 @@
         "action_url": "http://127.0.0.1:8000/WaddleDBM/currency/get_currency.json",
         "description": "This command gets the currency of the current user. Example: !currency get",
         "request_method": "GET",
-        "request_parameters": [
-            "community_name"
-        ],
+        "request_parameters": [],
         "payload_keys": [
-            "identity_name"
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
         ],
         "req_priv_list": [
             "read"
@@ -37,13 +40,13 @@
         "action_url": "http://127.0.0.1:8000/WaddleDBM/currency/transfer_currency.json",
         "description": "This command gives currency from one user to another. Example: !currency give [user] [amount]",
         "request_method": "POST",
-        "request_parameters": [
-            "community_name"
-        ],
+        "request_parameters": [],
         "payload_keys": [
+            "community_name",
             "identity_name",
-            "receiver_name",
-            "amount"
+            "command_string",
+            "channel_id",
+            "account"
         ],
         "req_priv_list": [
             "read",
@@ -55,12 +58,13 @@
         "action_url": "http://127.0.0.1:8000/WaddleDBM/currency/subtract_currency.json",
         "description": "This command removes a given amount of currency to the current user. Example: !currency rem [amount]",
         "request_method": "POST",
-        "request_parameters": [
-            "community_name"
-        ],
+        "request_parameters": [],
         "payload_keys": [
+            "community_name",
             "identity_name",
-            "amount"
+            "command_string",
+            "channel_id",
+            "account"
         ],
         "req_priv_list": [
             "read",

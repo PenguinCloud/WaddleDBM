@@ -6,51 +6,55 @@ def index(): return dict(message="hello from communities.py")
 
 # Create a new community from a given payload. Throws an error if no payload is given, or the community already exists.
 def create():
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'community_name' not in payload or 'community_description' not in payload:
-        return dict(msg="Payload missing required fields.")
-    if db(db.communities.community_name == payload['community_name']).count() > 0:
-        return dict(msg="Community already exists.")
-    db.communities.insert(community_name=payload['community_name'], community_description=payload['community_description'])
-    return dict(msg="Community created.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True)
+    
+    command_str_list = payload['command_string']
+
+    # Set the community name and description to the first and second elements of the command string, respectively.
+    community_name = command_str_list[0]
+    community_description = command_str_list[1]
+
+    # Check if the community already exists.
+    if db(db.communities.community_name == community_name).count() > 0:
+        return dict(msg="Community already exists.", error=True, status=400)
+    db.communities.insert(community_name=community_name, community_description=community_description)
+    return dict(msg="Community created.", status=200)
 
 # Create a new community with a payload only containing the community name. Throws an error if no payload is given, or the community already exists.
 def create_by_name():
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    # Check if the community name and identity name fields are in the payload.
-    if 'community_name' not in payload or 'identity_name' not in payload:
-        return dict(msg="Payload missing required fields. Need community_name and identity_name.")
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True)
     
-    # Check if the 'description' field is in the payload. If not, set it to an empty string.
-    if 'description' not in payload:
-        payload['description'] = ""
+    community = payload['community']
+    identity = payload['identity']
+    command_str_list = payload['command_string']
+
+    # Set the community name to the first element of the command string.
+    community_name = command_str_list[0]
+
+    community_description = ""
+
+    # Set the community description to the second element of the command string, if there is one.
+    if len(command_str_list) > 1:
+        community_description = command_str_list[1]
 
     # Check if the community already exists.
-    if db(db.communities.community_name == payload['community_name']).count() > 0:
+    if db(db.communities.community_name == community_name).count() > 0:
         return dict(msg="Community already exists.")
     
     # Create the community with the given community name.
-    db.communities.insert(community_name=payload['community_name'], community_description=payload['description'])
+    db.communities.insert(community_name=community_name, community_description=community_description)
 
     # Create the default roles for the community, using the community_id of the newly created community, as well as the
     # the db_initialization.py file's create_roles function.
-    community = db(db.communities.community_name == payload['community_name']).select().first()
     db_init.create_roles(community.id)
-
-    # After a community is created, add the identity as a member of the community with the Owner role from the roles table.
-    community = db(db.communities.community_name == payload['community_name']).select().first()
-    identity = db(db.identities.name == payload['identity_name']).select().first()
-
-    # If the identity does not exist, return an error.
-    if not identity:
-        return dict(msg="Identity does not exist.")
 
     # From the roles table, get the Owner role for the community.
     role = waddle_helpers.get_owner_role(community.id)
@@ -65,86 +69,110 @@ def get_all():
 
 # Get a community by its name. If the community does not exist, return an error.
 def get_by_name():
-    community_name = request.args(0)
-    community_name = waddle_helpers.decode_name(community_name)
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True)
+
+    command_str_list = payload['command_string']
+
+    # Set the community name to the first element of the command string.
+    community_name = command_str_list[0]
+
     if not community_name:
-        return dict(msg="No community name given.")
+        return dict(msg="No community name given.", error=True, status=400)
     community = db(db.communities.community_name == community_name).select().first()
     if not community:
-        return dict(msg="Community does not exist.")
-    return dict(data=community)
+        return dict(msg="Community does not exist.", error=True, status=400)
+    
+    return dict(data=community, status=200)
 
 # Update a community by its name. If the community does not exist, return an error.
 def update_by_name():
-    community_name = request.args(0)
-    community_name = waddle_helpers.decode_name(community_name)
-    if not community_name:
-        return dict(msg="No community name given.")
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'community_name' not in payload or 'community_description' not in payload:
-        return dict(msg="Payload missing required fields.")
-    community = db(db.communities.community_name == community_name).select().first()
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True)
+    
+    community = payload['community']
+    identity = payload['identity']
+    command_str_list = payload['command_string']
+
+    # Set the community name to the first element of the command string.
+    community_name = command_str_list[0]
+
+    # Set the community description to the second element of the command string, if there is one.
+    community_description = command_str_list[1]
+
     if not community:
-        return dict(msg="Community does not exist.")
-    community.update_record(community_name=payload['community_name'], community_description=payload['community_description'])
-    return dict(msg="Community updated.")
+        return dict(msg="Community does not exist.", error=True, status=400)
+    
+    community.update_record(community_name=community_name, community_description=community_description)
+    return dict(msg="Community updated.", status=200)
 
 # Update a community's description by its name. This can only be done by an identity_name that is part of the community with the Owner role. If the community does not exist, return an error.
 def update_desc_by_name():
-    community_name = request.args(0)
-    community_name = waddle_helpers.decode_name(community_name)
-    if not community_name:
-        return dict(msg="No community name given.")
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'identity_name' not in payload or 'community_description' not in payload:
-        return dict(msg="Payload missing required fields.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True)
+    
+    identity = payload['identity']
+    command_str_list = payload['command_string']
+
+    # Set the community name to the first element of the command string.
+    community_name = command_str_list[0]
+
+    # Set the community description to the second element of the command string, if there is one.
+    community_description = command_str_list[1]
+
+    if not community_name:
+        return dict(msg="No community name given.", error=True, status=400)
+    
     community = db(db.communities.community_name == community_name).select().first()
     if not community:
-        return dict(msg="Community does not exist.")
-    identity = db(db.identities.name == payload['identity_name']).select().first()
-    if not identity:
-        return dict(msg="Identity does not exist.")
+        return dict(msg="Community does not exist.", error=True, status=400)
+
     member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
     if not member:
         return dict(msg="You are not a member of this community.")
     role = db(db.roles.id == member.role_id).select().first()
     if role.name != "Owner":
-        return dict(msg="You do not have permission to update this community's description.")
-    community.update_record(community_description=payload['community_description'])
-    return dict(msg="Community description updated.")
+        return dict(msg="You do not have permission to update this community's description.", error=True, status=400)
+    community.update_record(community_description=community_description)
+    return dict(msg="Community description updated.", status=200)
     
 
 # Delete a community by its name. This can only be done by an identity_name that is part of the community with the Owner role. If the community does not exist, return an error. 
 def delete_by_name():
-    community_name = request.args(0)
-    community_name = waddle_helpers.decode_name(community_name)
-    if not community_name:
-        return dict(msg="No community name given.")
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
+
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'identity_name' not in payload:
-        return dict(msg="Payload missing required fields.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True)
+    
+    identity = payload['identity']
+    command_str_list = payload['command_string']
+
+    # Set the community name to the first element of the command string.
+    community_name = command_str_list[0]
+    
     community = db(db.communities.community_name == community_name).select().first()
     if not community:
-        return dict(msg="Community does not exist.")
-    identity = db(db.identities.name == payload['identity_name']).select().first()
-    if not identity:
-        return dict(msg="Identity does not exist.")
+        return dict(msg="Community does not exist.", error=True, status=400)
+
     member = db((db.community_members.community_id == community.id) & (db.community_members.identity_id == identity.id)).select().first()
     if not member:
-        return dict(msg="You are not a member of this community.")
+        return dict(msg="You are not a member of this community.", error=True, status=400)
+    
     role = db(db.roles.id == member.role_id).select().first()
     if role.name != "Owner":
-        return dict(msg="You do not have permission to delete this community.")
+        return dict(msg="You do not have permission to delete this community.", error=True, status=400)
+    
     db(db.communities.community_name == community_name).delete()
-    return dict(msg="Community deleted.")
+    return dict(msg="Community deleted.", status=200)
 
     

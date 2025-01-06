@@ -2,17 +2,15 @@
     {
         "command_name" : "calender_add",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/calender/create.json",
-        "description": "This command adds a new event to the calender. Example: !calender add [event_name] [event_description] [event_start] [event_end]",
+        "description": "This command adds a new event to the calender. Example: /calender add event_name event_description event_start event_end",
         "request_method": "POST",
-        "request_parameters": [
-            "community_name"
-        ],
+        "request_parameters": [],
         "payload_keys": [
+            "community_name",
             "identity_name",
-            "event_name",
-            "event_description",
-            "event_start",
-            "event_end"
+            "command_string",
+            "channel_id",
+            "account"
         ],
         "req_priv_list": [
             "read",
@@ -23,13 +21,15 @@
     {
         "command_name" : "calender_get_all",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/calender/get_by_community.json",
-        "description": "This command gets all the events in the calender for the current community. Example: !calender get all. Optionally, you can pass a start and end date to get all events on that time frame. Example: !calender get all [start_date] [end_date]",
+        "description": "This command gets all the events in the calender for the current community. Example: /calender get all. Optionally, you can pass a start and end date to get all events on that time frame. Example: /calender get all start_date end_date",
         "request_method": "GET",
-        "request_parameters": [
-            "community_name"
-        ],
+        "request_parameters": [],
         "payload_keys": [
-
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
         ],
         "req_priv_list": [
             "read"
@@ -38,16 +38,15 @@
     {
         "command_name" : "calender_update",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/calender/update_by_name.json",
-        "description": "This command updates an event in the calender. Example: !calender update [event_name] [event_description] [event_start] [event_end]",
+        "description": "This command updates an event in the calender. Example: /calender update event_name event_description event_start event_end",
         "request_method": "PUT",
-        "request_parameters": [
-            "community_name"
-        ],
+        "request_parameters": [],
         "payload_keys": [
-            "event_name",
-            "event_description",
-            "event_start",
-            "event_end"
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
         ],
         "req_priv_list": [
             "read",
@@ -58,13 +57,15 @@
     {
         "command_name" : "calender_delete",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/calender/delete_by_name.json",
-        "description": "This command deletes an event from the calender. Example: !calender delete [event_name]",
+        "description": "This command deletes an event from the calender. Example: /calender delete event_name",
         "request_method": "DELETE",
-        "request_parameters": [
-            "community_name"
-        ],
+        "request_parameters": [],
         "payload_keys": [
-            "event_name"
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
         ],
         "req_priv_list": [
             "read",

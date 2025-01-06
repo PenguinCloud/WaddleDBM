@@ -8,87 +8,44 @@ def index(): return dict(message="hello from communities_modules.py")
 # Get all community modules accross all communities.
 def get_all():
     community_modules = db(db.community_modules).select()
-    return dict(data=community_modules)
+    return dict(data=community_modules, status=200)
 
-# Get all community modules in a given community id.
-def get_by_community_id():
-    community_id = request.args(0)
-    if not community_id:
-        return dict(msg="No community id given.")
-    community_modules = db(db.community_modules.community_id == community_id).select()
-    return dict(data=community_modules)
+# Get all community modules for a given community name.
+def get_by_community_name():
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-# Get a community module by its community id and module id. If the community module does not exist, return an error.
-def get_by_community_id_and_module_id():
-    community_id = request.args(0)
-    module_id = request.args(1)
-    if not community_id or not module_id:
-        return dict(msg="No community id or module id given.")
-    community_module = db((db.community_modules.community_id == community_id) & (db.community_modules.module_id == module_id)).select().first()
-    if not community_module:
-        return dict(msg="Community module is not installed in this community.")
-    return dict(community_module=community_module)
-
-# Get a community module by its community name and module id. If the community module does not exist, return an error.
-def get_by_community_name_and_module_id():
-    community_name = request.args(0)
-    module_id = request.args(1)
-    if not community_name or not module_id:
-        return dict(msg="No community name or module id given.")
-    community = db(db.communities.community_name == community_name).select().first()
-    if not community:
-        return dict(msg="Community does not exist.")
-    community_module = db((db.community_modules.community_id == community.id) & (db.community_modules.module_id == module_id)).select().first()
-    if not community_module:
-        return dict(msg="Community module is not installed in this community.")
-    return community_module.as_dict()
-
-# Update a community module by its community id and module id. If the community module does not exist, return an error.
-def update_by_community_id_and_module_id():
-    community_id = request.args(0)
-    module_id = request.args(1)
-    if not community_id or not module_id:
-        return dict(msg="No community id or module id given.")
-    payload = request.body.read()
     if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'module_id' not in payload or 'community_id' not in payload or 'enabled' not in payload or 'priv_list' not in payload:
-        return dict(msg="Payload missing required fields.")
-    community_module = db((db.community_modules.community_id == community_id) & (db.community_modules.module_id == module_id)).select().first()
-    if not community_module:
-        return dict(msg="Community module does not exist.")
-    community_module.update_record(**payload)
-    return dict(msg="Community module updated.")
-
-# Delete a community module by its community id and module id. If the community module does not exist, return an error.
-def delete_by_community_id_and_module_id():
-    community_id = request.args(0)
-    module_id = request.args(1)
-    if not community_id or not module_id:
-        return dict(msg="No community id or module id given.")
-    community_module = db((db.community_modules.community_id == community_id) & (db.community_modules.module_id == module_id)).select().first()
-    if not community_module:
-        return dict(msg="Community module does not exist.")
-    community_module.delete_record()
-    return dict(msg="Community module deleted.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
+    community = payload['community']
+    community_modules = db(db.community_modules.community_id == community.id).select()
+    return dict(data=community_modules, status=200)
 
 # Install a community module, using its module_id in a payload, into a given community_name as an argument. If the community module already exists in the given community, return an error.
 def install_by_community_name():
-    community_name = request.args(0)
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not community_name or not payload:
-        return dict(msg="Missing community name or payload.")
+    if not payload:
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
+    community = payload['community']
+    community_name = community.community_name
+    identity = payload['identity']
+    identity_name = identity.name
+    command_str_list = payload['command_string']
 
-    payload = jloads(payload)
-    if 'name' not in payload or 'identity_name' not in payload:
-        return dict(msg="Payload missing required fields: name and identity_name.")
+    if not command_str_list:
+        return dict(msg="No command string provided.", error=True, status=400)
+    
+    # Set the module_name to the first element in the command_str_list
+    module_name = command_str_list[0]
 
     # Combine queries for community, identity, module, and membership
     query = (db.communities.community_name == community_name) & \
-            (db.identities.name == payload['identity_name']) & \
-            (db.modules.name == payload['name']) & \
+            (db.identities.name == identity_name) & \
+            (db.modules.name == module_name) & \
             (db.community_members.community_id == db.communities.id) & \
             (db.community_members.identity_id == db.identities.id) & \
             (db.roles.id == db.community_members.role_id)
@@ -119,31 +76,36 @@ def install_by_community_name():
     new_module = {
         'module_id': result.modules.id,
         'community_id': result.communities.id,
-        'enabled': payload.get('enabled', True),
-        'privilages': payload.get('privilages', [])
+        'enabled': True,
+        'privilages': ['read', 'write', 'execute']
     }
     db.community_modules.insert(**new_module)
     return dict(msg="Community module installed.")
 
 # Uninstall a community module, using its module_id in a payload, from a given community_name as an argument. If the community module does not exist in the given community, return an error.
 def uninstall_by_community_name():
-    community_name = request.args(0)
-    payload = request.body.read()
+    # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
+    payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not community_name:
-        return dict(msg="No community name given.")
     if not payload:
-        return dict(msg="No payload given.")
+        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
-    # Check if the payload contains the name  and identity_name fields
-    payload = jloads(payload)
-    if 'name' not in payload or 'identity_name' not in payload:
-        return dict(msg="Payload missing required fields. Please provide name and identity_name fields.")
+    community = payload['community']
+    community_name = community.community_name
+    identity = payload['identity']
+    identity_name = identity.name
+    command_str_list = payload['command_string']
+
+    if not command_str_list:
+        return dict(msg="No command string provided.", error=True, status=400)
+    
+    # Set the module_name to the first element in the command_str_list
+    module_name = command_str_list[0]
     
     # Combine queries for community, identity, and module
     community = db(db.communities.community_name == community_name).select().first()
-    identity = db(db.identities.name == payload['identity_name']).select().first()
-    module = db(db.modules.name == payload['name']).select().first()
+    identity = db(db.identities.name == identity_name).select().first()
+    module = db(db.modules.name == module_name).select().first()
 
     if not all([community, identity, module]):
         return dict(msg="Invalid community, identity, or module.")
@@ -151,10 +113,10 @@ def uninstall_by_community_name():
     if community.community_name == "Global":
         return dict(msg="Cannot install community module in Global community.")
 
-    if not waddle_helpers.identity_in_community(payload['identity_name'], community_name):
+    if not waddle_helpers.identity_in_community(identity_name, community_name):
         return dict(msg="Identity is not a member of the community.")
 
-    if not waddle_helpers.identity_is_admin(payload['identity_name'], community_name):
+    if not waddle_helpers.identity_is_admin(identity_name, community_name):
         return dict(msg="Identity is not an admin of the community.")
 
     # Check that the module exists

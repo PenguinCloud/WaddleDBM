@@ -4,10 +4,14 @@
         "action_url": "http://127.0.0.1:8000/WaddleDBM/test_script/test.json",
         "description": "This is a test script!!!",
         "request_method": "GET",
-        "request_parameters": [
-            "community_name"
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
         ],
-        "payload_keys": [],
         "req_priv_list": [
             "admin"
         ]
