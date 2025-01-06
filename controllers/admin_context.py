@@ -237,7 +237,7 @@ def delete_by_session_token():
 def delete_expired_sessions():
     current_time = datetime.now()
     db(db.admin_contexts.session_expires < current_time).delete()
-    logging.info("Expired admin context sessions deleted.")
+    logging.warning("Expired admin context sessions deleted.")
     return dict(msg="Expired admin context sessions deleted.")
 
 # Function to continuously delete expired admin context sessions every 5 minutes.

@@ -17,7 +17,9 @@ from WaddlebotLibs.botDBMHelpers import dbm_helpers
 
 # Import the matterbridge_helpers class from the WaddleDBM botMatterbridgeHelpers scripts module
 from WaddlebotLibs.botMatterbridgeHelpers import matterbridge_helpers
-# from ..WaddlebotLibs.botMatterbridgeHelpers import matterbridge_helpers
+
+# Import the BotLogger class from the WaddlebotLibs botLogger scripts module
+from WaddlebotLibs.botLogger import BotLogger
 
 # -------------------------------------------------------------------------
 # This scaffolding model makes your app work on Google App Engine too
@@ -176,13 +178,20 @@ db.define_table('module_types',
                 Field('name', 'string'),
                 Field('description', 'string'))
 
-# Define the marketplace table
+# Define the modules table
 db.define_table('modules', 
                 Field('name', 'string', requires=IS_NOT_EMPTY()),
                 Field('description', 'string', requires=IS_NOT_EMPTY()),
-                Field('gateway_url', 'string', requires=IS_NOT_EMPTY()),
-                Field('module_type_id', db.module_types),
-                Field('metadata', 'json'))
+                Field('module_type_id', db.module_types))
+
+# Define the module metadata table.
+# db.define_table('modules_metadata',
+#                 Field('module_id', db.modules),
+#                 Field('command', 'string', requires=IS_NOT_EMPTY()),
+#                 Field('action', 'string', requires=IS_NOT_EMPTY()),
+#                 Field('help_text', 'string', requires=IS_NOT_EMPTY()),
+#                 Field('method', 'string', requires=IS_NOT_EMPTY()),
+#                 Field('req_priv_list', 'list:string'))
 
 # Define the module metadata table.
 db.define_table('module_commands',
@@ -358,6 +367,9 @@ waddle_helpers = dbm_helpers(db)
 
 # Create a Matterbridge_Helpers object
 mat_helpers = matterbridge_helpers(db)
+
+# Create a BotLogger object
+waddleLogger = BotLogger()
 
 # Initialize the DB
 db_init.init_db()

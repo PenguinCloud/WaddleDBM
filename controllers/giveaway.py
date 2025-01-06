@@ -18,7 +18,7 @@ def index(): return dict(message="hello from giveaway.py")
 
 # A helper function to close a giveaway with a given guid.
 def close_giveaway(guid: str) -> None:
-    logging.info(f"Closing giveaway with guid {guid}")
+    logging.warning(f"Closing giveaway with guid {guid}")
     # Get the status id for the "Closed" status from the prize_statuses table
     status = db(db.prize_statuses.status_name == "Closed").select().first()
 
@@ -73,7 +73,7 @@ def create_giveaway_timeout(timeout: int, guid: str, community_id: int) -> None:
         for payload in payloads:
             matterbridge_helpers.send_matterbridge_message(payload)
         
-        logging.info(f"Giveaway with guid {guid} is closed. No entries found.")
+        logging.warning(f"Giveaway with guid {guid} is closed. No entries found.")
         return None
     
     # Select a random winner from the entries
@@ -92,7 +92,7 @@ def create_giveaway_timeout(timeout: int, guid: str, community_id: int) -> None:
     for payload in payloads:
         matterbridge_helpers.send_matterbridge_message(payload)
 
-    logging.info(f"Giveaway with guid {guid} is closed. Winner is {winner_identity.identity_name}.")
+    logging.warning(f"Giveaway with guid {guid} is closed. Winner is {winner_identity.identity_name}.")
     return None
 
 # A function to close a giveway with a given guid and then setting a winner, according to a winner_identity_name provided in the payload. 

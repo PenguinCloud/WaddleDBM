@@ -117,9 +117,7 @@ def get_marketplace_module_by_alias(alias, identity_name):
         return (
             db(
                 (
-                    db.modules.metadata.like(
-                        f'%"{replace_spaces(alias_command.command_val)}"%'
-                    )
+                    db.module_commands.command_name == alias_command.command_val
                 )
             )
             .select()
@@ -214,6 +212,11 @@ def get_all():
         marketplace_module.module_type_name = module_type.name
     return dict(data=modules)
 
+# Function to get all module commands from the module_commands table
+def get_all_module_commands():
+    commands = db(db.module_commands).select()
+    return dict(data=commands)
+
 # Get all the marketplace modules, as only the name and the id. Only modules that fall under the Community module type are returned.
 @require_payload
 def get_all_community_modules():
@@ -232,26 +235,6 @@ def get_all_community_modules():
         db.modules.id, db.modules.name
     )
     return dict(data=modules)
-
-# Get a marketplace module by URL. Throws an error if no URL is given, or the marketplace module does not exist. Also returns the module type name.
-def get_by_url():
-    url = request.vars.url
-
-    if not url:
-        return dict(msg="No URL given.")
-
-    url = unquote(url)
-
-    marketplace_module = db(db.modules.gateway_url == url).select().first()
-    if not marketplace_module:
-        return dict(msg="Marketplace Module does not exist.")
-    
-    # Also return the marketplace module type name part of the response
-    module_type = db(db.module_types.id == marketplace_module.module_type_id).select().first()
-    marketplace_module = marketplace_module.as_dict()
-    marketplace_module['module_type_name'] = module_type.name
-
-    return marketplace_module
 
 # Remove a marketplace module by name. Throws an error if no name is given, or the marketplace module does not exist.
 def remove():

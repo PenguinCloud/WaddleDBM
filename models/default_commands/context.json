@@ -1,0 +1,17 @@
+[
+    {
+        "command_name": "namespace_switch",
+        "action_url": "http://127.0.0.1:8000/WaddleDBM/context/set_context.json",
+        "description": "Changes the namespace of the given user to the given community namespace. Example: !namespace switch [my_community]",
+        "request_method": "PUT",
+        "request_parameters": [
+            "channel_id",
+            "account"
+        ],
+        "payload_keys": [
+            "community_name",
+            "identity_name"
+        ],
+        "req_priv_list": []
+    }
+]

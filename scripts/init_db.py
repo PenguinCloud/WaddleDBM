@@ -7,8 +7,9 @@ import logging
 
 # Import the necessary dataclasses from the Waddlebot-libs module
 # Might need to change the name of the module to Waddlebot_libs, because python is case sensitive
-from WaddlebotLibs.botClasses import module
+from WaddlebotLibs.botClasses import module, module_commands
 from WaddlebotLibs.botClasses import module_command_metadata
+
 
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
@@ -25,6 +26,11 @@ class db_initializer:
 
         # Using the create_default_data helper function, insert the default data into the tables.
 
+        # Run the test command
+        # logging.warning("=====================================")
+        # self.test_get_commands("applications/WaddleDBM/models/default_commands/admin_context.json")
+        # logging.warning("=====================================")
+
         # Create the default data for the prize_statuses table
         self.create_default_data("applications/WaddleDBM/models/default_prize_statuses.json", "prize_statuses", "status_name")
 
@@ -33,6 +39,9 @@ class db_initializer:
 
         # Create the default data for the core modules
         self.create_default_data("applications/WaddleDBM/models/core_modules.json", "modules", "name")
+
+        # After creating the core modules, create the module_commands for each module.
+        self.init_module_commands("applications/WaddleDBM/models/default_commands/")
 
         # Create the default data for the account types
         self.create_default_data("applications/WaddleDBM/models/default_account_types.json", "account_types", "type_name")
@@ -50,6 +59,17 @@ class db_initializer:
         self.create_default_data("applications/WaddleDBM/models/default_gateway_servers.json", "gateway_servers", "name")
 
     
+    # Test function to check if command files exist
+    def test_get_commands(self, commands_directory: str):
+        logging.warning("GETTING COMMANDS.....")
+        try:
+            with open(commands_directory, "r") as file:
+                data = jload(file)
+                print(data)
+
+        except FileNotFoundError:
+            logging.error("Core modules file not found. Unable to create core modules.")
+
     # A function to create the global community in the communities DB, if it doesnt exist, and create a routing entry for it
     def create_global_community(self):
         if self.db(self.db.communities.community_name == "Global").count() == 0:
@@ -90,13 +110,79 @@ class db_initializer:
     # Function to create the default data for a given file_path, table and compare_column.
     # This function is used to insert default data into the initial tables.
     def create_default_data(self, file_path: str, table: str, compare_column: str):
+        logging.warning(f"Creating default data for table {table}....")
         data = self.get_data(file_path)
         self.insert_data(table, data, compare_column)
-        
+
+    # Function to loop through the core modules, and create the module_commands for each module.
+    def init_module_commands(self, commands_directory: str):
+        logging.warning("Creating core modules....")
+
+        core_modules = self.db(self.db.modules).select()
+
+        for module in core_modules:
+            self.create_commands_by_module(commands_directory, module.name)
+
+    # Function that receives a module_name value, gets the module_id from the modules table, 
+    # and gets the commands from the appropriate json file, and inserts them into the module_commands table.
+    # The default module commands are found in the given commands folder directory variable. 
+    # Each module has its own json file with the commands for that module, and the name of the file is the module_name.
+    def create_commands_by_module(self, commands_directory: str, module_name: str):
+        logging.warning(f"Creating module commands for module {module_name}....")
+
+        try:
+            module_id = self.db(self.db.modules.name == module_name).select().first().id
+
+            file_path = f"{commands_directory}{module_name}.json"
+            data = self.get_data(file_path)
+
+            logging.warning("=====================================")
+            logging.warning(f"FOUND DATA!!!:")
+            logging.warning(data)
+            logging.warning("=====================================")
+
+            # Each command in the data is of type module_commands, which is a dataclass.
+
+            # Set each command as a module_commands object, and insert it into the module_commands table.
+            for command in data:
+                command = {
+                    "module_id": module_id,
+                    "command_name": command['command_name'],
+                    "description": command['description'],
+                    "action_url": command['action_url'],
+                    "request_method": command['request_method'],
+                    "request_parameters": command['request_parameters'],
+                    "payload_keys": command['payload_keys'],
+                    "req_priv_list": command['req_priv_list'],
+                }
+
+                logging.warning("Command object set. Inserting into module_commands table....")
+                logging.warning("Command object:")
+                logging.warning(command)
+
+                # Insert the command into the module_commands table.
+                # Only do so if the command does not already exist in the table.
+                if self.db(self.db.module_commands.command_name == command['command_name']).count() == 0:
+                    self.db.module_commands.insert(
+                        module_id=command['module_id'],
+                        command_name=command['command_name'],
+                        description=command['description'],
+                        action_url=command['action_url'],
+                        request_method=command['request_method'],
+                        request_parameters=command['request_parameters'],
+                        payload_keys=command['payload_keys'],
+                        req_priv_list=command['req_priv_list']
+                    )
+
+                logging.warning("Command inserted into module_commands table.")
+        # If the module is not found, log an error message.        
+        except AttributeError:
+            logging.error(f"Module {module_name} not found. Unable to create module commands.")
 
     # A helper function to retrieve data from a given json file, and return it as a list of dictionaries.
     def get_data(self, file_path: str):
         try:
+            logging.warning(f"Retrieving data from file {file_path}....")
             with open(file_path, "r") as file:
                 data = jload(file)
 
@@ -109,7 +195,7 @@ class db_initializer:
     # A helper function to insert given data, into a given table, if the data does not already exist.
     def insert_data(self, table: str, data: list, compare_column: str):
         # Log the table that the data is being inserted into
-        logging.info(f"Inserting data into table {table}....")
+        logging.warning(f"Inserting data into table {table}....")
 
         if not self.db[table]:
             logging.error(f"Table {table} does not exist. Unable to insert data.")

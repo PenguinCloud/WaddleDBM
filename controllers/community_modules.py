@@ -82,13 +82,13 @@ def install_by_community_name():
         return dict(msg="Missing community name or payload.")
 
     payload = jloads(payload)
-    if 'module_name' not in payload or 'identity_name' not in payload:
-        return dict(msg="Payload missing required fields: module_name and identity_name.")
+    if 'name' not in payload or 'identity_name' not in payload:
+        return dict(msg="Payload missing required fields: name and identity_name.")
 
     # Combine queries for community, identity, module, and membership
     query = (db.communities.community_name == community_name) & \
             (db.identities.name == payload['identity_name']) & \
-            (db.modules.name == payload['module_name']) & \
+            (db.modules.name == payload['name']) & \
             (db.community_members.community_id == db.communities.id) & \
             (db.community_members.identity_id == db.identities.id) & \
             (db.roles.id == db.community_members.role_id)
@@ -135,15 +135,15 @@ def uninstall_by_community_name():
     if not payload:
         return dict(msg="No payload given.")
     
-    # Check if the payload contains the module_name  and identity_name fields
+    # Check if the payload contains the name  and identity_name fields
     payload = jloads(payload)
-    if 'module_name' not in payload or 'identity_name' not in payload:
-        return dict(msg="Payload missing required fields. Please provide module_name and identity_name fields.")
+    if 'name' not in payload or 'identity_name' not in payload:
+        return dict(msg="Payload missing required fields. Please provide name and identity_name fields.")
     
     # Combine queries for community, identity, and module
     community = db(db.communities.community_name == community_name).select().first()
     identity = db(db.identities.name == payload['identity_name']).select().first()
-    module = db(db.modules.name == payload['module_name']).select().first()
+    module = db(db.modules.name == payload['name']).select().first()
 
     if not all([community, identity, module]):
         return dict(msg="Invalid community, identity, or module.")

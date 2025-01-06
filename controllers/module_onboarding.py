@@ -2,12 +2,11 @@
 import json
 import logging
 
+# Set the logging level to INFO
+logging.basicConfig(level=logging.INFO)
 
 # try something like
 def index(): return dict(message="hello from module onboarding.py")
-
-# set the logging level to info
-logging.basicConfig(level=logging.INFO)
 
 # A helper function to return the module_type_id of a module type with the
 # given name of "Community"
@@ -20,7 +19,7 @@ def get_community_module_type_id():
 # Helper function to insert a command in the module_commands table. Returns a flag to indicate
 # if the command exists in the database or not.
 def insert_command(module_id, command):
-    logging.info("Inserting command into the database...")
+    logging.warning("Inserting command into the database...")
     flag = False
     # Check if the command object is not empty and if it already exists in the database
     if command and not db((db.module_commands.command_name == command['command_name'])).select().first():
@@ -29,7 +28,7 @@ def insert_command(module_id, command):
         # Print a response flash
         response.flash = 'New command has been added to your module.'
     else:
-        logging.info("Command already exists in the database. Skipping...")
+        logging.warning("Command already exists in the database. Skipping...")
         # Print a response flash
         response.flash = 'This command already exists. Please check the command name.'
         flag = True
@@ -38,37 +37,18 @@ def insert_command(module_id, command):
 
 # Helper function to retrieve a list of commands from the module_commands table
 def get_commands(module_id):
-    logging.info("Getting commands from the database...")
+    logging.warning("Getting commands from the database...")
     return db(db.module_commands.module_id == module_id).select()
 
 # Helper function to check if a given command name already exists in the given metadata object as a key
 def command_exists_in_metadata(command_name, metadata):
-    logging.info("Checking if command exists in metadata...")
+    logging.warning("Checking if command exists in metadata...")
     return command_name in metadata
 
 # Helper function to check if the command object contains all the required fields
 def command_object_is_valid(command):
-    logging.info("Checking if command object is valid...")
+    logging.warning("Checking if command object is valid...")
     return 'command_name' in command and 'action_url' in command and 'request_method' in command and 'request_parameters' in command and 'payload_keys' in command and 'req_priv_list' in command and 'description' in command
-
-# Function to add a command object to the metadata of a module. This command object is received from the form
-def add_command_to_metadata(command_list: list, metadata: dict) -> dict:
-    logging.info("Adding command to metadata...")
-    # Check if the post request is not empty
-    if len(command_list) > 0:
-        for command in command_list:
-            if command_object_is_valid(command) and not command_exists_in_metadata(command['command_name'], metadata):
-                # Get the values from the form
-                metadata[command['command_name']] = {
-                    "action": command['action_url'],
-                    "description": command['description'],
-                    "method": command['request_method'],
-                    "parameters": command['request_parameters'],
-                    "payload_keys": command['payload_keys'],
-                    "req_priv_list": command['req_priv_list']
-                }
-
-    return metadata
 
 # Helper function to convert a given command string into a command string 
 # that can be used as a key in the metadata object, but replacing spaces 
@@ -148,7 +128,7 @@ def manage_commands():
     # Check if the module id is in the URL parameters
     if 'module_id' not in request.vars:
         # Redirect to the module onboarding page
-        logging.info("No module id in the URL. Redirecting...")
+        logging.warning("No module id in the URL. Redirecting...")
         redirect(URL('module_onboarding', 'onboard_form'))
 
     # Get the module id from the URL
@@ -160,7 +140,7 @@ def manage_commands():
     # Check if the module exists
     if not module:
         # Redirect to the module onboarding page
-        logging.info("Module does not exist. Redirecting...")
+        logging.warning("Module does not exist. Redirecting...")
         redirect(URL('module_onboarding', 'onboard_form'))
 
     # Create an sql form from the sql form factory to create a form for the user to input the command details
@@ -182,24 +162,6 @@ def manage_commands():
 
         # Insert the command form into the database
         exists_flag = insert_command(module_id, command_form.vars)
-
-        # Set the command variable to the form variables
-        command_list = get_commands(module_id)
-
-        # Get the metadata from the module
-        metadata = {}
-
-        # Check if the metadata is not empty  
-        if module.metadata:
-            # Load the metadata from the module
-            metadata = module.metadata
-
-        if not exists_flag:
-            # Get the command object from the form
-            newMetadata = add_command_to_metadata(command_list=command_list, metadata=metadata)
-
-            # Update the module metadata
-            module.update_record(metadata=newMetadata)
 
         # Refresh the grid
         command_grid = SQLFORM.grid(db.module_commands.module_id == module_id, create=False, editable=True, deletable=True)

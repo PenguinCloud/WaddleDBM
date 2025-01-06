@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 from json import loads as jloads
 
-import logging
-
-# Set logging level to INFO
-logging.basicConfig(level=logging.INFO)
-
 # try something like
 def index(): return dict(message="hello from communities.py")
 
