@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 from json import loads as jloads
 
+from py4web import URL, abort, action, redirect, request
+from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
+                     unauthenticated)
+
+from ..models import waddle_helpers
+
+# Define the base route for the identity_label controller
+base_route = "api/identity_label/"
 
 # try something like
 def index(): return dict(message="hello from identity_label.py")
@@ -15,12 +23,11 @@ def parse_payload() -> dict:
 # Function to create a new identity label for a given identity_name and community_name.
 # Throws an error if no identity_name or community_name is given, or the identity label already exists.
 # Also throws an error if the identity or the community does not exist.
+@action(base_route + "create", method="POST")
+@action.uses(db)
 def create():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']
@@ -39,12 +46,13 @@ def create():
     return dict(msg="Identity label created.")
 
 # Get all identity labels for a given identity name and community name in a payload object.
+@action(base_route + "get_by_identity_and_community", method="GET")
+@action.uses(db)
 def get_by_identity_and_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     community = payload['community']
     identity = payload['identity']
@@ -56,12 +64,13 @@ def get_by_identity_and_community():
 
 # Function to update an identity label for a given identity name and community name.
 # Throws an error if no identity name, community name or label is given, or the identity label does not exist.
+@action(base_route + "update_by_identity_and_community", method="PUT")
+@action.uses(db)
 def update_by_identity_and_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     community = payload['community']
     identity = payload['identity']
@@ -82,12 +91,13 @@ def update_by_identity_and_community():
 
 # Function to delete an identity label for a given identity name and community name.
 # Throws an error if no identity name or community name is given, or the identity label does not exist.
+@action(base_route + "delete_by_identity_and_community", method="DELETE")
+@action.uses(db)
 def delete_by_identity_and_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     community = payload['community']
     identity = payload['identity']

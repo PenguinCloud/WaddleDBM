@@ -1,0 +1,67 @@
+[
+    {
+        "description": "A test set of commands for the community",
+        "module_type_id": 1,
+        "name": "community"
+    },
+    {
+        "description": "A test set of commands for the marketplace",
+        "module_type_id": 1,
+        "name": "marketplace"
+    },
+    {
+        "description": "A test script module of one that must be added to a community.",
+        "module_type_id": 2,
+        "name": "test_module"
+    },
+    {
+        "description": "A test set of commands for community context.",
+        "module_type_id": 1,
+        "name": "context"
+    },
+    {
+        "description": "A list of commands to handle the creation and deletion of gateway routes",
+        "module_type_id": 1,
+        "name": "gateway_manager"
+    },
+    {
+        "description": "A list of commands to handle the creation and deletion of routes between communities",
+        "module_type_id": 1,
+        "name": "routing_manager"
+    },
+    {
+        "description": "A list of commands to manage currencies for users within communities.",
+        "module_type_id": 1,
+        "name": "currency"
+    },
+    {
+        "description": "A list of commands to manage admin contexts.",
+        "module_type_id": 1,
+        "name": "admin_context"
+    },
+    {
+        "description": "A list of commands to manage text responses.",
+        "module_type_id": 1,
+        "name": "text_response"
+    },
+    {
+        "description": "A list of commands to manage Command Aliases.",
+        "module_type_id": 1,
+        "name": "alias_commands"
+    },
+    {
+        "description": "A list of commands to manage community Calenders.",
+        "module_type_id": 1,
+        "name": "calender"
+    },
+    {
+        "description": "A list of commands to manage identity labels.",
+        "module_type_id": 1,
+        "name": "identity_label"
+    },
+    {
+        "description": "A list of commands to manage giveaways.",
+        "module_type_id": 1,
+        "name": "giveaway"
+    }
+]

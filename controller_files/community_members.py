@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
 from json import loads as jloads
 
+from py4web import URL, abort, action, redirect, request
+from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
+                     unauthenticated)
+
+from ..models import waddle_helpers
+
+# Define the base route for the community_members controller
+base_route = "api/community_members/"
 
 # try something like
 def index(): return dict(message="hello from communities.py")
 
 # Create a new community member from a given payload. Throws an error if no payload is given, or the community member id already exists in a given community id
+@action(base_route + "create_member", method="POST")
+@action.uses(db)
 def create_member():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     identity = payload['identity']
     command_str_list = payload['command_string']
@@ -51,12 +58,11 @@ def get_all():
     return dict(data=community_members, status=200)
 
 # Get community members by a given community name. Return the member names, as well as their roles. If the community does not exist, return an error.
+@action(base_route + "get_names_by_community_name", method="GET")
+@action.uses(db)
 def get_names_by_community_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
 
@@ -65,12 +71,11 @@ def get_names_by_community_name():
     return dict(data=community_members)
 
 # Using the community name and identity name, remove a member from a community.
+@action(base_route + "remove_member", method="DELETE")
+@action.uses(db)
 def remove_member():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     identity = payload['identity']
     command_str_list = payload['command_string']
@@ -111,12 +116,11 @@ def remove_member():
     return dict(msg=f"{identity.name} has left the community {community_name}.")
 
 # Using a community name, identity name, member name and role name, update the role of a member in a community to the given role, if the member exists, the role exists, the community exists, the identity exists, and the identity is the owner of the community.
-def update_member_role():
+@action(base_route + "set_role", method="PUT")
+@action.uses(db)
+def set_role():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']

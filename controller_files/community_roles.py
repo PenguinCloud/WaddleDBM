@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 from json import loads as jloads
 
+from py4web import URL, abort, action, redirect, request
+from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
+                     unauthenticated)
+
+from ..models import waddle_helpers
+
+# Define the base route for the roles controller
+base_route = "api/community_roles/"
 
 # try something like
 def index(): return dict(message="hello from roles.py")
@@ -9,9 +17,6 @@ def index(): return dict(message="hello from roles.py")
 def create_role():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']
@@ -49,12 +54,11 @@ def get_all():
     return dict(data=roles)
 
 # Function to get the role that is allocated to a given identity in a given community.
+@action(base_route + "get_role_by_identity_and_community", method="GET")
+@action.uses(db)
 def get_role_by_identity_and_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']
@@ -73,9 +77,6 @@ def get_role_by_identity_and_community():
 def get_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     command_str_list = payload['command_string']
 
@@ -91,9 +92,6 @@ def get_by_name():
 def get_by_community_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
 
@@ -110,9 +108,6 @@ def get_by_community_name():
 def set_role():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']
@@ -154,9 +149,6 @@ def set_role():
 def update_by_name_and_community_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']
@@ -191,9 +183,6 @@ def update_by_name_and_community_name():
 def delete_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     command_str_list = payload['command_string']
 
@@ -211,9 +200,6 @@ def delete_by_name():
 def delete_by_name_and_community_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     command_str_list = payload['command_string']

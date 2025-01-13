@@ -8,6 +8,11 @@ import logging
 import random
 import os
 
+from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
+                     unauthenticated)
+
+from ..models import waddle_helpers, mat_helpers
+
 # Set the logger configuration
 logging.basicConfig(level=logging.INFO)
 
@@ -57,7 +62,7 @@ def create_giveaway_timeout(timeout: int, guid: str, community_id: int) -> None:
     entries = db(db.prize_entries.prize_id == giveaway.id).select()
 
     # Get the gateway payloads for the community
-    payloads = matterbridge_helpers.create_matterbridge_payloads(community_id, f"Giveaway with guid {guid} is closed. A winner will be announced shortly.")
+    payloads = mat_helpers.create_matterbridge_payloads(community_id, f"Giveaway with guid {guid} is closed. A winner will be announced shortly.")
 
     # If there are no payloads, return an error
     if not payloads or len(payloads) == 0:
@@ -71,7 +76,7 @@ def create_giveaway_timeout(timeout: int, guid: str, community_id: int) -> None:
 
         # Send a message to Matterbridge
         for payload in payloads:
-            matterbridge_helpers.send_matterbridge_message(payload)
+            mat_helpers.send_matterbridge_message(payload)
         
         logging.warning(f"Giveaway with guid {guid} is closed. No entries found.")
         return None
@@ -90,7 +95,7 @@ def create_giveaway_timeout(timeout: int, guid: str, community_id: int) -> None:
 
     # Send a message to Matterbridge
     for payload in payloads:
-        matterbridge_helpers.send_matterbridge_message(payload)
+        mat_helpers.send_matterbridge_message(payload)
 
     logging.warning(f"Giveaway with guid {guid} is closed. Winner is {winner_identity.identity_name}.")
     return None
@@ -127,17 +132,16 @@ def close_giveaway_with_winner(giveaway, winner):
 
 # A function to announce the winner of a giveaway in the chat of every gateway that the community is connected to, via Matterbridge.
 def announce_winner(giveaway, winner):
-    payloads = matterbridge_helpers.create_matterbridge_payloads(giveaway.community_id, f"Giveaway with guid {giveaway.guid} is closed. Winner is {winner.identity_name}.")
+    payloads = mat_helpers.create_matterbridge_payloads(giveaway.community_id, f"Giveaway with guid {giveaway.guid} is closed. Winner is {winner.identity_name}.")
     for payload in payloads:
-        matterbridge_helpers.send_matterbridge_message(payload)
+        mat_helpers.send_matterbridge_message(payload)
 
 # Function to add a giveaway to the database, via the prizes table, per community name. Throws an error if no payload is given.
 def create() :
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     community = payload['community']
     command_str_list = payload['command_string']
@@ -182,8 +186,7 @@ def get_all_by_community_name() :
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     community = payload['community']
     
@@ -220,8 +223,7 @@ def enter() :
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     community = payload['community']
     identity = payload['identity']
@@ -264,8 +266,7 @@ def get_entries() :
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     identity = payload['identity']
     command_str_list = payload['command_string']
@@ -298,8 +299,7 @@ def remove() :
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     community = payload['community']
     identity = payload['identity']
@@ -324,8 +324,7 @@ def close_with_winner():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
 
     command_str_list = payload['command_string']
 

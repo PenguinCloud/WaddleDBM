@@ -33,7 +33,8 @@ from .common import (T, auth, authenticated, cache, db, flash, logger, session,
                      unauthenticated)
                      
 # from .controller_files.test import api_GET_things
-from .controller_files import test
+# Import the controller files for each of the modules.
+from .controller_files import test, admin_context, alias_commands, calendar, communities, community_members, community_modules, community_roles, context, currency, gateway_server_types, gateway_servers, gateway_types, giveaway, identities, identity_label, module_onboarding, modules_types, modules, routing_gateways, routing, text_responses
 
 
 @action("index")

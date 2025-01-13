@@ -1,0 +1,9 @@
+[
+    {
+        "name": "Twitch_Server",
+        "server_id": "irc.chat.twitch.tv:6697",
+        "server_nick": "waddlebot",
+        "server_type": 1,
+        "protocol": "irc"
+    }
+]

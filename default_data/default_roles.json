@@ -1,0 +1,42 @@
+[
+    {
+        "role": "Owner",
+        "permissions": [
+            "read", 
+            "write", 
+            "update", 
+            "delete", 
+            "admin", 
+            "owner"
+        ],
+        "description": "Owners can read, write, update, delete, admin, and owner"
+    },
+    {
+        "role": "Administrator",
+        "permissions": [
+            "read", 
+            "write", 
+            "update", 
+            "delete", 
+            "admin"
+        ],
+        "description": "Admins can read, write, and admin"
+    },
+    {
+        "role": "Moderator",
+        "permissions": [
+            "read", 
+            "write", 
+            "update", 
+            "delete"
+        ],
+        "description": "Owners can read, write, update, delete, admin, and owner"
+    },
+    {
+        "role": "Member",
+        "permissions": [
+            "read"
+        ],
+        "description": "Members can read"
+    }
+]

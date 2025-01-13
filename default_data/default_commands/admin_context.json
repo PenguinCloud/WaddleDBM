@@ -1,0 +1,32 @@
+[
+    {
+        "command_name" : "admin_login",
+        "description": "This command logs an admin into an admin context to run admin commands. User must be an admin of the community. Example: /admin_login",
+        "request_method": "POST",
+        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/admin_context/create_session",
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
+        ],
+        "req_priv_list": []
+    },
+    {
+        "command_name" : "admin_logout",
+        "description": "This command logs an admin out of an admin context. User must be an admin of the community. Example: /admin_logout",
+        "request_method": "POST",
+        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/admin_context/delete_by_community_and_identity",
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
+        ],
+        "req_priv_list": []
+    }
+]

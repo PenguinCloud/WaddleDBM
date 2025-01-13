@@ -1,18 +1,25 @@
 # -*- coding: utf-8 -*-
 from json import loads as jloads
 
+from py4web import URL, abort, action, redirect, request
+from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
+                     unauthenticated)
+
+from ..models import waddle_helpers
+
+# Define the base route for the currency controller
+base_route = "api/currency/"
 
 # try something like
 def index(): return dict(message="hello from currency.py")
 
 # Using a community name in the arguments and an identity name in the payload, get the currency of the identity in the community. 
 # If the community or identity does not exist, return an error.
+@action(base_route + "get_currency", method="GET")
+@action.uses(db)
 def get_currency():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']
@@ -32,12 +39,11 @@ def get_currency():
 
 # Using a community name, identity name, and amount, add the amount to the member's currency in the community. If the community or 
 # member does not exist, return an error.
+@action(base_route + "add_currency", method="POST")
+@action.uses(db)
 def add_currency():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']
@@ -64,12 +70,11 @@ def add_currency():
 
 # Using a community name, identity name, and amount, subtract the amount from the member's currency in the community. If the community or
 # member does not exist, return an error.
+@action(base_route + "subtract_currency", method="POST")
+@action.uses(db)
 def subtract_currency():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']
@@ -99,9 +104,6 @@ def subtract_currency():
 def set_currency():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']
@@ -128,12 +130,11 @@ def set_currency():
 
 # Using a community name, a sender member name, a receiver member name, and an amount, transfer the amount from the sender to the receiver. 
 # If the community, sender, or receiver does not exist, return an error. If the sender does not have enough currency, return an error.
+@action(base_route + "transfer_currency", method="POST")
+@action.uses(db)
 def transfer_currency():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
-
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
     
     community = payload['community']
     identity = payload['identity']

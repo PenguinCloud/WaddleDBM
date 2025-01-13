@@ -7,12 +7,15 @@ import logging
 
 # Import the necessary dataclasses from the Waddlebot-libs module
 # Might need to change the name of the module to Waddlebot_libs, because python is case sensitive
-from WaddlebotLibs.botClasses import module, module_commands
-from WaddlebotLibs.botClasses import module_command_metadata
+from ..modules.WaddlebotLibs.botClasses import module, module_commands
+from ..modules.WaddlebotLibs.botClasses import module_command_metadata
 
 
 # Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
+
+# Set the base URL to find all the default data files
+base_url = "apps/WaddleDBM/default_data"
 
 # Class to initialize the DB
 class db_initializer:
@@ -28,35 +31,35 @@ class db_initializer:
 
         # Run the test command
         # logging.warning("=====================================")
-        # self.test_get_commands("applications/WaddleDBM/models/default_commands/admin_context.json")
+        # self.test_get_commands("{base_url}/default_commands/admin_context.json")
         # logging.warning("=====================================")
 
         # Create the default data for the prize_statuses table
-        self.create_default_data("applications/WaddleDBM/models/default_prize_statuses.json", "prize_statuses", "status_name")
+        self.create_default_data(f"{base_url}/default_prize_statuses.json", "prize_statuses", "status_name")
 
         # Create the default data for the module_types table
-        self.create_default_data("applications/WaddleDBM/models/default_module_types.json", "module_types", "name")
+        self.create_default_data(f"{base_url}/default_module_types.json", "module_types", "name")
 
         # Create the default data for the core modules
-        self.create_default_data("applications/WaddleDBM/models/core_modules.json", "modules", "name")
+        self.create_default_data(f"{base_url}/core_modules.json", "modules", "name")
 
         # After creating the core modules, create the module_commands for each module.
-        self.init_module_commands("applications/WaddleDBM/models/default_commands/")
+        self.init_module_commands(f"{base_url}/default_commands/")
 
         # Create the default data for the account types
-        self.create_default_data("applications/WaddleDBM/models/default_account_types.json", "account_types", "type_name")
+        self.create_default_data(f"{base_url}/default_account_types.json", "account_types", "type_name")
 
         # Create the default data for the gateway server types
-        self.create_default_data("applications/WaddleDBM/models/default_gateway_server_types.json", "gateway_server_types", "type_name")
+        self.create_default_data(f"{base_url}/default_gateway_server_types.json", "gateway_server_types", "type_name")
 
         # Create the default data for the gateway types
-        self.create_default_data("applications/WaddleDBM/models/default_gateway_types.json", "gateway_types", "type_name")
+        self.create_default_data(f"{base_url}/default_gateway_types.json", "gateway_types", "type_name")
 
         # Create the default data for the gateway accounts
-        self.create_default_data("applications/WaddleDBM/models/default_gateway_accounts.json", "gateway_accounts", "account_name")
+        self.create_default_data(f"{base_url}/default_gateway_accounts.json", "gateway_accounts", "account_name")
 
         # Create the default data for the gateway servers
-        self.create_default_data("applications/WaddleDBM/models/default_gateway_servers.json", "gateway_servers", "name")
+        self.create_default_data(f"{base_url}/default_gateway_servers.json", "gateway_servers", "name")
 
     
     # Test function to check if command files exist
@@ -79,6 +82,8 @@ class db_initializer:
             if self.db(self.db.routing.community_id == global_community.id).count() == 0:
                 self.db.routing.insert(channel="Global", community_id=global_community.id, gateways=[], aliases=[])
 
+                self.db.commit()
+
             # Create the default roles for the global community.
             self.create_roles(global_community.id)
 
@@ -86,9 +91,12 @@ class db_initializer:
     # A helper function to create a list of roles for a newly created community, using its community_id.
     # TODO: Figure out how to add the requirements field to the roles table and implement it.
     def create_roles(self, community_id: int):
+        logging.warning("Creating default roles....")
 
         # Read the default roles from the default_roles.json file
-        filePath = "applications/WaddleDBM/models/default_roles.json"
+        filePath = f"{base_url}/default_roles.json"
+
+        roles = []
 
         try:
             with open(filePath, "r") as file:
@@ -96,6 +104,9 @@ class db_initializer:
 
         except FileNotFoundError:
             logging.error("Core modules file not found. Unable to create core modules.") 
+
+        logging.warning("Found Default Roles:")
+        logging.warning(roles)
 
         requirements = ["None"]
 
@@ -105,6 +116,8 @@ class db_initializer:
             priv_list = role['permissions']
 
             self.db.roles.insert(name=name, description=description, community_id=community_id, priv_list=priv_list, requirements=requirements)
+
+        self.db.commit()
 
 
     # Function to create the default data for a given file_path, table and compare_column.
@@ -136,10 +149,10 @@ class db_initializer:
             file_path = f"{commands_directory}{module_name}.json"
             data = self.get_data(file_path)
 
-            logging.warning("=====================================")
-            logging.warning(f"FOUND DATA!!!:")
-            logging.warning(data)
-            logging.warning("=====================================")
+            # logging.warning("=====================================")
+            # logging.warning(f"FOUND DATA!!!:")
+            # logging.warning(data)
+            # logging.warning("=====================================")
 
             # Each command in the data is of type module_commands, which is a dataclass.
 
@@ -208,5 +221,7 @@ class db_initializer:
         for entry in data:
             if self.db(self.db[table][compare_column] == entry[compare_column]).count() == 0:
                 self.db[table].insert(**entry)
+
+        self.db.commit()
 
     

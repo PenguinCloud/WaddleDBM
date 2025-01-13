@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 from json import loads as jloads
+from py4web import URL, abort, action, redirect, request
 
+from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
+                     unauthenticated)
+
+from ..models import waddle_helpers
+
+# Define the base route for the routing controller
+base_route = "api/routing/"
 
 # try something like
 def index(): return dict(message="hello from routing.py")
@@ -89,12 +97,13 @@ def get_by_community_name():
 
 # Add a routing gateway to a community's list of gateways, if it doesnt exist, by their community name. If the community or 
 # routing does not exist, return an error. The  is passed as an argument. The community_name is passed as a payload.
+@action(base_route + "add_route_to_community", method="PUT")
+@action.uses(db)
 def add_route_to_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     channel_id = payload["channel_id"]
     account = payload["account"]
@@ -135,12 +144,13 @@ def add_route_to_community():
 
 # Remove a routing gateway from a community's list of gateways, if it exists, by their community name. If the community or 
 # routing does not exist, return an error. The channel ID is passed as an argument. The community_name is passed as a payload.
+@action(base_route + "remove_route_from_community", method="PUT")
+@action.uses(db)
 def remove_route_from_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     channel_id = payload["channel_id"]
     account = payload["account"]

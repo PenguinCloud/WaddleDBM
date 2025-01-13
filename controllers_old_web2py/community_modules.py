@@ -15,8 +15,7 @@ def get_by_community_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     community = payload['community']
     community_modules = db(db.community_modules.community_id == community.id).select()
@@ -27,8 +26,7 @@ def install_by_community_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     community = payload['community']
     community_name = community.community_name
@@ -87,8 +85,7 @@ def uninstall_by_community_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
 
-    if not payload:
-        return dict(msg="This script could not execute. Please ensure that the identity_name, community_name and command_string is provided.", error=True, status=400)
+    
     
     community = payload['community']
     community_name = community.community_name
