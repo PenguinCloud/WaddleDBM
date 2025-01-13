@@ -43,15 +43,29 @@ Documentation: ./docs/
 Premium Support: https://support.penguintech.group 
 Community Bugs / Issues: -/issues
 
-# How to setup for testing with web2py
+# How to setup with py4web locally
 
-To setup and run this module for testing puproses in web2py, do the following:
+1. Install py4web by running the following command:
 
-1. Ensure that you have web2py downloaded somewhere on your system. Source files of web2py can be found at http://www.web2py.com/init/default/download
+```
+pip install py4web
+```
 
-2. Navigate to the "applications" folder of web2py, found in its root directory.
+2. In your folder of choice for py4web installation, run the following command to setup the apps folder:
 
-3. Run the following command to clone the project into your web2py application:
+```
+py4web setup apps
+```
+
+3. Set a password for the admin interface via:
+
+```
+py4web set_password
+```
+
+4. Navigate to into the "apps" directory.
+
+5. Run the following command to clone the project into py4web:
 
 ```
 git clone https://github.com/PenguinCloud/WaddleDBM.git --recursive
@@ -63,13 +77,15 @@ If you are running a different branch with new modules and forgot to clone with 
 git submodule update --init
 ```
 
-4. In the root folder of web2py, run web2py.exe
+6. Navigate one level up from the apps folder, so that you are in the directory that contains the "apps" folder.
 
-5. In the next prompt that appears, leave the settings as is and provide a root password to web2py.
+7. Run the following command to run py4web:
 
-6. Click on "start server"
+```
+py4web run apps
+```
 
-7. Web2py should be running now. To view that the application is setup correctly, navigate to: http://127.0.0.1:8000/WaddleDBM/default/index
+8. py4web should be running now. Navigate to http://127.0.0.1:8000 to view the dashboard.
 
 # How to setup testing with docker
 
