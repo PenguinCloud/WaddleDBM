@@ -2,7 +2,7 @@
     {
         "command_name" : "marketplace_install",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/api/community_modules/install_by_community_name",
-        "description": "This command installs a marketplace module into the given community. Example: !marketplace install <my_community> [module_id]",
+        "description": "This command installs a marketplace module into the given community. Example: !marketplace install [my_community] [module_id]",
         "request_method": "POST",
         "request_parameters": [],
         "payload_keys": [
@@ -14,12 +14,13 @@
         ],
         "req_priv_list": [
             "admin"
-        ]
+        ],
+        "req_param_amount": 2
     },
     {
         "command_name" : "marketplace_ls",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/api/modules/get_all_community_modules",
-        "description": "List all the items in the marketplace",
+        "description": "List all the items in the marketplace. Example: !marketplace ls",
         "request_method": "GET",
         "request_parameters": [],
         "payload_keys": [
@@ -31,12 +32,13 @@
         ],
         "req_priv_list": [
             "read"
-        ]
+        ],
+        "req_param_amount": 0
     },
     {
         "command_name" : "marketplace_uninstall",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/api/community_modules/uninstall_by_community_name",
-        "description": "This command uninstalls a module from a community. Example: !marketplace uninstall <my_community> [module_id]",
+        "description": "This command uninstalls a module from a community. Example: !marketplace uninstall [my_community] [module_id]",
         "request_method": "DELETE",
         "request_parameters": [],
         "payload_keys": [
@@ -48,7 +50,8 @@
         ],
         "req_priv_list": [
             "admin"
-        ]
+        ],
+        "req_param_amount": 2
     },
     {
         "command_name" : "marketplace_onboard_module",
@@ -63,6 +66,7 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list": []
+        "req_priv_list": [],
+        "req_param_amount": 0
     } 
 ]

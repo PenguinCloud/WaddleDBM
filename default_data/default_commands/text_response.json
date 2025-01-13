@@ -12,7 +12,8 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list": []
+        "req_priv_list": [],
+        "req_param_amount": 1
     },
     {
         "command_name" : "text_delete",
@@ -27,12 +28,13 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list": []
+        "req_priv_list": [],
+        "req_param_amount": 1
     },
     {
         "command_name" : "text_get_all",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/api/text_responses/get_all",
-        "description": "This command gets all the text responses for the current community.",
+        "description": "This command gets all the text responses for the current community. Example: !text get all",
         "request_method": "GET",
         "request_parameters": [],
         "payload_keys": [
@@ -42,7 +44,8 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list": []
+        "req_priv_list": [],
+        "req_param_amount": 1
     },
     {
         "command_name" : "text_set",
@@ -57,6 +60,7 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list": []
+        "req_priv_list": [],
+        "req_param_amount": 2
     }
 ]

@@ -7,7 +7,6 @@ import logging
 
 # Import the necessary dataclasses from the Waddlebot-libs module
 # Might need to change the name of the module to Waddlebot_libs, because python is case sensitive
-from ..modules.WaddlebotLibs.botClasses import module, module_commands
 from ..modules.WaddlebotLibs.botClasses import module_command_metadata
 
 
@@ -167,6 +166,7 @@ class db_initializer:
                     "request_parameters": command['request_parameters'],
                     "payload_keys": command['payload_keys'],
                     "req_priv_list": command['req_priv_list'],
+                    "req_param_amount": command['req_param_amount']
                 }
 
                 logging.warning("Command object set. Inserting into module_commands table....")
@@ -184,7 +184,8 @@ class db_initializer:
                         request_method=command['request_method'],
                         request_parameters=command['request_parameters'],
                         payload_keys=command['payload_keys'],
-                        req_priv_list=command['req_priv_list']
+                        req_priv_list=command['req_priv_list'],
+                        req_param_amount=command['req_param_amount']
                     )
 
                 logging.warning("Command inserted into module_commands table.")
@@ -217,6 +218,9 @@ class db_initializer:
         if not data:
             logging.error("Data list is empty. Unable to insert data.")
             return
+        
+        logging.warning(f"Found data to insert:")
+        logging.warning(data)
 
         for entry in data:
             if self.db(self.db[table][compare_column] == entry[compare_column]).count() == 0:

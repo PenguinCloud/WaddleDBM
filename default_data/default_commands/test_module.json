@@ -1,6 +1,6 @@
 [
     {
-        "command_name" : "#test_script",
+        "command_name" : "test_script",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/api/test_script/test",
         "description": "This is a test script!!!",
         "request_method": "GET",
@@ -14,6 +14,7 @@
         ],
         "req_priv_list": [
             "admin"
-        ]
+        ],
+        "req_param_amount": 0
     }
 ]

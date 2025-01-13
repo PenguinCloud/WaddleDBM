@@ -16,7 +16,8 @@
             "read",
             "write",
             "admin"
-        ]
+        ],
+        "req_param_amount": 1
     },
     {
         "command_name" : "currency_get",
@@ -33,7 +34,8 @@
         ],
         "req_priv_list": [
             "read"
-        ]
+        ],
+        "req_param_amount": 0
     },
     {
         "command_name" : "currency_give",
@@ -51,7 +53,8 @@
         "req_priv_list": [
             "read",
             "write"
-        ]
+        ],
+        "req_param_amount": 2
     },
     {
         "command_name" : "currency_rem",
@@ -69,6 +72,7 @@
         "req_priv_list": [
             "read",
             "write"
-        ]
+        ],
+        "req_param_amount": 1
     }
 ]

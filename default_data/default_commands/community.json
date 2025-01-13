@@ -10,7 +10,8 @@
       "identity_name",
       "command_string"
     ],
-    "req_priv_list": []
+    "req_priv_list": [],
+    "req_param_amount": 1
   },
   {
     "command_name": "community_leave",
@@ -23,7 +24,8 @@
       "identity_name",
       "command_string"
     ],
-    "req_priv_list": []
+    "req_priv_list": [],
+    "req_param_amount": 1
   },
   {
     "command_name": "community_manage_add",
@@ -36,12 +38,13 @@
       "identity_name",
       "command_string"
     ],
-    "req_priv_list": []
+    "req_priv_list": [],
+    "req_param_amount": 1
   },
   {
     "command_name": "community_manage_desc",
     "action_url": "http://127.0.0.1:8000/WaddleDBM/api/communities/update_desc_by_name",
-    "description": "Add a description to a community. Example: !community manage desc [My community description] <my_community>",
+    "description": "Add a description to a community. Example: !community manage desc [My community description] [my_community]",
     "request_method": "PUT",
     "request_parameters": [],
     "payload_keys": [
@@ -52,7 +55,8 @@
     "req_priv_list": [
       "write",
       "admin"
-    ]
+    ],
+    "req_param_amount": 2
   },
   {
     "command_name": "community_manage_ls",
@@ -65,12 +69,13 @@
       "identity_name",
       "command_string"
     ],
-    "req_priv_list": []
+    "req_priv_list": [],
+    "req_param_amount": 0
   },
   {
     "command_name": "community_manage_rem",
     "action_url": "http://127.0.0.1:8000/WaddleDBM/api/communities/delete_by_name",
-    "description": "Remove a community. Example: !community manage rem <my_community>",
+    "description": "Remove a community. Example: !community manage rem [my_community]",
     "request_method": "DELETE",
     "request_parameters": [],
     "payload_keys": [
@@ -81,7 +86,8 @@
     "req_priv_list": [
       "admin",
       "delete"
-    ]
+    ],
+    "req_param_amount": 1
   },
   {
     "command_name": "community_members_ls",
@@ -96,7 +102,8 @@
     ],
     "req_priv_list": [
       "read"
-    ]
+    ],
+    "req_param_amount": 0
   },
   {
     "command_name": "community_set_role",
@@ -111,7 +118,8 @@
     ],
     "req_priv_list": [
       "admin"
-    ]
+    ],
+    "req_param_amount": 2
   },
   {
     "command_name": "community_get_role",
@@ -127,6 +135,7 @@
     ],
     "req_priv_list": [
       "read"
-    ]
+    ],
+    "req_param_amount": 1
   }
 ]

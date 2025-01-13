@@ -8,10 +8,10 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
                      unauthenticated)
 
 # Define the base route for the marketplace controller
-base_route = "api/marketplace/"
+base_route = "api/modules/"
 
 # try something like
-def index(): return dict(message="hello from marketplace.py")
+def index(): return dict(message="hello from modules.py")
 
 # Function to decode names with space in
 from urllib.parse import unquote
@@ -219,6 +219,8 @@ def get_all():
     return dict(data=modules)
 
 # Function to get all module commands from the module_commands table
+@action(base_route + "get_all_module_commands", method="GET")
+@action.uses(db)
 def get_all_module_commands():
     commands = db(db.module_commands).select()
     return dict(data=commands)

@@ -18,7 +18,8 @@
             "admin",
             "write",
             "read"
-        ]
+        ],
+        "req_param_amount": 3
     },
     {
         "command_name" : "giveaway_get_all",
@@ -36,7 +37,8 @@
         ],
         "req_priv_list": [
             "read"
-        ]
+        ],
+        "req_param_amount": 0
     },
     {
         "command_name" : "giveaway_enter",
@@ -54,7 +56,8 @@
         ],
         "req_priv_list": [
             "read"
-        ]
+        ],
+        "req_param_amount": 1
     },
     {
         "command_name" : "giveaway_get_entries",
@@ -72,7 +75,8 @@
         ],
         "req_priv_list": [
             "read"
-        ]
+        ],
+        "req_param_amount": 1
     },
     {
         "command_name" : "giveaway_close_with_winner",
@@ -92,6 +96,7 @@
             "read",
             "write",
             "admin"
-        ]
+        ],
+        "req_param_amount": 2
     }
 ]

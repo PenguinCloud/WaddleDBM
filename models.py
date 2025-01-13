@@ -59,7 +59,8 @@ db.define_table('module_commands',
                 Field('request_method', 'string', requires=IS_NOT_EMPTY()),
                 Field('request_parameters', 'list:string'),
                 Field('payload_keys', 'list:string'),
-                Field('req_priv_list', 'list:string'))
+                Field('req_priv_list', 'list:string'),
+                Field('req_param_amount', 'integer', default=0))
 
 # Define the identities table
 db.define_table('identities', 

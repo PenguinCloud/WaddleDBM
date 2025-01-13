@@ -2,7 +2,7 @@
     {
         "command_name" : "alias",
         "action_url":"http://127.0.0.1:8000/WaddleDBM/api/alias_commands/get_by_alias",
-        "description":"This command gets a alias commands from a given value. Example: /alias /alias",
+        "description":"This command gets a alias commands from a given value. Example: /alias [/alias]",
         "request_method":"GET",
         "request_parameters":[],
         "payload_keys": [
@@ -12,12 +12,13 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list":[]
+        "req_priv_list":[],
+        "req_param_amount": 1
     },
     {
         "command_name" : "alias_delete",
         "action_url":"http://127.0.0.1:8000/WaddleDBM/api/alias_commands/delete_by_alias",
-        "description":"This command delete a alias commands from a given value. Example: /alias_delete /alias",
+        "description":"This command delete a alias commands from a given value. Example: /alias_delete [/alias]",
         "request_method":"DELETE",
         "request_parameters":[],
         "payload_keys": [
@@ -27,7 +28,8 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list":[]
+        "req_priv_list":[],
+        "req_param_amount": 1
     },
     {
         "command_name" : "alias_get_all",
@@ -42,12 +44,13 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list":[]
+        "req_priv_list":[],
+        "req_param_amount": 0
     },
     {
         "command_name" : "alias_set",
         "action_url":"http://127.0.0.1:8000/WaddleDBM/api/alias_commands/set_alias_command",
-        "description":"This command maps an existing waddlebot command to an alias. Example: /alias set /alias /command",
+        "description":"This command maps an existing waddlebot command to an alias. Example: /alias set [/alias] [/command]",
         "request_method":"POST",
         "request_parameters":[],
         "payload_keys": [
@@ -57,6 +60,7 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list":[]
+        "req_priv_list":[],
+        "req_param_amount": 2
     }
 ]

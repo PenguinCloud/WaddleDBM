@@ -2,7 +2,7 @@
     {
         "command_name" : "calender_add",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/api/calender/create",
-        "description": "This command adds a new event to the calender. Example: /calender add event_name event_description event_start event_end",
+        "description": "This command adds a new event to the calender. Example: /calender add [event_name] [event_description] [event_start] [event_end]",
         "request_method": "POST",
         "request_parameters": [],
         "payload_keys": [
@@ -16,7 +16,8 @@
             "read",
             "write",
             "admin"
-        ]
+        ],
+        "req_param_amount": 4
     },
     {
         "command_name" : "calender_get_all",
@@ -33,12 +34,13 @@
         ],
         "req_priv_list": [
             "read"
-        ]
+        ],
+        "req_param_amount": 0
     },
     {
         "command_name" : "calender_update",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/api/calender/update_by_name",
-        "description": "This command updates an event in the calender. Example: /calender update event_name event_description event_start event_end",
+        "description": "This command updates an event in the calender. Example: /calender update [event_name] [event_description] [event_start event_end]",
         "request_method": "PUT",
         "request_parameters": [],
         "payload_keys": [
@@ -52,12 +54,13 @@
             "read",
             "write",
             "admin"
-        ]
+        ],
+        "req_param_amount": 4
     },
     {
         "command_name" : "calender_delete",
         "action_url": "http://127.0.0.1:8000/WaddleDBM/api/calender/delete_by_name",
-        "description": "This command deletes an event from the calender. Example: /calender delete event_name",
+        "description": "This command deletes an event from the calender. Example: /calender delete [event_name]",
         "request_method": "DELETE",
         "request_parameters": [],
         "payload_keys": [
@@ -71,6 +74,7 @@
             "read",
             "write",
             "admin"
-        ]
+        ],
+        "req_param_amount": 1
     }
 ]

@@ -14,7 +14,8 @@
         ],
         "req_priv_list": [
             "read"
-        ]
+        ],
+        "req_param_amount": 0
     },
     {
         "command_name" : "identity_label_add",
@@ -33,7 +34,8 @@
             "read",
             "write",
             "admin"
-        ]
+        ],
+        "req_param_amount": 1
     },
     {
         "command_name" : "identity_label_update",
@@ -52,7 +54,8 @@
             "read",
             "write",
             "admin"
-        ]
+        ],
+        "req_param_amount": 1
     },
     {
         "command_name" : "idenity_label_delete",
@@ -71,6 +74,7 @@
             "read",
             "write",
             "admin"
-        ]
+        ],
+        "req_param_amount": 1
     }
 ]

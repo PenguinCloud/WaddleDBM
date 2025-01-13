@@ -15,7 +15,8 @@
         ],
         "req_priv_list": [
             "admin"
-        ]
+        ],
+        "req_param_amount": 2
     },
     {
         "command_name" : "gateway_rem",
@@ -32,7 +33,8 @@
         ],
         "req_priv_list": [
             "admin"
-        ]
+        ],
+        "req_param_amount": 2
     }
 
 ]

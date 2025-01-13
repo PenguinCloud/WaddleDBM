@@ -14,7 +14,8 @@
         ],
         "req_priv_list": [
             "admin"
-        ]
+        ],
+        "req_param_amount": 1
     },
     {
         "command_name" : "route_rem",
@@ -31,6 +32,7 @@
         ],
         "req_priv_list": [
             "admin"
-        ]
+        ],
+        "req_param_amount": 1
     }
 ]

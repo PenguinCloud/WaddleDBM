@@ -12,7 +12,8 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list": []
+        "req_priv_list": [],
+        "req_param_amount": 0
     },
     {
         "command_name" : "admin_logout",
@@ -27,6 +28,7 @@
             "channel_id",
             "account"
         ],
-        "req_priv_list": []
+        "req_priv_list": [],
+        "req_param_amount": 0
     }
 ]
