@@ -106,10 +106,26 @@
     "req_param_amount": 0
   },
   {
+    "command_name": "community_create_role",
+    "action_url": "http://127.0.0.1:8000/WaddleDBM/api/community_members/create_role",
+    "description": "Creates a new role inside a given community. Example: !community create role [role_name]",
+    "request_method": "POST",
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [
+      "admin"
+    ],
+    "req_param_amount": 1
+  },
+  {
     "command_name": "community_set_role",
     "action_url": "http://127.0.0.1:8000/WaddleDBM/api/community_members/set_role",
     "description": "Updates the roll of a given member in a community. The member updating the roll, must be the owner of the community, or have admin privilages. Example: !community update role [member_name_to_update_role] [name_of_the_role]",
-    "request_method": "PUT",
+    "request_method": "POST",
     "request_parameters": [],
     "payload_keys": [
       "community_name",

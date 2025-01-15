@@ -14,6 +14,8 @@ base_route = "api/community_roles/"
 def index(): return dict(message="hello from roles.py")
 
 # Create a new role from a given payload. Throws an error if no payload is given, or the role already exists.
+@action(base_route + "create_role", method="POST")
+@action.uses(db)
 def create_role():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -22,18 +24,20 @@ def create_role():
     identity = payload['identity']
     command_str_list = payload['command_string']
 
-    # Set the command string elements as follows into an insert dictionary:
+    # Set the command string elements as follows into an insert dictionary.
+    # If the given index is not present in the command string, set the value to None.
     # name: command_str_list[0]
-    # description: command_str_list[1]
-    # priv_list: command_str_list[2]
-    # requirements: command_str_list[3]
-    # community_name: command_str_list[4]
+    description = command_str_list[1] if len(command_str_list) > 1 else None
+    priv_list = command_str_list[2] if len(command_str_list) > 2 else None
+    requirements = command_str_list[3] if len(command_str_list) > 3 else None
+    community_name = command_str_list[4] if len(command_str_list) > 4 else None
+
     insert_dict = {
         'name': command_str_list[0],
-        'description': command_str_list[1],
-        'priv_list': command_str_list[2],
-        'requirements': command_str_list[3],
-        'community_name': command_str_list[4]
+        'description': description,
+        'priv_list': priv_list,
+        'requirements': requirements,
+        'community_name': community_name
     }
 
     # Check if the identity is an admin of the community
@@ -71,7 +75,11 @@ def get_role_by_identity_and_community():
         return dict(msg="Identity is not in the community.")
     
     role = waddle_helpers.get_identity_role_in_community(identity_name, community_name)
-    return dict(data=role)
+    if not role:
+        return dict(msg="Role does not exist.")
+    
+    # Return the role name as a message
+    return dict(msg=role.name)
 
 # Get a role by its name. If the role does not exist, return an error.
 def get_by_name():
@@ -105,6 +113,8 @@ def get_by_community_name():
 # The function accepts 2 identity names, a role name, and a community name. The first identity is the identity
 # whose role is to be set, and the second identity is the identity of the user making the request.
 # Only an identity with admin privileges can set the role of another identity.
+@action(base_route + "set_role", method="POST")
+@action.uses(db)
 def set_role():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
