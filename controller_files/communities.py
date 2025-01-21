@@ -37,7 +37,7 @@ def create_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
     
-    community = payload['community']
+    # community = payload['community']
     identity = payload['identity']
     command_str_list = payload['command_string']
 
@@ -56,6 +56,9 @@ def create_by_name():
     
     # Create the community with the given community name.
     db.communities.insert(community_name=community_name, community_description=community_description)
+
+    # Get the newly created community.
+    community = db(db.communities.community_name == community_name).select().first()
 
     # Create the default roles for the community, using the community_id of the newly created community, as well as the
     # the db_initialization.py file's create_roles function.
