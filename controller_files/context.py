@@ -155,8 +155,16 @@ def get_by_identity_id():
     return dict(data=context)
 
 # Get a context by an identity name. If the context does not exist, return an error.
+@action(base_route + "get_by_identity_name", method="GET")
+@action.uses(db)
 def get_by_identity_name():
-    identity_name = request.args(0)
+    payload = request.body.read()
+
+    # Convert the payload to a dictionary.
+    payload = jloads(payload)
+
+    identity_name = payload['identity_name']
+
     if not identity_name:
         return dict(msg="No identity name given.")
     identity_name = waddle_helpers.decode_name(identity_name)
