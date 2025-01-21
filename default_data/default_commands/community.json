@@ -141,7 +141,7 @@
     "command_name": "community_get_role",
     "action_url": "http://127.0.0.1:8000/WaddleDBM/api/community_roles/get_role_by_identity_and_community",
     "description": "Returns the role of the current user in the current community. Example: !community get role [my_community]",
-    "request_method": "PUT",
+    "request_method": "GET",
     "request_parameters": [
     ],
     "payload_keys": [

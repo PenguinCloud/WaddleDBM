@@ -77,8 +77,8 @@ def set_context():
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
     
     identity = payload['identity']
-    channel = payload["channel_id"]
-    account = payload["account"]
+    # channel = payload["channel_id"]
+    # account = payload["account"]
     command_str_list = payload['command_string']
     
     # Set the community name to the first element of the command_str_list.
@@ -89,40 +89,41 @@ def set_context():
     if not community:
         return dict(msg="Community does not exist. Please create the community first.")
 
-    # Check if the channel exists in the given community routing, by checking the gateways column of the routing table for the given community. If it doesnt exist, create it.
-    routing = db(db.routing.community_id == community.id).select().first()
-    if not routing:
-        routing = db.routing.insert(channel=community_name, community_id=community.id, routing_gateway_ids=[], aliases=[])
+    # TODO: Implement the below code when the slash commands are implemented.
+    # # Check if the channel exists in the given community routing, by checking the gateways column of the routing table for the given community. If it doesnt exist, create it.
+    # routing = db(db.routing.community_id == community.id).select().first()
+    # if not routing:
+    #     routing = db.routing.insert(channel=community_name, community_id=community.id, routing_gateway_ids=[], aliases=[])
     
-    # Check if the account exists in the gateway_servers table.
-    # First, split the account into the protocol and the server name by splitting the account string by the first dot.
-    account_split = account.split(".", 1)
-    print(account_split)
-    if len(account_split) != 2:
-        return dict(msg="Invalid account format. Please provide the account in the format 'protocol.server_name', for example 'twitch.Twitch_Server'.")
+    # # Check if the account exists in the gateway_servers table.
+    # # First, split the account into the protocol and the server name by splitting the account string by the first dot.
+    # account_split = account.split(".", 1)
+    # print(account_split)
+    # if len(account_split) != 2:
+    #     return dict(msg="Invalid account format. Please provide the account in the format 'protocol.server_name', for example 'twitch.Twitch_Server'.")
     
-    protocol = account_split[0]
-    server_name = account_split[1]
+    # protocol = account_split[0]
+    # server_name = account_split[1]
 
-    gateway_server = db((db.gateway_servers.protocol == protocol) & (db.gateway_servers.name == server_name)).select().first()
+    # gateway_server = db((db.gateway_servers.protocol == protocol) & (db.gateway_servers.name == server_name)).select().first()
 
-    if not gateway_server:
-        return dict(msg="Account does not exist in the gateway servers. Please add the account to the gateway servers first.")
+    # if not gateway_server:
+    #     return dict(msg="Account does not exist in the gateway servers. Please add the account to the gateway servers first.")
     
-    # Get the routing_gateway id for the given account and channel.
-    routing_gateway = db((db.routing_gateways.channel_id == channel) & (db.routing_gateways.gateway_server == gateway_server.id)).select().first()
+    # # Get the routing_gateway id for the given account and channel.
+    # routing_gateway = db((db.routing_gateways.channel_id == channel) & (db.routing_gateways.gateway_server == gateway_server.id)).select().first()
 
-    if not routing_gateway:
-        return dict(msg="Channel/Gateway is not found in the database. Please set it up first.")
+    # if not routing_gateway:
+    #     return dict(msg="Channel/Gateway is not found in the database. Please set it up first.")
 
-    # Check if the given community is the Global or Default community. If it isnt, check if the channel exists in the community routing.
-    if community.community_name != "Global" and community.community_name != "Default":
-        # Get the routing_gateway_ids from the routing record.
-        routing_gateway_ids = routing.routing_gateway_ids
+    # # Check if the given community is the Global or Default community. If it isnt, check if the channel exists in the community routing.
+    # if community.community_name != "Global" and community.community_name != "Default":
+    #     # Get the routing_gateway_ids from the routing record.
+    #     routing_gateway_ids = routing.routing_gateway_ids
 
-        # Check if the gateway is in the gateways list.
-        if routing_gateway.id not in routing_gateway_ids:
-            return dict(msg="Gateway is not found in the community routing. Please add the gateway to the community routing first.")
+    #     # Check if the gateway is in the gateways list.
+    #     if routing_gateway.id not in routing_gateway_ids:
+    #         return dict(msg="Gateway is not found in the community routing. Please add the gateway to the community routing first.")
 
     # If the identity is not in the community, return an error.
     community_member = db((db.community_members.identity_id == identity.id) & (db.community_members.community_id == community.id)).select().first()
