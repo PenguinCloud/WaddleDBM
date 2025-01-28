@@ -14,6 +14,8 @@ base_route = "api/routing_gateways/"
 def index(): return dict(message="hello from routing_gateways.py")
 
 # Create a new routing gateway from a given payload. Throws an error if no payload is given, or the routing gateway already exists.
+@action(base_route + "create_gateway", method="POST")
+@action.uses(db)
 def create_gateway():
     payload = request.body.read()
     if not payload:
@@ -42,6 +44,8 @@ def create_gateway():
     return dict(msg="Routing gateway created.", status=201, route_type=route_type.type_name)
 
 # This function activates a routing gateway by a given activation key. If the routing gateway does not exist, return an error.
+@action(base_route + "activate_gateway", method="POST")
+@action.uses(db)
 def activate_gateway():
     payload = request.body.read()
     if not payload:
@@ -56,6 +60,8 @@ def activate_gateway():
     return dict(msg="Routing gateway activated.", status=200)
 
 # Get all routing gateways in the database and displaye the actual names of the gateway type and gateway_server, instead of their IDs.
+@action(base_route + "get_all", method="GET")
+@action.uses(db)
 def get_all():
     routing_gateways = db(db.routing_gateways).select()
     data = []
@@ -126,6 +132,8 @@ def delete_by_channel_id():
     return dict(msg="Routing gateway deleted.")
     
 # Delete a routing gateway by its channel id and gateway type. The variables are passed as a payload. If the routing gateway does not exist, return an error.
+@action(base_route + "delete_by_channel_id_and_gateway_type", method="POST")
+@action.uses(db)
 def delete_by_channel_id_and_gateway_type():
     payload = request.body.read()
     if not payload:

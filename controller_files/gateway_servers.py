@@ -14,6 +14,8 @@ base_route = "api/gateway_servers/"
 def index(): return dict(message="hello from gateway_servers.py")
 
 # Create a new gateway server from a given payload. Throws an error if no payload is given, or the gateway server already exists.
+@action(base_route + "create_gateway_server", method="POST")
+@action.uses(db)
 def create_gateway_server():
     payload = request.body.read()
     if not payload:
@@ -35,6 +37,8 @@ def create_gateway_server():
     return dict(msg="Gateway server created.", status=201)
 
 # Get all gateway servers in the database and displaye the actual names of the server type, instead of their IDs.
+@action(base_route + "get_all", method="GET")
+@action.uses(db)
 def get_all():
     gateway_servers = db(db.gateway_servers).select()
     data = []
@@ -96,6 +100,8 @@ def update_by_name():
     return dict(msg="Gateway server updated.", status=200)
 
 # Delete a gateway server by its name. If the gateway server does not exist, return an error.
+@action(base_route + "delete_by_name", method="DELETE")
+@action.uses(db)
 def delete_by_name():
     name = request.args(0)
     if not name:
