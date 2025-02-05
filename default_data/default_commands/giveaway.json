@@ -1,7 +1,7 @@
 [
     {
         "command_name" : "giveaway_create",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/giveaway/create",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/giveaway/create",
         "description": "This command creates a giveaway for the current community. Example: !giveaway create [prize_name] [prize_description] [timeout]",
         "request_method": "POST",
         "request_parameters": [
@@ -23,7 +23,7 @@
     },
     {
         "command_name" : "giveaway_get_all",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/giveaway/get_all_by_community_name",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/giveaway/get_all_by_community_name",
         "description": "This command fetches all the giveaways for the current community. Example: !giveaway get all",
         "request_method": "GET",
         "request_parameters": [
@@ -42,7 +42,7 @@
     },
     {
         "command_name" : "giveaway_enter",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/giveaway/enter",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/giveaway/enter",
         "description": "This command allows the current identity to enter a given giveaway through a given giveaway GUID. Example: !giveaway enter [giveaway_guid]",
         "request_method": "POST",
         "request_parameters": [
@@ -61,7 +61,7 @@
     },
     {
         "command_name" : "giveaway_get_entries",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/giveaway/get_entries",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/giveaway/get_entries",
         "description": "This command retrieves all the entries for a given giveaway. Example: !giveaway get entries [giveaway_guid]",
         "request_method": "GET",
         "request_parameters": [
@@ -80,7 +80,7 @@
     },
     {
         "command_name" : "giveaway_close_with_winner",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/giveaway/close_with_winner",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/giveaway/close_with_winner",
         "description": "This command closes a giveaway and selects a winner. Example: !giveaway close with winner [giveaway_guid] [winner_name]",
         "request_method": "PUT",
         "request_parameters": [

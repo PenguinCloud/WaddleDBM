@@ -1,7 +1,7 @@
 [
     {
         "command_name" : "currency_add",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/currency/add_currency",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/currency/add_currency",
         "description": "This command adds a given amount of currency to the current user. Example: !currency add [amount]",
         "request_method": "POST",
         "request_parameters": [],
@@ -21,7 +21,7 @@
     },
     {
         "command_name" : "currency_get",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/currency/get_currency",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/currency/get_currency",
         "description": "This command gets the currency of the current user. Example: !currency get",
         "request_method": "GET",
         "request_parameters": [],
@@ -39,7 +39,7 @@
     },
     {
         "command_name" : "currency_give",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/currency/transfer_currency",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/currency/transfer_currency",
         "description": "This command gives currency from one user to another. Example: !currency give [user] [amount]",
         "request_method": "POST",
         "request_parameters": [],
@@ -58,7 +58,7 @@
     },
     {
         "command_name" : "currency_rem",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/currency/subtract_currency",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/currency/subtract_currency",
         "description": "This command removes a given amount of currency to the current user. Example: !currency rem [amount]",
         "request_method": "POST",
         "request_parameters": [],

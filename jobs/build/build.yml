@@ -14,10 +14,38 @@
     owner: "{{ run.user }}"
     group: "{{ run.user }}"
 
-- name: Copy file with owner and permissions
+- name: Create /var/www/html/py4web if it does not exist
+  ansible.builtin.file:
+    path:  "/var/www/html/py4web"
+    state: directory
+    mode: '0755'
+    owner: "{{ run.user }}"
+    group: "{{ run.user }}"
+
+- name: Install the py4web package
+  ansible.builtin.pip:
+    name: py4web
+
+- name: Setup the py4web apps folder, using py4web setup
+  ansible.builtin.command:
+    argv:
+      - /usr/local/bin/py4web
+      - setup
+      - /var/www/html/py4web/apps
+      - -Y
+
+- name: Copy file with owner and permissions (Web2PY)
   ansible.builtin.copy:
     src: "/opt/manager/WaddleDBM/"
     dest: "/var/www/html/web2py/applications/WaddleDBM/"
+    owner: "{{ run.user }}"
+    group: "{{ run.user }}"
+    mode: '0755'
+
+- name: Copy file with owner and permissions (Py4Web)
+  ansible.builtin.copy:
+    src: "/opt/manager/WaddleDBM/"
+    dest: "/var/www/html/py4web/apps/WaddleDBM/"
     owner: "{{ run.user }}"
     group: "{{ run.user }}"
     mode: '0755'
@@ -25,6 +53,13 @@
 - name: Make sure web2py is executable by the run user
   ansible.builtin.file:
     dest: "/var/www/html/web2py/web2py.py"
+    owner: "{{ run.user }}"
+    group: "{{ run.user }}"
+    mode: '0755'
+
+- name: Make sure py4web is executable by the run user
+  ansible.builtin.file:
+    dest: "/usr/local/bin/py4web"
     owner: "{{ run.user }}"
     group: "{{ run.user }}"
     mode: '0755'

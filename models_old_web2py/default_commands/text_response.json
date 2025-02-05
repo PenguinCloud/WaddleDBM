@@ -1,7 +1,7 @@
 [
     {
         "command_name" : "text",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/text_responses/get_by_text.json",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/text_responses/get_by_text.json",
         "description": "This command gets a text response from a given value. Example: !text [text]",
         "request_method": "GET",
         "request_parameters": [],
@@ -16,7 +16,7 @@
     },
     {
         "command_name" : "text_delete",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/text_responses/delete_by_text.json",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/text_responses/delete_by_text.json",
         "description": "This command delete a text response from a given value. Example: !text delete [text]",
         "request_method": "DELETE",
         "request_parameters": [],
@@ -31,7 +31,7 @@
     },
     {
         "command_name" : "text_get_all",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/text_responses/get_all.json",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/text_responses/get_all.json",
         "description": "This command gets all the text responses for the current community.",
         "request_method": "GET",
         "request_parameters": [],
@@ -46,7 +46,7 @@
     },
     {
         "command_name" : "text_set",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/text_responses/set_text_response.json",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/text_responses/set_text_response.json",
         "description": "This command maps a text response to a text value. Example: !text set [text_to_bind_response_to] [response]",
         "request_method": "POST",
         "request_parameters": [],

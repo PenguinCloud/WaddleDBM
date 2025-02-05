@@ -6,6 +6,7 @@ from threading import Thread
 import requests
 import time
 import logging
+import os
 
 from py4web import URL, abort, action, redirect, request
 from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
@@ -16,8 +17,7 @@ from ..models import waddle_helpers
 # Define the base route for the calendar controller
 base_route = "api/calendar/"
 
-# TODO: Get the below variables from a config file
-matterbridgePostURL = 'http://localhost:4200/api/message'
+matterbridgePostURL = os.environ.get('MATTERBRIDGE_URL')
 
 stop_threads = False
 

@@ -4,6 +4,7 @@
 from pydal import DAL
 from json import load as jload
 import logging
+import os
 
 # Import the necessary dataclasses from the Waddlebot-libs module
 # Might need to change the name of the module to Waddlebot_libs, because python is case sensitive
@@ -14,7 +15,7 @@ from ..modules.WaddlebotLibs.botClasses import module_command_metadata
 logging.basicConfig(level=logging.INFO)
 
 # Set the base URL to find all the default data files
-base_url = "apps/WaddleDBM/default_data"
+base_url = os.path.join(os.getcwd(), "apps/WaddleDBM/default_data")
 
 # Class to initialize the DB
 class db_initializer:
@@ -33,32 +34,49 @@ class db_initializer:
         # self.test_get_commands("{base_url}/default_commands/admin_context.json")
         # logging.warning("=====================================")
 
+        testcurrentpath = os.getcwd()
+
+        print("Current path: ", testcurrentpath)
+
+        testparentpath = os.path.dirname(testcurrentpath)
+
+        print("Parent path: ", testparentpath)
+
         # Create the default data for the prize_statuses table
-        self.create_default_data(f"{base_url}/default_prize_statuses.json", "prize_statuses", "status_name")
+        # self.create_default_data(f"{base_url}/default_prize_statuses.json", "prize_statuses", "status_name")
+        self.create_default_data(os.path.join(base_url, "default_prize_statuses.json"), "prize_statuses", "status_name")
 
         # Create the default data for the module_types table
-        self.create_default_data(f"{base_url}/default_module_types.json", "module_types", "name")
+        # self.create_default_data(f"{base_url}/default_module_types.json", "module_types", "name")
+        self.create_default_data(os.path.join(base_url, "default_module_types.json"), "module_types", "name")
 
         # Create the default data for the core modules
-        self.create_default_data(f"{base_url}/core_modules.json", "modules", "name")
+        # self.create_default_data(f"{base_url}/core_modules.json", "modules", "name")
+        self.create_default_data(os.path.join(base_url, "core_modules.json"), "modules", "name")
 
         # After creating the core modules, create the module_commands for each module.
-        self.init_module_commands(f"{base_url}/default_commands/")
+        # self.init_module_commands(f"{base_url}/default_commands/")
+        self.init_module_commands(os.path.join(base_url, "default_commands/"))
 
         # Create the default data for the account types
-        self.create_default_data(f"{base_url}/default_account_types.json", "account_types", "type_name")
+        # self.create_default_data(f"{base_url}/default_account_types.json", "account_types", "type_name")
+        self.create_default_data(os.path.join(base_url, "default_account_types.json"), "account_types", "type_name")
 
         # Create the default data for the gateway server types
-        self.create_default_data(f"{base_url}/default_gateway_server_types.json", "gateway_server_types", "type_name")
+        # self.create_default_data(f"{base_url}/default_gateway_server_types.json", "gateway_server_types", "type_name")
+        self.create_default_data(os.path.join(base_url, "default_gateway_server_types.json"), "gateway_server_types", "type_name")
 
         # Create the default data for the gateway types
-        self.create_default_data(f"{base_url}/default_gateway_types.json", "gateway_types", "type_name")
+        # self.create_default_data(f"{base_url}/default_gateway_types.json", "gateway_types", "type_name")
+        self.create_default_data(os.path.join(base_url, "default_gateway_types.json"), "gateway_types", "type_name")
 
         # Create the default data for the gateway accounts
-        self.create_default_data(f"{base_url}/default_gateway_accounts.json", "gateway_accounts", "account_name")
+        # self.create_default_data(f"{base_url}/default_gateway_accounts.json", "gateway_accounts", "account_name")
+        self.create_default_data(os.path.join(base_url, "default_gateway_accounts.json"), "gateway_accounts", "account_name")
 
         # Create the default data for the gateway servers
-        self.create_default_data(f"{base_url}/default_gateway_servers.json", "gateway_servers", "name")
+        # self.create_default_data(f"{base_url}/default_gateway_servers.json", "gateway_servers", "name")
+        self.create_default_data(os.path.join(base_url, "default_gateway_servers.json"), "gateway_servers", "name")
 
     
     # Test function to check if command files exist

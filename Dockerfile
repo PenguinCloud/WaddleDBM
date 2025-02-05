@@ -19,12 +19,12 @@ RUN pip install -r requirements.txt
 RUN ansible-playbook entrypoint.yml -c local --tags "build,run"
 
 # PUT YER ENVS in here
-ENV MATTERBRIDGE_URL="http://localhost:4200/api/message"
+ENV MATTERBRIDGE_URL="http://host.docker.internal:4200/api/message"
 
-WORKDIR /var/www/html/web2py/
+WORKDIR /var/www/html/py4web/
 
 # Switch to non-root user
-# USER waddlebot
+USER waddlebot
 
 # Entrypoint time (aka runtime)
 ENTRYPOINT ["/bin/bash","/opt/manager/WaddleDBM/entrypoint.sh"]

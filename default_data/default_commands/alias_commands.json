@@ -1,7 +1,7 @@
 [
     {
         "command_name" : "alias",
-        "action_url":"http://127.0.0.1:8000/WaddleDBM/api/alias_commands/get_by_alias",
+        "action_url":"http://host.docker.internal:8000/WaddleDBM/api/alias_commands/get_by_alias",
         "description":"This command gets a alias commands from a given value. Example: /alias [/alias]",
         "request_method":"GET",
         "request_parameters":[],
@@ -17,7 +17,7 @@
     },
     {
         "command_name" : "alias_delete",
-        "action_url":"http://127.0.0.1:8000/WaddleDBM/api/alias_commands/delete_by_alias",
+        "action_url":"http://host.docker.internal:8000/WaddleDBM/api/alias_commands/delete_by_alias",
         "description":"This command delete a alias commands from a given value. Example: /alias_delete [/alias]",
         "request_method":"DELETE",
         "request_parameters":[],
@@ -33,7 +33,7 @@
     },
     {
         "command_name" : "alias_get_all",
-        "action_url":"http://127.0.0.1:8000/WaddleDBM/api/alias_commands/get_all",
+        "action_url":"http://host.docker.internal:8000/WaddleDBM/api/alias_commands/get_all",
         "description":"This command gets all the alias commands for the current community. Example: /alias_get_all",
         "request_method":"GET",
         "request_parameters":[],
@@ -49,7 +49,7 @@
     },
     {
         "command_name" : "alias_set",
-        "action_url":"http://127.0.0.1:8000/WaddleDBM/api/alias_commands/set_alias_command",
+        "action_url":"http://host.docker.internal:8000/WaddleDBM/api/alias_commands/set_alias_command",
         "description":"This command maps an existing waddlebot command to an alias. Example: /alias set [/alias] [/command]",
         "request_method":"POST",
         "request_parameters":[],

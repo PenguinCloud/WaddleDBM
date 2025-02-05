@@ -6,9 +6,9 @@ from threading import Thread
 import requests
 import time
 import logging
+import os
 
-# TODO: Get the below variables from a config file
-matterbridgePostURL = 'http://localhost:4200/api/message'
+matterbridgePostURL = os.environ.get('MATTERBRIDGE_URL')
 
 stop_threads = False
 

@@ -1,7 +1,7 @@
 [
     {
         "command_name" : "marketplace_install",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/community_modules/install_by_community_name",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/community_modules/install_by_community_name",
         "description": "This command installs a marketplace module into the given community. Example: !marketplace install [my_community] [module_id]",
         "request_method": "POST",
         "request_parameters": [],
@@ -19,7 +19,7 @@
     },
     {
         "command_name" : "marketplace_ls",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/modules/get_all_community_modules",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/modules/get_all_community_modules",
         "description": "List all the items in the marketplace. Example: !marketplace ls",
         "request_method": "GET",
         "request_parameters": [],
@@ -37,7 +37,7 @@
     },
     {
         "command_name" : "marketplace_uninstall",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/community_modules/uninstall_by_community_name",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/community_modules/uninstall_by_community_name",
         "description": "This command uninstalls a module from a community. Example: !marketplace uninstall [my_community] [module_id]",
         "request_method": "DELETE",
         "request_parameters": [],
@@ -55,7 +55,7 @@
     },
     {
         "command_name" : "marketplace_onboard_module",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/modules/start_module_onboard",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/modules/start_module_onboard",
         "description": "This command starts the onboarding process for a module, by displaying a link to a module onboarding form. Example: !marketplace onboard module",
         "request_method": "GET",
         "request_parameters": [],

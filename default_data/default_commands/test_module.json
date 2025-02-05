@@ -1,7 +1,7 @@
 [
     {
         "command_name" : "test_script",
-        "action_url": "http://127.0.0.1:8000/WaddleDBM/api/test_script/test",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/test_script/test",
         "description": "This is a test script!!!",
         "request_method": "GET",
         "request_parameters": [],
