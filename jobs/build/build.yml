@@ -34,6 +34,30 @@
       - /var/www/html/py4web/apps
       - -Y
 
+- name: Ensure the user has access to /var/www/html/py4web/apps/_scaffold/databases directory
+  ansible.builtin.file:
+    path: "/var/www/html/py4web/apps/_scaffold/databases"
+    state: directory
+    mode: '0755'
+    owner: "{{ run.user }}"
+    group: "{{ run.user }}"
+
+- name: Ensure the user has access to /var/www/html/py4web/apps/_scaffold/uploads directory
+  ansible.builtin.file:
+    path: "/var/www/html/py4web/apps/_scaffold/uploads"
+    state: directory
+    mode: '0755'
+    owner: "{{ run.user }}"
+    group: "{{ run.user }}"
+
+- name: Ensure the user has access to /var/www/html/py4web/apps/showcase/databases
+  ansible.builtin.file:
+    path: "/var/www/html/py4web/apps/showcase/databases"
+    state: directory
+    mode: '0755'
+    owner: "{{ run.user }}"
+    group: "{{ run.user }}"
+
 - name: Copy file with owner and permissions (Web2PY)
   ansible.builtin.copy:
     src: "/opt/manager/WaddleDBM/"
