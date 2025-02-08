@@ -63,7 +63,7 @@ py4web setup apps
 py4web set_password
 ```
 
-4. Navigate to into the "apps" directory.
+4. Navigate to the "apps" directory.
 
 5. Run the following command to clone the project into py4web:
 
