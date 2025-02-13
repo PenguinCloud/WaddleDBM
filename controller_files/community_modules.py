@@ -27,6 +27,23 @@ def get_by_community_name():
     community_modules = db(db.community_modules.community_id == community.id).select()
     return dict(data=community_modules, status=200)
 
+def get_lookup(community_name, identity_name, module_name):
+    query = (
+        (db.communities.community_name == community_name) &
+        (db.identities.name == identity_name) &
+        (db.modules.name == module_name) &
+        (db.community_members.community_id == db.communities.id) &
+        (db.community_members.identity_id == db.identities.id) &
+        (db.roles.id == db.community_members.role_id)
+    )
+    fields = (
+        db.communities.ALL,
+        db.identities.ALL,
+        db.modules.ALL,
+        db.roles.name.with_alias('role_name')
+    )
+    return db(query).select(*fields).first()
+
 # Install a community module, using its module_id in a payload, into a given community_name as an argument. If the community module already exists in the given community, return an error.
 @action(base_route + "install_by_community_name", method="POST")
 @action.uses(db)
@@ -46,19 +63,8 @@ def install_by_community_name():
     # Set the module_name to the first element in the command_str_list
     module_name = command_str_list[0]
 
-    # Combine queries for community, identity, module, and membership
-    query = (db.communities.community_name == community_name) & \
-            (db.identities.name == identity_name) & \
-            (db.modules.name == module_name) & \
-            (db.community_members.community_id == db.communities.id) & \
-            (db.community_members.identity_id == db.identities.id) & \
-            (db.roles.id == db.community_members.role_id)
-
-    result = db(query).select(db.communities.ALL, 
-                              db.identities.ALL, 
-                              db.modules.ALL,
-                              db.roles.name.with_alias('role_name')).first()
-
+    # Combine queries for community, identity, and module
+    result = get_lookup(community_name, identity_name, module_name)
     if not result:
         return dict(msg="Invalid community, identity, or module, or identity is not a member of the community.")
 
@@ -106,24 +112,18 @@ def uninstall_by_community_name():
     module_name = command_str_list[0]
     
     # Combine queries for community, identity, and module
-    community = db(db.communities.community_name == community_name).select().first()
-    identity = db(db.identities.name == identity_name).select().first()
-    module = db(db.modules.name == module_name).select().first()
+    result = get_lookup(community_name, identity_name, module_name)
+    if not result:
+        return dict(msg="Invalid community, identity, or module, or identity is not a member of the community.")
 
-    if not all([community, identity, module]):
-        return dict(msg="Invalid community, identity, or module.")
+    if result.communities.community_name == "Global":
+        return dict(msg="Cannot uninstall community module in Global community.")
 
-    if community.community_name == "Global":
-        return dict(msg="Cannot install community module in Global community.")
-
-    if not waddle_helpers.identity_in_community(identity_name, community_name):
-        return dict(msg="Identity is not a member of the community.")
-
-    if not waddle_helpers.identity_is_admin(identity_name, community_name):
+    if result.role_name not in ['Admin', 'Owner', 'admin', 'owner']:
         return dict(msg="Identity is not an admin of the community.")
 
     # Check that the module exists
-    community_module = db((db.community_modules.community_id == community.id) & (db.community_modules.module_id == module.id)).select().first()
+    community_module = db((db.community_modules.community_id == result.communities.id) & (db.community_modules.module_id == result.modules.id)).select().first()
     
     if not community_module:
         return dict(msg="Community module does not exist.")
