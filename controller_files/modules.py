@@ -133,20 +133,17 @@ def get_marketplace_module_by_alias(alias, identity_name):
 # Decorator to require a payload in the request body. If no payload is given, return an error message.
 def require_payload(f):
     def wrapper(*args, **kwargs):
-        payload = request.body.read()
-        if not payload:
+        raw_payload = request.body.read()
+        if not raw_payload:
             return dict(msg="No payload given.")
-        return f(jloads(payload), *args, **kwargs)
+        payload = jloads(raw_payload)
+        return f(payload, *args, **kwargs)
     return wrapper
 
 # Create a new marketplace module from a given payload. Throws an error if no payload is given, or the marketplace module already exists.
 @require_payload
-def create():
-    payload = request.body.read()
-    if not payload:
-        return dict(msg="No payload given.")
-    payload = jloads(payload)
-    if 'name' not in payload or 'description' not in payload or 'gateway_url' not in payload or 'module_type_id' not in payload or 'metadata' not in payload:
+def create(payload):
+    if not all(field in payload for field in ('name', 'description', 'gateway_url', 'module_type_id', 'metadata')):
         return dict(msg="Payload missing required fields.")
     if db(db.modules.name == payload['name']).count() > 0:
         return dict(msg="Marketplace Module already exists.")
@@ -158,21 +155,13 @@ def create():
 # If the marketplace module does not exist, check if the name can be used as an alias to get the marketplace module.
 # If the alias command exists, return the aliased command value.
 @require_payload
-def get():
-    # Check if a payload is given, and if so, get the identity name from the payload
-    payload = request.body.read()
-
-    if not payload:
-        return dict(msg="No payload given.")
-    
-    payload = jloads(payload)
-
-    # Ensure that the identity name and module name is present in the payload
+def get(payload):
+    # Check if the payload contains the required fields
     if 'name' not in payload or 'identity_name' not in payload:
         return dict(msg="Payload missing required fields.")
-
-    identity_name = payload.get("identity_name", None)
-    name = payload.get("name", None)
+    
+    identity_name = payload["identity_name"]
+    name = payload["name"]
 
     if identity_name:
         # Get the marketplace module. If it does not exists, check if the name can be used as an alias to get the marketplace module.
