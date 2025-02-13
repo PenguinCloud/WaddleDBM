@@ -4,9 +4,9 @@ from json import dumps as jdumps
 from datetime import datetime, timedelta
 from threading import Thread
 import requests
-import time
 import logging
 import os
+import asyncio
 
 from py4web import URL, abort, action, redirect, request
 from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
@@ -23,6 +23,39 @@ stop_threads = False
 
 # try something like
 def index(): return dict(message="hello from calendar.py")
+
+# Function to parse the event properties from a given command string list.
+def parse_event_properties(command_str_list):
+    # Ensure the list has the expected 4 elements.
+    if len(command_str_list) < 4:
+        raise ValueError("Insufficient event properties in command_string")
+    return {
+        "event_name": command_str_list[0],
+        "event_description": command_str_list[1],
+        "event_start": command_str_list[2],
+        "event_end": command_str_list[3]
+    }
+
+# Function to parse the event name from the command string list.
+def parse_event_name(command_str_list):
+    if len(command_str_list) < 1:
+        raise ValueError("Insufficient event properties in command_string")
+    return {
+        "event_name": command_str_list[0]
+    }
+
+# Function to parse the community and date range from the command string list.
+def parse_community_and_dates(command_str_list):
+    start_date = datetime.now()
+    end_date = start_date + timedelta(days=30)
+    if len(command_str_list) > 0:
+        start_date = command_str_list[0]
+    if len(command_str_list) > 1:
+        end_date = command_str_list[1]
+    return {
+        "start_date": start_date,
+        "end_date": end_date
+    }
 
 # Function to get a routing_gateway channel_id from a given routing_gateway_id. If it doesnt exist, return null.
 def get_channel_id(routing_gateway_id: int) -> str:
@@ -41,8 +74,8 @@ def get_account(routing_gateway_id: int) -> str:
         return None
     return f"{gateway_server.protocol}.{gateway_server.name}"
 
-# Create a new calender event from a given payload. Throws an error if no payload is given.
-@action("create", method="POST")
+# Create a new calendar event from a given payload. Throws an error if no payload is given.
+@action(base_route + "create", method="POST")
 @action.uses(db)
 def create():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
@@ -51,44 +84,45 @@ def create():
     community = payload['community']
     command_str_list = payload['command_string']
 
-    # Set the event name to that of the first element in the command string list
-    event_name = command_str_list[0]
+    # Parse the event properties from the command string list
+    event_properties = parse_event_properties(command_str_list)
 
-    # Set the event description to that of the second element in the command string list
-    event_description = command_str_list[1]
-
-    # Set the event start to that of the third element in the command string list
-    event_start = command_str_list[2]
-
-    # Set the event end to that of the fourth element in the command string list
-    event_end = command_str_list[3]
-    
-    # Create the event
-    db.calendar.insert(community_id=community.id, event_name=event_name, event_description=event_description, event_start=event_start, event_end=event_end, notification_sent=False)
+    # Insert the event into the calendar table
+    db.calendar.insert(
+        event_name=event_properties['event_name'],
+        event_description=event_properties['event_description'],
+        event_start=event_properties['event_start'],
+        event_end=event_properties['event_end'],
+        community_id=community.id
+    )
     return dict(msg="Event created.", status=201)
 
-# Get all calender events.
+# Get all calendar events.
+@action(base_route + "get_all", method="GET")
+@action.uses(db)
 def get_all():
     events = db(db.calendar).select()
     return dict(data=events, status=200)
 
-# Get a calender event by its name. If the event does not exist, return an error.
+# Get a calendar event by its name. If the event does not exist, return an error.
+@action(base_route + "get_by_name", method="GET")
+@action.uses(db)
 def get_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
     
     command_str_list = payload['command_string']
 
-    # Set the event name to that of the first element in the command string list
-    event_name = command_str_list[0]
+    # Parse the event name from the command string list
+    event_properties = parse_event_name(command_str_list)
 
-    event = db(db.calendar.event_name == event_name).select().first()
+    event = db(db.calendar.event_name == event_properties['event_name']).select().first()
     if not event:
         return dict(msg="Event not found.", status=404)
     return dict(data=event, status=200)
 
 # Get calendar events by a community name and between a start and end date from a payload. Return an error if the community does not exist.
-@action("get_by_community", method="GET")
+@action(base_route + "get_by_community", method="GET")
 @action.uses(db)
 def get_by_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
@@ -97,20 +131,14 @@ def get_by_community():
     community = payload['community']
     command_str_list = payload['command_string']
     
-    # The start and end date are optional. The start date is the current date and the end date is the current date plus 30 days.
-    start_date = datetime.now()
-    end_date = start_date + timedelta(days=30)
+    # Parse the community and date range from the command string list
+    date_properties = parse_community_and_dates(command_str_list)
 
-    # If the start and end date are provided, set them to the given values.
-    if len(command_str_list) > 0:
-        start_date = command_str_list[0]
-        end_date = command_str_list[1]
-
-    events = db((db.calendar.community_id == community.id) & (db.calendar.event_start >= start_date) & (db.calendar.event_start <= end_date)).select()
+    events = db((db.calendar.community_id == community.id) & (db.calendar.event_start >= date_properties['start_date']) & (db.calendar.event_start <= date_properties['end_date'])).select()
     return dict(data=events, status=200)
 
 # Update a calendar event by its event name and community name. If the event does not exist, return an error.
-@action("update_by_name", method="PUT")
+@action(base_route + "update_by_name", method="PUT")
 @action.uses(db)
 def update_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
@@ -119,39 +147,26 @@ def update_by_name():
     community = payload['community']
     command_str_list = payload['command_string']
 
-    # Set the event name to that of the first element in the command string list
-    event_name = command_str_list[0]
+    # Parse the event properties from the command string list
+    event_properties = parse_event_properties(command_str_list)
 
-    event = db(db.calendar.event_name == event_name).select().first()
+    event = db(db.calendar.event_name == event_properties['event_name']).select().first()
 
     if not event:
         return dict(msg="Event not found.", status=404)
     
-    # Set the event description to that of the second element in the command string list
-    event_description = command_str_list[1]
-
-    # Set the event start to that of the third element in the command string list
-    event_start = command_str_list[2]
-
-    # set the event end to that of the fourth element in the command string list
-    event_end = command_str_list[3]
-
-    # Set the community id to that of the community
-    event.community_id = community.id
-    
     # Update the event
-    if event_description:
-        event.event_description = event_description
-    if event_start:
-        event.event_start = event_start
-    if event_end:
-        event.event_end = event_end
+    event.update_record(
+        community_id=community.id,
+        event_description=event_properties['event_description'],
+        event_start=event_properties['event_start'],
+        event_end=event_properties['event_end']
+    )
     
-    event.update_record()
     return dict(msg="Event updated.", status=200)
 
 # Delete a calendar event by its name and community name in a payload. If the event does not exist, return an error.
-@action("delete_by_name", method="DELETE")
+@action(base_route + "delete_by_name", method="DELETE")
 @action.uses(db)
 def delete_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
@@ -160,10 +175,10 @@ def delete_by_name():
     community = payload['community']
     command_str_list = payload['command_string']
 
-    # Set the event name to that of the first element in the command string list
-    event_name = command_str_list[0]
+    # Parse the event name from the command string list
+    event_properties = parse_event_name(command_str_list)
 
-    event = db(db.calendar.event_name == event_name).select().first()
+    event = db(db.calendar.event_name == event_properties['event_name']).select().first()
     if not event:
         return dict(msg="Event not found.", status=404)
 
@@ -236,7 +251,7 @@ def check_events_start():
             if stop_threads:
                 break
         # Sleep for 1 minute
-        time.sleep(60)
+        asyncio.sleep(60)
 
 # A loop function to check if an event has ended. If it has, send a message to the Matterbridge.
 def check_events_end():
@@ -302,7 +317,7 @@ def check_events_end():
                 break
 
         # Sleep for 1 minute
-        time.sleep(60)
+        asyncio.sleep(60)
 
 # Function to start the check_events loop in a new thread.
 def start_event_check():
