@@ -63,7 +63,7 @@ py4web setup apps
 py4web set_password
 ```
 
-4. Navigate to into the "apps" directory.
+4. Navigate to the "apps" directory.
 
 5. Run the following command to clone the project into py4web:
 
@@ -85,7 +85,7 @@ git submodule update --init
 py4web run apps
 ```
 
-8. py4web should be running now. Navigate to http://127.0.0.1:8000 to view the dashboard.
+8. py4web should be running now. Navigate to by default, the main administrative interface should be available on http://127.0.0.1:8000 to view. To test any of the calls locally, run http requests on http://127.0.0.1:8000/WaddleDBM/api/<controller_base_url>/<action_name>
 
 # How to setup testing with docker
 
