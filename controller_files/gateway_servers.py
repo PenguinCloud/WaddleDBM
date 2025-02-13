@@ -53,6 +53,8 @@ def get_all():
     return dict(data=data)
 
 # Get a gateway server by its name. If the gateway server does not exist, return an error.
+@action(base_route + "get_by_name", method="GET")
+@action.uses(db)
 def get_by_name():
     name = request.args(0)
     if not name:
@@ -64,6 +66,8 @@ def get_by_name():
     return dict(name=gateway_server.name, server_type=waddle_helpers.decode_name(server_type.type_name), server_nick=gateway_server.server_nick)
 
 # Update a gateway server by its name. If the gateway server does not exist, return an error.
+@action(base_route + "update_by_name", method="PUT")
+@action.uses(db)
 def update_by_name():
     name = request.args(0)
     
