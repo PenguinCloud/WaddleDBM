@@ -11,6 +11,6 @@ from .models import db
 from .tasks import scheduler
 
 # optional parameters
-__version__ = "0.0.0"
-__author__ = "you <you@example.com>"
-__license__ = "anything you want"
+__version__ = "1.1.0"
+__author__ = "@PenguinCloud"
+__license__ = "GNU AFFERO GENERAL PUBLIC LICENSE Version 3"
