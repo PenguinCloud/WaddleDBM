@@ -3,8 +3,9 @@ import json
 import logging
 
 from py4web import URL, abort, action, redirect, request, response
-from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
-                     unauthenticated)
+from py4web.utils.form import Form, FormStyleBulma
+from ..common import (T, db, session, Field)
+from pydal.validators import IS_NOT_EMPTY
 
 # Define the base route for the module onboarding controller
 base_route = "api/module_onboarding/"
@@ -66,37 +67,36 @@ def convert_command_to_key(command):
         command = "#" + command
     return command.replace(" ", "_")
 
+# Helper function to convert a given command key back into a command string
+def normalize_value(value):
+    if value is None:
+        return []
+    elif isinstance(value, str):
+        return [value]
+    return value
+
 # Helper function to convert the instances of the command's payload keys,
 # parameters amd req_priv_list from a string to a list. If they are None,
 # they are converted to an empty list.
 def convert_command_values_to_list(command):
-    # Check if the command object is not empty
-    if command:
-        # Convert the none values to an empty list
-        if command['payload_keys'] is None:
-            command['payload_keys'] = []
-        elif isinstance(command['payload_keys'], str):
-            command['payload_keys'] = [command['payload_keys']]
-        
-        if command['request_parameters'] is None:
-            command['request_parameters'] = []
-        elif isinstance(command['request_parameters'], str):
-            command['request_parameters'] = [command['request_parameters']]
-
-        if command['req_priv_list'] is None:
-            command['req_priv_list'] = []
-        elif isinstance(command['req_priv_list'], str):
-            command['req_priv_list'] = [command['req_priv_list']]                                   
-
+    for key in ['payload_keys', 'request_parameters', 'req_priv_list']:
+        command[key] = normalize_value(command.get(key))
     return command
 
+@action(base_route + "onboard_form", method=["GET", "POST"])
+@action.uses(db, session, T, "module_onboarding/onboard_form.html")
 def onboard_form():
-    module_form = SQLFORM(db.modules, fields=['name', 'description', 'gateway_url'])
+    fields = [
+        Field('name', requires=IS_NOT_EMPTY()),
+        Field('description', requires=IS_NOT_EMPTY()),
+        Field('gateway_url', requires=IS_NOT_EMPTY())
+    ]
+    module_form = Form(fields, formstyle=FormStyleBulma)
 
     # Get the community module type id
     module_type_id = get_community_module_type_id()
 
-    if module_form.validate():
+    if module_form.accepted:
         # Add the module type id to the form
         module_form.vars.module_type_id = module_type_id
         
@@ -127,7 +127,8 @@ def onboard_form():
     
     return dict(module_form=module_form)
 
-# Function to add a command to a given module id, found in the arguments of the URL
+@action(base_route + "manage_commands", method=["GET", "POST"])
+@action.uses(db, session, T, "module_onboarding/manage_commands.html")
 def manage_commands():
     # Set a flag to be used by the UI to determine if the form should be displayed
     show_form = True
@@ -150,14 +151,22 @@ def manage_commands():
         logging.warning("Module does not exist. Redirecting...")
         redirect(URL('module_onboarding', 'onboard_form'))
 
-    # Create an sql form from the sql form factory to create a form for the user to input the command details
-    command_form = SQLFORM.factory(db.module_commands, fields=['command_name', 'action_url', 'request_method', 'request_parameters', 'payload_keys', 'req_priv_list', 'description'])
+    fields = [
+        Field('command_name', requires=IS_NOT_EMPTY()),
+        Field('action_url', requires=IS_NOT_EMPTY()),
+        Field('request_method', requires=IS_NOT_EMPTY()),
+        Field('request_parameters', requires=IS_NOT_EMPTY()),
+        Field('payload_keys', requires=IS_NOT_EMPTY()),
+        Field('req_priv_list', requires=IS_NOT_EMPTY()),
+        Field('description', requires=IS_NOT_EMPTY())
+    ]
+    command_form = Form(fields, formstyle=FormStyleBulma)
 
     # Create a grid to display the commands
-    command_grid = SQLFORM.grid(db.module_commands.module_id == module_id, create=False, editable=True, deletable=True)
+    command_grid = db(db.module_commands.module_id == module_id).select()
 
     # Check if the form is valid
-    if command_form.validate():
+    if command_form.accepted:
         # Transform the command_name into a key
         command_form.vars.command_name = convert_command_to_key(command_form.vars.command_name)
 
@@ -171,7 +180,7 @@ def manage_commands():
         exists_flag = insert_command(module_id, command_form.vars)
 
         # Refresh the grid
-        command_grid = SQLFORM.grid(db.module_commands.module_id == module_id, create=False, editable=True, deletable=True)
+        command_grid = db(db.module_commands.module_id == module_id).select()
     elif command_form.errors:
         response.flash = 'Form has errors. Please fill out the form'
 
