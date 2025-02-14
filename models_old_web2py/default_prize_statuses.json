@@ -1,0 +1,14 @@
+[
+    {
+        "status_name": "open",
+        "description": "The prize is open for entry."
+    },
+    {
+        "status_name": "claiming",
+        "description": "The prize is being claimed."
+    },
+    {
+        "status_name": "closed",
+        "description": "The prize is closed."
+    }
+]

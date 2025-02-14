@@ -1,0 +1,27 @@
+{{extend 'waddle_layout.html'}}
+<h1>WaddleBot Module Command Manager</h1>
+
+{{if show_form:}}
+    <p>
+        Welcome to the Module Command Manager!
+    </p>
+
+    <p>
+        This section allows you to add commands for your module. To get started, please fill out the form below.
+    </p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Add a Command</h2>
+            {{=command_form}}
+        </div>
+        <div class="col-md-6">
+            <h2>Current Commands</h2>
+            {{=command_grid}}
+        </div>
+    </div>
+{{else:}}
+    <p>
+        No module selected. Please ensure that the proper module ID is passed in the URL.
+    </p>
+{{pass}}

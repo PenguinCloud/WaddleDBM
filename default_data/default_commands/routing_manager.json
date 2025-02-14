@@ -1,0 +1,38 @@
+[
+    {
+        "command_name" : "route_add",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/routing/add_route_to_community",
+        "description": "This command adds a channel to a community. Example: !route add [community name]",
+        "request_method": "PUT",
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
+        ],
+        "req_priv_list": [
+            "admin"
+        ],
+        "req_param_amount": 1
+    },
+    {
+        "command_name" : "route_rem",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/routing/remove_route_from_community",
+        "description": "This command removes a channel from a community. Example: !route rem [community name]",
+        "request_method": "PUT",
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
+        ],
+        "req_priv_list": [
+            "admin"
+        ],
+        "req_param_amount": 1
+    }
+]

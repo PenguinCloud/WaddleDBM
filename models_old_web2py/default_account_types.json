@@ -1,0 +1,10 @@
+[
+    {
+        "type_name": "Twitch",
+        "description": "An account associated with Twitch"
+    },
+    {
+        "type_name": "Discord",
+        "description": "An account associated with Discord"
+    }
+]

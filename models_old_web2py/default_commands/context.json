@@ -1,0 +1,17 @@
+[
+    {
+        "command_name": "namespace_switch",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/context/set_context.json",
+        "description": "Changes the namespace of the given user to the given community namespace. Example: !namespace switch [my_community]",
+        "request_method": "PUT",
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
+        ],
+        "req_priv_list": []
+    }
+]

@@ -1,0 +1,40 @@
+[
+
+    {
+        "command_name" : "gateway_add",
+        "action_url": "http://host.docker.internal:5000/gateway-creator/",
+        "description": "This command creates a new route for a given platform and channel. Example: !route add [platform] [channel]",
+        "request_method": "POST",
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
+        ],
+        "req_priv_list": [
+            "admin"
+        ],
+        "req_param_amount": 2
+    },
+    {
+        "command_name" : "gateway_rem",
+        "action_url": "http://host.docker.internal:5000/gateway-creator/",
+        "description": "This command removes a route for a given platform and channel. Example: !route rem [platform] [channel]",
+        "request_method": "DELETE",
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
+        ],
+        "req_priv_list": [
+            "admin"
+        ],
+        "req_param_amount": 2
+    }
+
+]

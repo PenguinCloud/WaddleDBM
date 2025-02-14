@@ -5,3 +5,12 @@ id_rsa*
 venv/
 .idea/
 
+databases/
+errors/
+sql.txt
+*.log
+*.log.*
+*.table
+sessions/
+*__pycache__
+*.pyc

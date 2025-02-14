@@ -1,0 +1,157 @@
+[
+  {
+    "command_name": "community_join",
+    "action_url": "http://host.docker.internal:8000/WaddleDBM/api/community_members/create_member",
+    "description": "Creates a new member for a given community. Example: !community join [my_community]",
+    "request_method": "POST",
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [],
+    "req_param_amount": 1
+  },
+  {
+    "command_name": "community_leave",
+    "action_url": "http://host.docker.internal:8000/WaddleDBM/api/community_members/remove_member",
+    "description": "Leaves the given community. Example: !community leave [my_community]",
+    "request_method": "DELETE",
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [],
+    "req_param_amount": 1
+  },
+  {
+    "command_name": "community_manage_add",
+    "action_url": "http://host.docker.internal:8000/WaddleDBM/api/communities/create_by_name",
+    "description": "Add a new community. Example: !community manage add [my_community]",
+    "request_method": "POST",
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [],
+    "req_param_amount": 1
+  },
+  {
+    "command_name": "community_manage_desc",
+    "action_url": "http://host.docker.internal:8000/WaddleDBM/api/communities/update_desc_by_name",
+    "description": "Add a description to a community. Example: !community manage desc [My community description] [my_community]",
+    "request_method": "PUT",
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [
+      "write",
+      "admin"
+    ],
+    "req_param_amount": 2
+  },
+  {
+    "command_name": "community_manage_ls",
+    "action_url": "http://host.docker.internal:8000/WaddleDBM/api/communities/get_all",
+    "description": "List all the communities. Example: !community manage ls",
+    "request_method": "GET",
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [],
+    "req_param_amount": 0
+  },
+  {
+    "command_name": "community_manage_rem",
+    "action_url": "http://host.docker.internal:8000/WaddleDBM/api/communities/delete_by_name",
+    "description": "Remove a community. Example: !community manage rem [my_community]",
+    "request_method": "DELETE",
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [
+      "admin",
+      "delete"
+    ],
+    "req_param_amount": 1
+  },
+  {
+    "command_name": "community_members_ls",
+    "action_url": "http://host.docker.internal:8000/WaddleDBM/api/community_members/get_names_by_community_name",
+    "description": "Returns a list of all the members of the current community. Example: !community members ls",
+    "request_method": "GET",
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [
+      "read"
+    ],
+    "req_param_amount": 0
+  },
+  {
+    "command_name": "community_create_role",
+    "action_url": "http://host.docker.internal:8000/WaddleDBM/api/community_members/create_role",
+    "description": "Creates a new role inside a given community. Example: !community create role [role_name]",
+    "request_method": "POST",
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [
+      "admin"
+    ],
+    "req_param_amount": 1
+  },
+  {
+    "command_name": "community_set_role",
+    "action_url": "http://host.docker.internal:8000/WaddleDBM/api/community_members/set_role",
+    "description": "Updates the roll of a given member in a community. The member updating the roll, must be the owner of the community, or have admin privilages. Example: !community update role [member_name_to_update_role] [name_of_the_role]",
+    "request_method": "POST",
+    "request_parameters": [],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [
+      "admin"
+    ],
+    "req_param_amount": 2
+  },
+  {
+    "command_name": "community_get_role",
+    "action_url": "http://host.docker.internal:8000/WaddleDBM/api/community_roles/get_role_by_identity_and_community",
+    "description": "Returns the role of the current user in the current community. Example: !community get role [my_community]",
+    "request_method": "GET",
+    "request_parameters": [
+    ],
+    "payload_keys": [
+      "community_name",
+      "identity_name",
+      "command_string"
+    ],
+    "req_priv_list": [
+      "read"
+    ],
+    "req_param_amount": 1
+  }
+]

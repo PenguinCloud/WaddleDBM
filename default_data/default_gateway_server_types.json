@@ -1,0 +1,10 @@
+[
+    {
+        "type_name": "Twitch",
+        "description": "A gateway server type for Twitch"
+    },
+    {
+        "type_name": "Discord",
+        "description": "A gateway server type for Discord"
+    }
+]

@@ -1,0 +1,20 @@
+[
+    {
+        "command_name" : "test_script",
+        "action_url": "http://host.docker.internal:8000/WaddleDBM/api/test_script/test",
+        "description": "This is a test script!!!",
+        "request_method": "GET",
+        "request_parameters": [],
+        "payload_keys": [
+            "community_name",
+            "identity_name",
+            "command_string",
+            "channel_id",
+            "account"
+        ],
+        "req_priv_list": [
+            "admin"
+        ],
+        "req_param_amount": 0
+    }
+]
