@@ -1,3 +1,7 @@
 {
-    "git.enableCommitSigning": true
+    "git.enableCommitSigning": true,
+    "workbench.colorCustomizations": {
+        "titleBar.activeBackground": "#a4adc2dd",
+        "activityBar.background": "#b0b9ceaa"
+    }
 }
