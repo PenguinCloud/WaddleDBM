@@ -4,7 +4,7 @@ This file defines the database models
 
 from pydal.validators import *
 
-from .common import Field, db
+from .common import Field, db, auth
 
 
 # Import the db initializer script from scripts/db_initialization.py
@@ -224,7 +224,7 @@ db.commit()
 # #######################################################
 
 # Create a DB initializer object
-db_init = db_initializer(db)
+db_init = db_initializer(db, auth)
 
 # Create a WaddleDBM_Helpers object
 waddle_helpers = dbm_helpers(db)

@@ -20,6 +20,9 @@ RUN ansible-playbook entrypoint.yml -c local --tags "build,run"
 
 # PUT YER ENVS in here
 ENV MATTERBRIDGE_URL="http://host.docker.internal:4200/api/message"
+ENV DEFAULT_USER="waddlebot_user"
+ENV DEFAULT_PASSWORD="SwgPi13TvM8r"
+ENV DEFAULT_EMAIL="<insert email>"
 
 WORKDIR /var/www/html/py4web/
 
