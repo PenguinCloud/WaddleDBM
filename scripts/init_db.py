@@ -78,6 +78,10 @@ class db_initializer:
         # self.create_default_data(f"{base_url}/default_gateway_servers.json", "gateway_servers", "name")
         self.create_default_data(os.path.join(base_url, "default_gateway_servers.json"), "gateway_servers", "name")
 
+        # Create the default data for the routing gateways table
+        # self.create_default_data(f"{base_url}/default_routing_gateways.json", "routing_gateways", "gateway_name")
+        self.create_default_data(os.path.join(base_url, "default_routing_gateways.json"), "routing_gateways", "channel_id")
+
     
     # Test function to check if command files exist
     def test_get_commands(self, commands_directory: str):
