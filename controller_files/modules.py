@@ -267,7 +267,7 @@ def update():
     return dict(msg="Marketplace Module updated.")
 
 # Function to output the URL of the module onboarding page.
-@action(base_route + "start_module_onboard", method="GET")
+@action(f"{base_route}start_module_onboard", method="GET")
 @action.uses(db)
 @basic_auth(auth)
 def start_module_onboard():
