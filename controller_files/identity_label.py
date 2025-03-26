@@ -7,6 +7,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the identity_label controller
 base_route = "api/identity_label/"
 
@@ -25,6 +27,7 @@ def parse_payload() -> dict:
 # Also throws an error if the identity or the community does not exist.
 @action(base_route + "create", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def create():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -48,6 +51,7 @@ def create():
 # Get all identity labels for a given identity name and community name in a payload object.
 @action(base_route + "get_by_identity_and_community", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_by_identity_and_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -66,6 +70,7 @@ def get_by_identity_and_community():
 # Throws an error if no identity name, community name or label is given, or the identity label does not exist.
 @action(base_route + "update_by_identity_and_community", method="PUT")
 @action.uses(db)
+@basic_auth(auth)
 def update_by_identity_and_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -93,6 +98,7 @@ def update_by_identity_and_community():
 # Throws an error if no identity name or community name is given, or the identity label does not exist.
 @action(base_route + "delete_by_identity_and_community", method="DELETE")
 @action.uses(db)
+@basic_auth(auth)
 def delete_by_identity_and_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())

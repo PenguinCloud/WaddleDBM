@@ -14,6 +14,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers, mat_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the giveaway controller
 base_route = "api/giveaway/"
 
@@ -143,6 +145,7 @@ def announce_winner(giveaway, winner):
 # Function to add a giveaway to the database, via the prizes table, per community name. Throws an error if no payload is given.
 @action(base_route + "create", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def create() :
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -189,6 +192,7 @@ def create() :
 # Returns the prize name, guid, winner_identity_name (If a winner exists), prize_status_name and timeout.
 @action(base_route + "get_all_by_community_name", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_all_by_community_name() :
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -225,6 +229,7 @@ def get_all_by_community_name() :
 # and must not have already entered the giveaway.
 @action(base_route + "enter", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def enter() :
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -268,6 +273,7 @@ def enter() :
 # Function to get all the entries for a given giveaway guid. Throws an error if no guid is provided, or the guid does not exist.
 @action(base_route + "get_entries", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_entries() :
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -324,6 +330,7 @@ def remove() :
 # Function to close a giveaway with a given guid and set a winner. If no winner_identity_name is provided, a random winner is selected from the entries.
 @action(base_route + "close", method="PUT")
 @action.uses(db)
+@basic_auth(auth)
 def close_with_winner():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())

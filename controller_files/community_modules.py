@@ -7,6 +7,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the community_modules controller
 base_route = "api/community_modules/"
 
@@ -47,6 +49,7 @@ def get_lookup(community_name, identity_name, module_name):
 # Install a community module, using its module_id in a payload, into a given community_name as an argument. If the community module already exists in the given community, return an error.
 @action(base_route + "install_by_community_name", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def install_by_community_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -95,6 +98,7 @@ def install_by_community_name():
 # Uninstall a community module, using its module_id in a payload, from a given community_name as an argument. If the community module does not exist in the given community, return an error.
 @action(base_route + "uninstall_by_community_name", method="DELETE")
 @action.uses(db)
+@basic_auth(auth)
 def uninstall_by_community_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())

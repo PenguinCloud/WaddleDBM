@@ -7,6 +7,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import db_init, waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the communities controller
 base_route = "api/communities/"
 
@@ -33,6 +35,7 @@ def create():
 # Create a new community with a payload only containing the community name. Throws an error if no payload is given, or the community already exists.
 @action(base_route + "create_by_name", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def create_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -73,6 +76,7 @@ def create_by_name():
 # Get all communities.
 @action(base_route + "get_all", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_all():
     communities = db(db.communities).select()
     return dict(data=communities)
@@ -119,6 +123,7 @@ def update_by_name():
 # Update a community's description by its name. This can only be done by an identity_name that is part of the community with the Owner role. If the community does not exist, return an error.
 @action(base_route + "update_desc_by_name", method="PUT")
 @action.uses(db)
+@basic_auth(auth)
 def update_desc_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -152,6 +157,7 @@ def update_desc_by_name():
 # Delete a community by its name. This can only be done by an identity_name that is part of the community with the Owner role. If the community does not exist, return an error. 
 @action(base_route + "delete_by_name", method="DELETE")
 @action.uses(db)
+@basic_auth(auth)
 def delete_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())

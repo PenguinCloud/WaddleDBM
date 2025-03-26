@@ -2,10 +2,13 @@
 from json import loads as jloads
 from urllib.parse import unquote
 import logging
+import os
 
 from py4web import URL, abort, action, redirect, request
 from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
                      unauthenticated)
+
+from ..modules.auth_utils import basic_auth
 
 # Define the base route for the marketplace controller
 base_route = "api/modules/"
@@ -210,6 +213,7 @@ def get_all():
 # Function to get all module commands from the module_commands table
 @action(base_route + "get_all_module_commands", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_all_module_commands():
     commands = db(db.module_commands).select()
     return dict(data=commands)
@@ -217,6 +221,7 @@ def get_all_module_commands():
 # Get all the marketplace modules, as only the name and the id. Only modules that fall under the Community module type are returned.
 @action(base_route + "get_all_community_modules", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_all_community_modules():
     payload = request.body.read()
     if not payload:
@@ -264,7 +269,7 @@ def update():
 # Function to output the URL of the module onboarding page.
 @action(base_route + "start_module_onboard", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def start_module_onboard():
-    # TODO: Implement a place to store the onboarding page URL
-    onboardUrl = "http://127.0.0.1:8000/WaddleDBM/api/module_onboarding/onboard_form"
+    onboardUrl = os.environ.get("MODULE_ONBOARD_URL")
     return dict(msg=f"Thank you for choosing Waddlebot! If you wish to onboard a new module, please visit the following URL: {onboardUrl}")
