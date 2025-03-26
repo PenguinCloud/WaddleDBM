@@ -8,6 +8,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the module_types controller
 base_route = "api/module_types/"
 
@@ -28,6 +30,7 @@ def get_valid_payload(required_fields):
 # Create a new module type from a given payload. Throws an error if no payload is given, or the module type already exists.
 @action(base_route + "create", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def create_module_type():
     payload, error = get_valid_payload(['name', 'description'])
     if error:
@@ -41,6 +44,7 @@ def create_module_type():
 # Get a module type by name. Throws an error if no name is given, or the module type does not exist.
 @action(base_route + "get/<name>", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_module_type(name):
     name = waddle_helpers.decode_name(name)
     if name is None:
@@ -53,6 +57,7 @@ def get_module_type(name):
 # Get all module types.
 @action(base_route + "get_all", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_all_module_types():
     module_types = db(db.module_types).select()
     return dict(data=module_types)
@@ -60,6 +65,7 @@ def get_all_module_types():
 # Update a module type by name. Throws an error if no name is given, or the module type does not exist.
 @action(base_route + "update/<name>", method="PUT")
 @action.uses(db)
+@basic_auth(auth)
 def update_module_type(name):
     name = waddle_helpers.decode_name(name)
     if not name:
@@ -76,6 +82,7 @@ def update_module_type(name):
 # Delete a module type by name. Throws an error if no name is given, or the module type does not exist.
 @action(base_route + "delete/<name>", method="DELETE")
 @action.uses(db)
+@basic_auth(auth)
 def delete_module_type(name):
     name = waddle_helpers.decode_name(name)
     if not name:

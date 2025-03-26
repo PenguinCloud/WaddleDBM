@@ -12,6 +12,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the admin_context controller
 base_route = "api/admin_context/"
 
@@ -25,6 +27,7 @@ def index(): return dict(message="hello from admin_context.py")
 # Throws an error if no payload is given, or the community or identity does not exist. The identity must also be an admin or owner of the community.
 @action(base_route + "create_session", method=["POST"])
 @action.uses(db, waddle_helpers)
+@basic_auth(auth)
 def create_session():    
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -172,6 +175,7 @@ def refresh_by_session_token():
 # If the session does not exist, return an error.
 @action(base_route + "delete_by_community_and_identity", method=["POST"])
 @action.uses(db, waddle_helpers)
+@basic_auth(auth)
 def delete_by_community_and_identity():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())

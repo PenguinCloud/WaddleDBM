@@ -7,6 +7,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the currency controller
 base_route = "api/currency/"
 
@@ -17,6 +19,7 @@ def index(): return dict(message="hello from currency.py")
 # If the community or identity does not exist, return an error.
 @action(base_route + "get_currency", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_currency():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -41,6 +44,7 @@ def get_currency():
 # member does not exist, return an error.
 @action(base_route + "add_currency", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def add_currency():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -72,6 +76,7 @@ def add_currency():
 # member does not exist, return an error.
 @action(base_route + "subtract_currency", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def subtract_currency():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -132,6 +137,7 @@ def set_currency():
 # If the community, sender, or receiver does not exist, return an error. If the sender does not have enough currency, return an error.
 @action(base_route + "transfer_currency", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def transfer_currency():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())

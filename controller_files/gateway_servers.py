@@ -6,6 +6,7 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
                      unauthenticated)
 
 from ..models import waddle_helpers
+from ..modules.auth_utils import basic_auth
 
 # base route for the gateway_servers controller
 base_route = "api/gateway_servers/"
@@ -16,6 +17,7 @@ def index(): return dict(message="hello from gateway_servers.py")
 # Create a new gateway server from a given payload. Throws an error if no payload is given, or the gateway server already exists.
 @action(base_route + "create_gateway_server", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def create_gateway_server():
     payload = request.body.read()
     if not payload:
@@ -39,6 +41,7 @@ def create_gateway_server():
 # Get all gateway servers in the database and displaye the actual names of the server type, instead of their IDs.
 @action(base_route + "get_all", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_all():
     gateway_servers = db(db.gateway_servers).select()
     data = []
@@ -55,6 +58,7 @@ def get_all():
 # Get a gateway server by its name. If the gateway server does not exist, return an error.
 @action(base_route + "get_by_name", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_by_name():
     name = request.args(0)
     if not name:
@@ -68,6 +72,7 @@ def get_by_name():
 # Update a gateway server by its name. If the gateway server does not exist, return an error.
 @action(base_route + "update_by_name", method="PUT")
 @action.uses(db)
+@basic_auth(auth)
 def update_by_name():
     name = request.args(0)
     
@@ -106,6 +111,7 @@ def update_by_name():
 # Delete a gateway server by its name. If the gateway server does not exist, return an error.
 @action(base_route + "delete_by_name", method="DELETE")
 @action.uses(db)
+@basic_auth(auth)
 def delete_by_name():
     name = request.args(0)
     if not name:

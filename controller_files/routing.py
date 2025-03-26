@@ -7,6 +7,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the routing controller
 base_route = "api/routing/"
 
@@ -99,6 +101,7 @@ def get_by_community_name():
 # routing does not exist, return an error. The  is passed as an argument. The community_name is passed as a payload.
 @action(base_route + "add_route_to_community", method="PUT")
 @action.uses(db)
+@basic_auth(auth)
 def add_route_to_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -146,6 +149,7 @@ def add_route_to_community():
 # routing does not exist, return an error. The channel ID is passed as an argument. The community_name is passed as a payload.
 @action(base_route + "remove_route_from_community", method="PUT")
 @action.uses(db)
+@basic_auth(auth)
 def remove_route_from_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())

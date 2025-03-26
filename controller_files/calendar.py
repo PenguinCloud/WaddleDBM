@@ -14,6 +14,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the calendar controller
 base_route = "api/calendar/"
 
@@ -77,6 +79,7 @@ def get_account(routing_gateway_id: int) -> str:
 # Create a new calendar event from a given payload. Throws an error if no payload is given.
 @action(base_route + "create", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def create():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -100,6 +103,7 @@ def create():
 # Get all calendar events.
 @action(base_route + "get_all", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_all():
     events = db(db.calendar).select()
     return dict(data=events, status=200)
@@ -107,6 +111,7 @@ def get_all():
 # Get a calendar event by its name. If the event does not exist, return an error.
 @action(base_route + "get_by_name", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -124,6 +129,7 @@ def get_by_name():
 # Get calendar events by a community name and between a start and end date from a payload. Return an error if the community does not exist.
 @action(base_route + "get_by_community", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_by_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -140,6 +146,7 @@ def get_by_community():
 # Update a calendar event by its event name and community name. If the event does not exist, return an error.
 @action(base_route + "update_by_name", method="PUT")
 @action.uses(db)
+@basic_auth(auth)
 def update_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -168,6 +175,7 @@ def update_by_name():
 # Delete a calendar event by its name and community name in a payload. If the event does not exist, return an error.
 @action(base_route + "delete_by_name", method="DELETE")
 @action.uses(db)
+@basic_auth(auth)
 def delete_by_name():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())

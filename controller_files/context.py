@@ -7,6 +7,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Set the base route for the context module.
 base_route = "api/context/"
 
@@ -18,6 +20,7 @@ def index(): return dict(message="hello from context.py")
 # If the community does not exist, return an error. If the identity_name is already in the community, return an error.  
 @action(base_route + "initialize_user", method=["POST"])
 @action.uses(db)
+@basic_auth(auth)
 def initialize_user():
     payload = request.body.read()
     if not payload:
@@ -72,6 +75,7 @@ def initialize_user():
 # must contain the identity name and community name to get their respective ID's
 @action(base_route + "set_context", method="PUT")
 @action.uses(db)
+@basic_auth(auth)
 def set_context():    
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -157,6 +161,7 @@ def get_by_identity_id():
 # Get a context by an identity name. If the context does not exist, return an error.
 @action(base_route + "get_by_identity_name", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_by_identity_name():
     payload = request.body.read()
 

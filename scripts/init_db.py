@@ -2,6 +2,7 @@
 
 # Import the necessary modules python modules
 from pydal import DAL
+from py4web.utils.auth import Auth
 from json import load as jload
 import logging
 import os
@@ -20,8 +21,9 @@ base_url = os.path.join(os.getcwd(), "apps/WaddleDBM/default_data")
 # Class to initialize the DB
 class db_initializer:
     # Constructor
-    def __init__(self, db: DAL):
+    def __init__(self, db: DAL, auth: Auth):
         self.db = db
+        self.auth = auth
 
     # Method to initialize the DB
     def init_db(self):
@@ -77,6 +79,13 @@ class db_initializer:
         # Create the default data for the gateway servers
         # self.create_default_data(f"{base_url}/default_gateway_servers.json", "gateway_servers", "name")
         self.create_default_data(os.path.join(base_url, "default_gateway_servers.json"), "gateway_servers", "name")
+
+        # Create the default data for the routing gateways table
+        # self.create_default_data(f"{base_url}/default_routing_gateways.json", "routing_gateways", "gateway_name")
+        self.create_default_data(os.path.join(base_url, "default_routing_gateways.json"), "routing_gateways", "channel_id")
+
+        # Create the default auth user
+        self.create_default_user()
 
     
     # Test function to check if command files exist
@@ -245,5 +254,36 @@ class db_initializer:
                 self.db[table].insert(**entry)
 
         self.db.commit()
+
+    # A function to create a new default auth user, if it does not already exist.
+    # This user information is extracted from the OS environment variables.
+    def create_default_user(self) -> None:
+        logging.warning("Creating default user....")
+
+        default_user = os.getenv("DEFAULT_USER")
+        default_password = os.getenv("DEFAULT_PASSWORD")
+        default_email = os.getenv("DEFAULT_EMAIL")
+
+        if not default_user or not default_password or not default_email:
+            logging.error("Default user information not found in environment variables. Unable to create default user.")
+            return
+
+        if self.db(self.db.auth_user.email == default_email).count() == 0:
+            logging.warning("Default user not found. Creating default user....")
+            user_data = {
+                'username': default_user,
+                'email': default_email,
+                'password': default_password,
+                'first_name': "Test",
+                'last_name': "User"
+            }
+            result = self.auth.register(user_data)
+            if result.get('errors'):
+                logging.error(f"Error creating default user: {result['errors']}")
+            else:
+                self.db.commit()
+                logging.info("Default user created successfully.")
+        else:
+            logging.info("Default user already exists.")
 
     

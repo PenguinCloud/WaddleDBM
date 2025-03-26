@@ -5,5 +5,12 @@
         "server_nick": "waddlebot",
         "server_type": 1,
         "protocol": "irc"
+    },
+    {
+        "name": "Pro_Waddling_Athletic_Club",
+        "server_id": "474965105759748096",
+        "server_nick": "waddlebot",
+        "server_type": 2,
+        "protocol": "discord"
     }
 ]

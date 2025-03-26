@@ -7,6 +7,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the alias_commands controller
 base_route = "api/alias_commands/"
 
@@ -17,6 +19,7 @@ def index(): return dict(message="hello from alias_commands.py")
 # This is stored per community name found in the arguments.
 @action(base_route + "set_alias_command", method=["POST"])
 @action.uses(db)
+@basic_auth(auth)
 def set_alias_command():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -55,6 +58,7 @@ def set_alias_command():
 # Get a list of the alias commands for a given community name
 @action(base_route + "get_all", method=["GET"])
 @action.uses(db)
+@basic_auth(auth)
 def get_all():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -70,6 +74,7 @@ def get_all():
 # Get a alias command by its alias value. If the alias command does not exist, return an error.
 @action(base_route + "get_by_alias", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_by_alias():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -90,6 +95,7 @@ def get_by_alias():
 # Delete a alias command by its alias value. If the alias command does not exist, return an error.
 @action(base_route + "delete_by_alias", method="DELETE")
 @action.uses(db)
+@basic_auth(auth)
 def delete_by_alias():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())

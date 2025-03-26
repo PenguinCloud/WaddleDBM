@@ -7,6 +7,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the text_responses controller
 base_route = "api/text_responses/"
 
@@ -17,6 +19,7 @@ def index(): return dict(message="hello from text_response.py")
 # This is stored per community name found in the arguments.
 @action(base_route + "set_text_response", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def set_text_response():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -72,6 +75,7 @@ def update_text_response():
 # Get a list of the text responses for a given community name
 @action(base_route + "get_all", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_all():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -89,6 +93,7 @@ def get_all():
 # Get a text response by its text value. If the text response does not exist, return an error.
 @action(base_route + "get_by_text", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_by_text():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -111,6 +116,7 @@ def get_by_text():
 # Delete a text response by its text value. If the text response does not exist, return an error.
 @action(base_route + "delete_by_text", method="DELETE")
 @action.uses(db)
+@basic_auth(auth)
 def delete_by_text():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())

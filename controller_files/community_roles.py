@@ -7,6 +7,8 @@ from ..common import (T, auth, authenticated, cache, db, flash, logger, session,
 
 from ..models import waddle_helpers
 
+from ..modules.auth_utils import basic_auth
+
 # Define the base route for the roles controller
 base_route = "api/community_roles/"
 
@@ -16,6 +18,7 @@ def index(): return dict(message="hello from roles.py")
 # Create a new role from a given payload. Throws an error if no payload is given, or the role already exists.
 @action(base_route + "create_role", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def create_role():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -60,6 +63,7 @@ def get_all():
 # Function to get the role that is allocated to a given identity in a given community.
 @action(base_route + "get_role_by_identity_and_community", method="GET")
 @action.uses(db)
+@basic_auth(auth)
 def get_role_by_identity_and_community():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
@@ -115,6 +119,7 @@ def get_by_community_name():
 # Only an identity with admin privileges can set the role of another identity.
 @action(base_route + "set_role", method="POST")
 @action.uses(db)
+@basic_auth(auth)
 def set_role():
     # Validate the payload, using the validate_waddlebot_payload function from the waddle_helpers objects
     payload = waddle_helpers.validate_waddlebot_payload(request.body.read())
