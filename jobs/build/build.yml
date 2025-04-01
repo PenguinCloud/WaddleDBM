@@ -73,6 +73,14 @@
     owner: "{{ run.user }}"
     group: "{{ run.user }}"
     mode: '0755'
+
+- name: Ensure the user has access to /var/www/html/py4web/apps/WaddleDBM/databases
+  ansible.builtin.file:
+    path: "/var/www/html/py4web/apps/WaddleDBM/databases"
+    state: directory
+    mode: '0755'
+    owner: "{{ run.user }}"
+    group: "{{ run.user }}"
     
 - name: Make sure web2py is executable by the run user
   ansible.builtin.file:

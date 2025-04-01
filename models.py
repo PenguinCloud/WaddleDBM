@@ -11,13 +11,13 @@ from .common import Field, db, auth
 from .scripts.init_db import db_initializer
 
 # Import the helper functions from the modules
-from .modules.WaddlebotLibs.botDBMHelpers import dbm_helpers
+from .modules.libs.botDBMHelpers import dbm_helpers
 
 # Import the matterbridge helper functions
-from .modules.WaddlebotLibs.botMatterbridgeHelpers import matterbridge_helpers
+from .modules.libs.botMatterbridgeHelpers import matterbridge_helpers
 
-# Import the BotLogger class from the WaddlebotLibs botLogger scripts module
-from .modules.WaddlebotLibs.botLogger import BotLogger
+# Import the BotLogger class from the libs botLogger scripts module
+from .modules.libs.botLogger import BotLogger
 
 ### Define your table below
 #

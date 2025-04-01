@@ -12,14 +12,14 @@ import sys
 from applications.WaddleDBM.scripts.init_db import db_initializer
 
 # Import the the waddledbm_helpers class from the WaddleDBM botDBMHelpers scripts module
-from WaddlebotLibs.botDBMHelpers import dbm_helpers
-# from ..WaddlebotLibs.botDBMHelpers import dbm_helpers
+from libs.botDBMHelpers import dbm_helpers
+# from ..libs.botDBMHelpers import dbm_helpers
 
 # Import the matterbridge_helpers class from the WaddleDBM botMatterbridgeHelpers scripts module
-from WaddlebotLibs.botMatterbridgeHelpers import matterbridge_helpers
+from libs.botMatterbridgeHelpers import matterbridge_helpers
 
-# Import the BotLogger class from the WaddlebotLibs botLogger scripts module
-from WaddlebotLibs.botLogger import BotLogger
+# Import the BotLogger class from the libs botLogger scripts module
+from libs.botLogger import BotLogger
 
 # -------------------------------------------------------------------------
 # This scaffolding model makes your app work on Google App Engine too

@@ -9,7 +9,7 @@ import os
 
 # Import the necessary dataclasses from the Waddlebot-libs module
 # Might need to change the name of the module to Waddlebot_libs, because python is case sensitive
-from ..modules.WaddlebotLibs.botClasses import module_command_metadata
+from ..modules.libs.botClasses import module_command_metadata
 
 
 # Set the logging level to INFO
